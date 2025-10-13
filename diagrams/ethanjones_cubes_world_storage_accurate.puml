@@ -1,0 +1,106 @@
+@startuml World_Storage
+!theme plain
+title World Storage
+
+    class Area {
+        ~{readonly} BLOCK_VISIBLE : int
+        ~{readonly} SIZE_BLOCKS : int
+        ~{readonly} SIZE_BLOCKS_POW2 : int
+        ~{readonly} SIZE_BLOCKS_SQUARED : int
+        ~{readonly} SIZE_BLOCKS_CUBED : int
+        ~{readonly} HALF_SIZE_BLOCKS : int
+        ~{readonly} MAX_Y : int
+        ~{readonly} NUM_RANDOM_UPDATES : int
+        ~{readonly} MAX_X_OFFSET : int
+        ~{readonly} MIN_X_OFFSET : int
+        ~{readonly} MAX_Y_OFFSET : int
+        ~{readonly} MIN_Y_OFFSET : int
+        ~{readonly} MAX_Z_OFFSET : int
+        ~{readonly} MIN_Z_OFFSET : int
+        ~{readonly} LOCK_MANAGER : LockManager<Area>
+        ~{readonly} features : AtomicReference<Object>
+        ~{readonly} areaX : int
+        ~{readonly} areaZ : int
+        ~{readonly} minBlockX : int
+        ~{readonly} minBlockZ : int
+        +... (more fields)
+        --
+        ~super() : void
+        ~this() : void
+        ~getBlock(x : int, y : int, z : int) : public Block
+        ~getMeta(x : int, y : int, z : int) : public int
+        ~heightmap(x : int, z : int) : public int
+        ~getSunlight(x : int, y : int, z : int) : public int
+        ~getLight(x : int, y : int, z : int) : public int
+        ~getMaxLight(x : int, y : int, z : int) : public int
+        ~setSunlight(x : int, y : int, z : int, l : int) : public void
+        ~modify() : void
+        ~updateRender(SIZE_BLOCKS : y /) : void
+        ~setLight(x : int, y : int, z : int, l : int) : public void
+        ~modify() : void
+        ~updateRender(SIZE_BLOCKS : y /) : void
+        ~getLightRaw(x : int, y : int, z : int) : public int
+        +... (more methods)
+    }
+    class AreaMap {
+        ~{readonly} map : LongMap<Area>
+        ~{readonly} sorted : ArrayList<Area>
+        ~modifiedSinceSort : boolean
+        ~{readonly} world : World
+        ~packed : long
+        ~packed : long
+        ~old : Area
+        ~packed : long
+        ~idx : int
+        ~true : return
+        ~stringBuilder : StringBuilder
+        -iterator : Iterator<Area>
+        -current : Area
+        ~current : return
+        ~packed : long
+        --
+        ~super() : void
+        ~getArea(areaX : int, areaZ : int) : public Area
+        ~lockedGetArea(areaX : int, areaZ : int) : public Area
+        ~setArea(areaX : int, areaZ : int, area : Area) : public boolean
+        ~if(null : area ==) : void
+        ~if(null : old !=) : void
+        ~if(area : old !=) : void
+        ~if(null : old !=) : void
+        ~if(null : old !=) : void
+        ~synchronized() : void
+        ~iterator() : Override public AreaIterator
+        ~CubesException(iterate" : "AreaMap must be write locked to) : throw new
+        ~if() : void
+        ~AreaIterator() : return new
+        ~toString() : public String
+        +... (more methods)
+    }
+    class AreaIterator {
+        -iterator : Iterator<Area>
+        -current : Area
+        ~current : return
+        ~packed : long
+        --
+        ~hasNext() : Override public boolean
+        ~next() : Override public Area
+        ~remove() : Override public void
+        ~CubesException(locked" : "AreaMap should be write) : throw new
+        ~IllegalStateException() : throw new
+        ~synchronized() : void
+        ~if(null : current !=) : void
+    }
+    class Entities {
+        ~{readonly} world : World
+        ~{readonly} map : HashMap<UUID, Entity>
+        ~dataGroups : ArrayList<DataGroup>
+        --
+        ~super() : void
+        ~getEntitiesForSave(areaX : int, areaZ : int) : public DataGroup[]
+    }
+    Lockable<Area> <|-- Area
+    WorldLockable <|-- AreaMap
+    Iterable<Area> <|.. AreaMap
+    Iterator<Area> <|.. AreaIterator
+    WorldLockable <|-- Entities
+@enduml

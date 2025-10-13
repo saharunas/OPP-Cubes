@@ -1,0 +1,182 @@
+@startuml Input_System
+!theme plain
+title Input System
+
+    class CameraController {
+        ~{readonly} JUMP_START_VELOCITY : float
+        ~{readonly} JUMP_RELEASE_VELOCITY : float
+        ~{readonly} walkSpeed : float
+        ~{readonly} flySpeed : float
+        -degreesPerPixel : float
+        +touchpad : Touchpad
+        +jumpButton : ImageButton
+        +descendButton : ImageButton
+        ~{readonly} tmp : Vector3
+        ~{readonly} tmpMovement : Vector3
+        -prevPosition : Vector3
+        -prevDirection : Vector3
+        ~{readonly} camera : Camera
+        -jumping : boolean
+        -flying : boolean
+        -lastJumpDown : long
+        -wasJumpDown : boolean
+        ~deltaX : float
+        ~deltaY : float
+        ~true : return
+        +... (more fields)
+        --
+        ~Vector3() : new
+        ~Vector3() : new
+        ~Vector3() : new
+        ~Vector3() : new
+        ~touchDragged(screenX : int, screenY : int, pointer : int) : Override public boolean
+        ~mouseMoved(screenX : int, screenY : int) : Override public boolean
+        ~touchDragged() : return
+        ~preventFlicker(newDirection : Vector3) : private boolean
+        ~keyDown(keycode : int) : Override public boolean
+        ~handled() : return
+        ~keyUp(keycode : int) : Override public boolean
+        ~handled() : return
+        ~handled(keycode : int) : private boolean
+        ~update() : public void
+        ~update() : void
+        +... (more methods)
+    }
+    enum ClickType {
+        ~{readonly} num : int
+        ~mine : return
+        ~place : return
+        ~desktopMiddleButton : return
+        ~desktopBackButton : return
+        ~desktopForwardButton : return
+        ~none : return
+        --
+        ~desktopForwardButton() : ,
+        ~type(i : int) : public static ClickType
+        ~switch() : void
+    }
+    class DesktopController {
+        -current : ClickType
+        ~true : return
+        ~true : return
+        ~player : Player
+        ~itemStack : ItemStack
+        ~camera : Camera
+        ~blockIntersection : BlockIntersection
+        ~r : BlockReference
+        ~b : Block
+        --
+        ~touchDown(screenX : int, screenY : int, pointer : int, button : int) : Override public boolean
+        ~handleClick() : void
+        ~touchUp(screenX : int, screenY : int, pointer : int, button : int) : Override public boolean
+        ~if(current.num : button ==) : void
+        ~handleClick(type : ClickType) : public static boolean
+        ~if(null : blockIntersection !=) : void
+        ~tick() : public void
+    }
+    class InputBlocker {
+        ~{static} BLOCK_INPUT : boolean
+        ~{static} INSTANCE : InputBlocker
+        ~BLOCK_INPUT : return
+        ~BLOCK_INPUT : return
+        ~BLOCK_INPUT : return
+        ~BLOCK_INPUT : return
+        ~BLOCK_INPUT : return
+        ~BLOCK_INPUT : return
+        ~BLOCK_INPUT : return
+        ~BLOCK_INPUT : return
+        --
+        ~keyDown(keycode : int) : Override public boolean
+        ~keyUp(keycode : int) : Override public boolean
+        ~keyTyped(character : char) : Override public boolean
+        ~touchDown(screenX : int, screenY : int, pointer : int, button : int) : Override public boolean
+        ~touchUp(screenX : int, screenY : int, pointer : int, button : int) : Override public boolean
+        ~touchDragged(screenX : int, screenY : int, pointer : int) : Override public boolean
+        ~mouseMoved(screenX : int, screenY : int) : Override public boolean
+        ~scrolled(amount : int) : Override public boolean
+    }
+    class InputChain {
+        ~{static} inputMultiplexer : InputMultiplexer
+        ~inputMultiplexer : return
+        +stageHud : Stage
+        +hud : InputProcessor
+        +cameraController : CameraController
+        +desktopController : DesktopController
+        +touchController : TouchController
+        --
+        ~InputMultiplexer() : new
+        ~getInputMultiplexer() : public static InputMultiplexer
+        ~showMenu(menu : Menu) : public static void
+        ~hideMenu(menu : Menu) : public static void
+        ~setup() : public void
+        ~TouchController() : new
+        ~DesktopController() : new
+        ~beforeRender() : public void
+        ~afterRender() : public void
+        ~tick() : public void
+        ~dispose() : Override public void
+    }
+    class TouchController {
+        ~{readonly} TAP_TIME : long
+        -down : boolean
+        -pointer : int
+        -timestamp : long
+        -mine : boolean
+        ~true : return
+        ~false : return
+        ~diff : long
+        ~true : return
+        ~false : return
+        ~diff : long
+        ~dX : float
+        ~dY : float
+        ~delta : float
+        --
+        ~touchDown(screenX : int, screenY : int, pointer : int, button : int) : public boolean
+        ~touchUp(screenX : int, screenY : int, pointer : int, button : int) : public boolean
+        ~if(pointer : down && this.pointer ==) : void
+        ~if() : void
+        ~update() : public void
+        ~if() : void
+        ~if() : void
+        ~if() : void
+        ~if() : void
+        ~tick() : public void
+    }
+    class KeyboardHelper {
+        ~false : return
+        ~false : return
+        ~false : return
+        ~{readonly} inputProcessor : InputProcessor
+        ~{static} keyTypedListeners : Array<KeyTypedListener>
+        --
+        ~keyDown(keycode : int) : Override public boolean
+        ~for(keyTypedListeners : KeyTypedListener listener :) : void
+        ~keyUp(keycode : int) : Override public boolean
+        ~for(keyTypedListeners : KeyTypedListener listener :) : void
+        ~keyTyped(character : char) : Override public boolean
+        ~for(keyTypedListeners : KeyTypedListener listener :) : void
+        ~KeyInputProcessor() : new
+        ~isKeyUp(keyCode : int) : public static boolean
+        ~isKeyDown(keyCode : int) : public static boolean
+        ~addKeyTypedListener(listener : KeyTypedListener) : public static void
+    }
+    class KeyInputProcessor {
+        ~false : return
+        ~false : return
+        ~false : return
+        --
+        ~keyDown(keycode : int) : Override public boolean
+        ~for(keyTypedListeners : KeyTypedListener listener :) : void
+        ~keyUp(keycode : int) : Override public boolean
+        ~for(keyTypedListeners : KeyTypedListener listener :) : void
+        ~keyTyped(character : char) : Override public boolean
+        ~for(keyTypedListeners : KeyTypedListener listener :) : void
+    }
+    InputAdapter <|-- CameraController
+    InputAdapter <|-- DesktopController
+    InputProcessor <|.. InputBlocker
+    Disposable <|.. InputChain
+    InputAdapter <|-- TouchController
+    InputAdapter <|-- KeyInputProcessor
+@enduml

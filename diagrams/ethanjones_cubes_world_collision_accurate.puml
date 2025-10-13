@@ -1,0 +1,66 @@
+@startuml Collision_System
+!theme plain
+title Collision System
+
+    class BlockIntersection {
+        ~{readonly} blockReference : BlockReference
+        ~{readonly} blockFace : BlockFace
+        ~{readonly} block : Block
+        ~{readonly} blockMeta : int
+        ~{readonly} rayLength : float
+        ~blockReference : return
+        ~blockFace : return
+        ~block : return
+        ~blockMeta : return
+        ~rayLength : return
+        ~blockReference : BlockReference
+        ~stepZ : int stepX, stepY,
+        ~rayLength : float tMaxX, tMaxY, tMaxZ, tDeltaX, tDeltaY, tDeltaZ,
+        ~side : XYZ
+        ~block : Block
+        ~blockFace : BlockFace
+        ~blockMeta : int
+        ~null : return
+        --
+        ~getBlockReference() : public BlockReference
+        ~getBlockFace() : public BlockFace
+        ~getBlock() : public Block
+        ~getBlockMeta() : public int
+        ~getRayLength() : public float
+        ~getBlockIntersection(origin : Vector3, direction : Vector3, world : World) : public static BlockIntersection
+        ~intersection() : return
+        ~intersection(origin : Vector3, direction : Vector3, radius : int, world : World) : public static BlockIntersection
+        ~if() : void
+        ~if() : else
+        ~if() : void
+        ~if() : else
+        ~if() : void
+        ~if() : else
+        ~if() : void
+        +... (more methods)
+    }
+    enum XYZ {
+    }
+    class PlayerCollision {
+        -world : World
+        ~{readonly} r : float
+        ~player : Player
+        ~pos : Vector3
+        ~blockX : int
+        ~blockZ : int
+        ~minBlockY : int
+        ~maxBlockY : int
+        ~x : int
+        ~y : int
+        ~z : int
+        --
+        ~preventNoclip(event : PlayerMovementEvent) : EventHandler public void
+        ~for() : void
+        ~limit() : void
+        ~limit() : void
+        ~limit() : void
+        ~limit() : void
+        ~check(position : Vector3, xOffset : float, yOffset : float, zOffset : float) : private boolean
+        ~limit(newPos : Vector3, xOffset : float, zOffset : float, height : float) : private void
+    }
+@enduml

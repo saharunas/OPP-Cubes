@@ -1,0 +1,242 @@
+@startuml World_Rendering
+!theme plain
+title World Rendering
+
+    class WorldGraphicsPools {
+        ~{readonly} toFree : ConcurrentLinkedQueue<AreaRenderer>
+        ~a : AreaRenderer
+        --
+        ~free(obj : T) : Override public void
+        ~IllegalArgumentException(null" : "obj cannot be) : throw new
+        ~freeAll(array : Array<T>) : Override public void
+        ~IllegalArgumentException(null" : "array cannot be) : throw new
+        ~for(array : T t :) : void
+        ~free() : void
+        ~clear() : Override public void
+        ~init() : public static void
+        ~newObject() : Override protected AreaRenderer
+        ~AreaRenderer() : return new
+        ~newObject() : Override protected AreaMesh
+        ~AreaMesh() : return new
+        ~free() : public static void
+    }
+    abstract class DisposablePool {
+        ~free(obj : T) : Override public void
+        ~IllegalArgumentException(null" : "obj cannot be) : throw new
+        ~freeAll(array : Array<T>) : Override public void
+        ~IllegalArgumentException(null" : "array cannot be) : throw new
+        ~for(array : T t :) : void
+        ~free() : void
+        ~clear() : Override public void
+    }
+    class AmbientOcclusion {
+        ~{readonly} A : int
+        ~{readonly} B : int
+        ~{readonly} C : int
+        ~{readonly} D : int
+        ~{readonly} E : int
+        ~{readonly} F : int
+        ~{readonly} G : int
+        ~{readonly} H : int
+        ~{readonly} SQRT_TOTAL : int
+        ~{readonly} TOTAL : int
+        ~{readonly} INDIVIDUAL_SIZE : int
+        ~{readonly} TEXTURE_SIZE : int
+        ~{readonly} FORMAT : Pixmap.Format
+        ~{static} loadedTexture : Texture
+        ~{static} loadedTextureAttribute : TextureAttribute
+        ~{static} loadedRegions : TextureRegion[]
+        ~a : Area
+        ~i : int
+        ~i : int
+        ~i : int
+        +... (more fields)
+        --
+        ~exists(base : Area, x : int, y : int, z : int) : private static boolean
+        ~y(area : Area, x : int, y : int, z : int) : private static TextureRegion
+        ~posY(area : Area, x : int, y : int, z : int, ao : boolean) : public static TextureRegion
+        ~y(area.minBlockX : x +, 1 : y +, area.minBlockZ : z +) : return
+        ~negY(area : Area, x : int, y : int, z : int, ao : boolean) : public static TextureRegion
+        ~y(area.minBlockX : x +, 1 : y -, area.minBlockZ : z +) : return
+        ~x(area : Area, x : int, y : int, z : int) : private static TextureRegion
+        ~posX(area : Area, x : int, y : int, z : int, ao : boolean) : public static TextureRegion
+        ~x(1 : x + area.minBlockX +, area.minBlockZ : z +) : return
+        ~negX(area : Area, x : int, y : int, z : int, ao : boolean) : public static TextureRegion
+        ~x(1 : x + area.minBlockX -, area.minBlockZ : z +) : return
+        ~z(area : Area, x : int, y : int, z : int) : private static TextureRegion
+        ~posZ(area : Area, x : int, y : int, z : int, ao : boolean) : public static TextureRegion
+        ~z(area.minBlockX : x +, 1 : z + area.minBlockZ +) : return
+        ~negZ(area : Area, x : int, y : int, z : int, ao : boolean) : public static TextureRegion
+        +... (more methods)
+    }
+    enum Strength {
+        ~{readonly} strength : float
+        --
+        ~weakest() : ,
+    }
+    class AreaBoundaries {
+        ~{static} state : int
+        ~{static} meshArea : Mesh
+        ~{static} verticesArea : float[]
+        ~{static} textureRegionArea : TextureRegion
+        ~{static} materialArea : Material
+        ~{static} meshCurrent : Mesh
+        ~{static} verticesCurrent : float[]
+        ~{static} textureRegionCurrent : TextureRegion
+        ~{static} materialCurrent : Material
+        ~vertexOffset : int
+        ~s : float
+        ~renderable : CubesRenderable
+        ~renderable : return
+        ~vertexOffset : return
+        ~vertexOffset : return
+        ~vertices : int
+        ~vertexOffset : int
+        ~s : float
+        ~renderable : CubesRenderable
+        ~renderable : return
+        +... (more fields)
+        --
+        ~update() : public static void
+        ~drawArea(areaX : int, areaY : int, areaZ : int) : public static Renderable
+        ~if(null : meshArea ==) : void
+        ~Mesh() : new
+        ~CubesRenderable() : new
+        ~createVerticesArea(vertices : float[], vertexOffset : int, x : float, z : float) : private static int
+        ~createVerticesArea(vertices : float[], vertexOffset : int, x1 : float, x2 : float, z1 : float, z2 : float, y : float) : private static int
+        ~drawCurrent(areaX : int, areaY : int, areaZ : int) : public static Renderable
+        ~if(null : meshCurrent ==) : void
+        ~Mesh() : new
+        ~for() : void
+        ~CubesRenderable() : new
+        ~createVerticesCurrent(vertices : float[], vertexOffset : int, x1 : float, x2 : float, y1 : float, y2 : float, z1 : float, z2 : float) : private static int
+    }
+    class AreaMesh {
+        ~{readonly} MAX_INDICES : int
+        ~{readonly} MAX_SIDES : int
+        ~{readonly} MAX_VERTICES : int
+        ~{static} indices : short[]
+        ~{static} vertices : float[]
+        ~j : short
+        ~{readonly} renderable : CubesRenderable
+        +mesh : Mesh
+        +meshPart : MeshPart
+        +vertexCount : int
+        +maxVertexOffset : int
+        ~components : int
+        ~v : int
+        --
+        ~for() : void
+        ~CubesRenderable() : new
+        ~Mesh() : new
+        ~MeshPart() : new
+        ~saveVertices(vertexCount : int) : public void
+        ~if() : void
+        ~reset() : Override public void
+        ~dispose() : Override public void
+    }
+    class AreaRenderer {
+        ~{static} renderedThisFrame : int
+        ~{static} renderedMeshesThisFrame : int
+        ~{static} refreshedThisFrame : int
+        ~{static} refreshedMeshesThisFrame : int
+        ~{static} refreshQueueLength : int
+        +refresh : boolean
+        -offset : Vector3
+        -area : Area
+        -ySection : int
+        -maxVertexOffset : int
+        -componentSize : int
+        -meshs : ArrayList<AreaMesh>
+        ~refresh : return
+        ~true : return
+        ~false : return
+        ~ao : boolean
+        ~maxX : Area
+        ~minX : Area
+        ~maxZ : Area
+        ~minZ : Area
+        +... (more fields)
+        --
+        ~Vector3() : new
+        ~needsRefresh() : public boolean
+        ~update() : public boolean
+        ~getRenderables(renderables : Array<Renderable>, pool : Pool<Renderable>) : Override public void
+        ~for(meshs : AreaMesh mesh :) : void
+        ~calculateVertices() : public boolean
+        ~getMeshInfo() : void
+        ~free() : void
+        ~for() : void
+        ~for() : void
+        ~if() : void
+        ~save() : void
+        ~render(vertexOffset : int, blockInt : int, x : int, y : int, z : int, i : int, ao : boolean, maxX : Area, minX : Area, maxZ : Area, minZ : Area) : private int
+        ~if(null : block !=) : void
+        ~save() : void
+        +... (more methods)
+    }
+    class AreaRenderStatus {
+        ~{static} UNKNOWN : int
+        ~{static} EMPTY : int
+        ~{static} COMPLETE_MAX_X : int
+        ~{static} COMPLETE_MIN_X : int
+        ~{static} COMPLETE_MAX_Y : int
+        ~{static} COMPLETE_MIN_Y : int
+        ~{static} COMPLETE_MAX_Z : int
+        ~{static} COMPLETE_MIN_Z : int
+        ~{static} COMPLETE : int
+        ~h : int
+        ~m : int
+        ~b1 : boolean
+        ~b2 : boolean
+        ~b3 : boolean
+        ~b4 : boolean
+        ~t1 : boolean
+        ~t2 : boolean
+        ~t3 : boolean
+        ~t4 : boolean
+        ~s1 : boolean
+        +... (more fields)
+        --
+        ~update(area : Area, ySection : int) : public static int
+        ~checkComplete(area : Area, h : int, x1 : int, y1 : int, z1 : int, x2 : int, y2 : int, z2 : int) : private static boolean
+        ~for() : void
+        ~for() : void
+        ~for() : void
+        ~checkEmpty(area : Area, ySection : int) : private static boolean
+        ~create(ySections : int) : public static int[]
+        ~for() : void
+    }
+    class DebugLineRenderer {
+        ~{readonly} start : Vector3
+        ~{readonly} end : Vector3
+        ~color : Color
+        ~{static} lines : ArrayList<Line>
+        ~{static} mesh : Mesh
+        ~{static} vertices : float[]
+        ~{readonly} renderer : ImmediateModeRenderer
+        ~l : Line
+        --
+        ~Vector3() : new
+        ~Vector3() : new
+        ~ImmediateModeRenderer20() : new
+        ~addLine(start : Vector3, end : Vector3, color : Color) : public static void
+        ~Line() : new
+        ~render() : public static void
+        ~for(lines : Line line :) : void
+    }
+    class Line {
+        ~{readonly} start : Vector3
+        ~{readonly} end : Vector3
+        ~color : Color
+        --
+        ~Vector3() : new
+        ~Vector3() : new
+    }
+    Pool<T> <|-- DisposablePool
+    Pool.Poolable <|.. AreaMesh
+    Disposable <|.. AreaMesh
+    RenderableProvider <|.. AreaRenderer
+    Disposable <|.. AreaRenderer
+    Pool.Poolable <|.. AreaRenderer
+@enduml

@@ -1,0 +1,222 @@
+@startuml Networking_System
+!theme plain
+title Networking System
+
+    abstract class Networking {
+        ~{readonly} NETWORKING_DEBUG : boolean
+        ~{static} serverSocketHints : ServerSocketHints
+        ~{static} socketHints : SocketHints
+        ~networkingState : NetworkingState
+        ~networkingState : return
+        --
+        ~ServerSocketHints() : new
+        ~SocketHints() : new
+        ~getNetworkingState() : public NetworkingState
+        ~setNetworkingState(networkingState : NetworkingState) : protected void
+        ~preInit() : public abstract void
+        ~init() : public abstract void
+        ~update() : public abstract void
+        ~stop() : public abstract void
+        ~sendPacketToServer(packet : Packet) : public void
+        ~UnsupportedOperationException() : throw new
+        ~sendPacketToClient(packet : Packet, clientIdentifier : ClientIdentifier) : public void
+        ~UnsupportedOperationException() : throw new
+        ~disconnected(socketMonitor : SocketMonitor, e : Exception) : public abstract void
+        ~processPackets() : public abstract void
+    }
+    enum NetworkingState {
+        +Starting
+    }
+    class NetworkingManager {
+        ~{static} clientNetworking : Networking
+        ~{static} serverNetworking : Networking
+        ~clientNetworking : return
+        ~serverNetworking : return
+        ~null : return
+        --
+        ~clientPreInit(clientNetworkingParameter : ClientNetworkingParameter) : public static void
+        ~ClientNetworking() : new
+        ~clientInit() : public static void
+        ~serverPreInit(serverNetworkingParameter : ServerNetworkingParameter) : public static void
+        ~ServerNetworking() : new
+        ~serverInit() : public static void
+        ~singleplayerPreInit() : public static void
+        ~SingleplayerNetworking() : new
+        ~sendPacketToServer(packet : Packet) : public static void
+        ~if(null : clientNetworking !=) : void
+        ~sendPacketToClient(packet : Packet, clientIdentifier : ClientIdentifier) : public static void
+        ~if(null : serverNetworking !=) : void
+        ~sendPacketToOtherClients(packet : Packet, otherThan : ClientIdentifier) : public static void
+        ~sendPacketToAllClients(packet : Packet) : public static void
+        ~getNetworking(side : Side) : public static Networking
+        +... (more methods)
+    }
+    class ClientConnectionInitializer {
+        ~{readonly} TIMEOUT : int
+        ~javaSocket : Socket
+        ~dataOutputStream : DataOutputStream
+        ~serverMajor : int
+        ~serverMinor : int
+        ~serverPoint : int
+        ~serverBuild : int
+        ~serverHash : String
+        ~dataInputStream : DataInputStream
+        ~e : throw
+        ~str : String
+        ~f : Field
+        ~javaSocket : Socket
+        ~javaSocket : return
+        ~javaSocket : Socket
+        ~dataOutputStream : DataOutputStream
+        ~firstTime : Long
+        ~dataInputStream : DataInputStream
+        ~pingResult : PingResult
+        ~secondTime : Long
+        +... (more fields)
+        --
+        ~connect(gdxSocket : com.badlogic.gdx.net.Socket) : public static void
+        ~if(SocketTimeoutException : e instanceof) : void
+        ~IOException(time" : "Server did not respond in) : throw new
+        ~if(Branding.VERSION_POINT : serverMajor == Branding.VERSION_MAJOR && serverMinor == Branding.VERSION_MINOR && serverPoint ==) : void
+        ~if(Branding.VERSION_BUILD : serverBuild ==) : void
+        ~IOException(Branding.VERSION_MAJOR_MINOR_POINT : "Server is running version " + str + " not " +) : throw new
+        ~extractJavaSocket(gdxSocket : com.badlogic.gdx.net.Socket) : public static Socket
+        ~if(NetJavaSocketImpl : gdxSocket instanceof) : void
+        ~if(null : javaSocket !=) : void
+        ~NullPointerException() : throw new
+        ~IOException(socket" : "Failed to get java) : throw new
+        ~ping(gdxSocket : com.badlogic.gdx.net.Socket) : public static PingResult
+        ~PingResult() : new
+        ~for() : void
+        ~if(SocketTimeoutException : e instanceof) : void
+        +... (more methods)
+    }
+    class ClientNetworking {
+        ~{readonly} PING_SECONDS : int
+        ~{readonly} PING_TICKS : int
+        ~{readonly} PING_NANOSECONDS : long
+        ~socket : Socket
+        ~pingResult : PingResult
+        ~pingResult : return
+        ~{readonly} clientNetworkingParameter : ClientNetworkingParameter
+        -socketMonitor : SocketMonitor
+        -socket : Socket
+        -exception : Exception
+        -tickCount : int
+        +pingTime : double
+        +awaitingPingResponse : boolean
+        ~socket : Socket
+        ~e : throw
+        ~packet : Packet
+        ~packetQueue : PacketQueue
+        --
+        ~ping(clientNetworkingParameter : ClientNetworkingParameter) : public static PingResult
+        ~PingResult() : new
+        ~preInit() : public synchronized void
+        ~setNetworkingState() : void
+        ~init() : Override public void
+        ~SocketMonitor() : new
+        ~setNetworkingState() : void
+        ~update() : Override public synchronized void
+        ~if(0 : tickCount % PING_TICKS ==) : void
+        ~if() : void
+        ~stop() : Override public synchronized void
+        ~setNetworkingState() : void
+        ~sendPacketToServer(packet : Packet) : Override public void
+        ~disconnected(socketMonitor : SocketMonitor, e : Exception) : Override public synchronized void
+        ~stop() : void
+        +... (more methods)
+    }
+    class ClientNetworkingParameter {
+        +host : String
+        +port : int
+    }
+    class PingResult {
+        +serverMajor : int
+        +serverMinor : int
+        +serverPoint : int
+        +serverBuild : int
+        +serverHash : String
+        +players : String[]
+        +ping : int
+        +failure : boolean
+        +exception : Exception
+        ~builder : StringBuilder
+        --
+        ~toString() : public String
+        ~if() : void
+        ~StringBuilder([" : ping + "ms v" + serverMajor + "." + serverMinor + "." + serverPoint + "." + serverBuild + " " + serverHash + ") : new
+        ~for(players : String player :) : void
+    }
+    abstract class DataPacket {
+        ~write(dataOutputStream : DataOutputStream) : Override public void
+        ~read(dataInputStream : DataInputStream) : Override public void
+        ~handlePacket() : Override public abstract void
+        ~write() : Override public abstract DataGroup
+        ~read(data : DataGroup) : Override public abstract void
+    }
+    abstract class Packet {
+        -socketMonitor : SocketMonitor
+        ~true : return
+        ~false : return
+        ~null : return
+        ~socketMonitor : return
+        --
+        ~write(dataOutputStream : DataOutputStream) : public abstract void
+        ~read(dataInputStream : DataInputStream) : public abstract void
+        ~handlePacket() : public abstract void
+        ~shouldSend() : public boolean
+        ~shouldCompress() : public boolean
+        ~copy() : public Packet
+        ~toString() : public String
+        ~getSocketMonitor() : public SocketMonitor
+        ~setSocketMonitor(socketMonitor : SocketMonitor) : public void
+    }
+    enum PacketDirection {
+        +TO_CLIENT
+        +TO_SERVER
+        --
+        ~annotation : Direction
+        ~dir : PacketDirection
+        ~true : return
+        ~annotation : Direction
+        ~dir : PacketDirection
+        ~true : return
+        --
+        ~checkPacketSend(packet : Class<? extends Packet>, side : Side) : public static boolean
+        ~checkPacketReceive(packet : Class<? extends Packet>, side : Side) : public static boolean
+        ~value() : PacketDirection
+    }
+    class PacketIDDatabase {
+        ~{readonly} lock : Object
+        ~i : int
+        ~integer : Integer
+        ~integer : return
+        ~packetClass : return
+        ~confirming : PacketID
+        ~packetID : PacketID
+        --
+        ~Object() : new
+        ~synchronized() : void
+        ~contains(c : Class<? extends Packet>) : public boolean
+        ~synchronized() : void
+        ~get(c : Class<? extends Packet>) : public int
+        ~synchronized() : void
+        ~CubesException(c : "Unregistered packet type: " +) : throw new
+        ~get(i : int) : extends Packet>
+        ~synchronized() : void
+        ~CubesException(i : "Unregistered packet type: " +) : throw new
+        ~process(packetID : PacketID) : public void
+        ~synchronized() : void
+        ~PacketID() : new
+        ~synchronized() : void
+        ~getPacketClass(c : String) : extends Packet>
+        +... (more methods)
+    }
+    enum State {
+        +Waiting
+    }
+    Networking <|-- ClientNetworking
+    Packet <|-- DataPacket
+    DataParser <|.. DataPacket
+@enduml

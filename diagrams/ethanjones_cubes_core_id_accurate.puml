@@ -1,0 +1,72 @@
+@startuml ID_Management_System
+!theme plain
+title ID Management System
+
+    class GetInstances {
+        ~g : GetBlock
+        ~block : Block
+        ~g : GetItem
+        ~item : Item
+        --
+        ~get(c : Class<?>) : public static void
+        ~CubesException(GetInstances" : "Failed to) : throw new
+        ~CubesException(GetInstances" : "Failed to) : throw new
+        ~value() : String
+        ~value() : String
+    }
+    class IDManager {
+        ~{readonly} MAX_BLOCK_ID : int
+        ~{static} blockList : List<Block>
+        ~{static} idToBlock : Map<String, Block>
+        ~{static} itemBlockList : List<ItemBlock>
+        ~{static} itemList : List<Item>
+        ~{static} idToItem : Map<String, Item>
+        ~{static} idToMod : Map<String, ModInstance>
+        ~{static} loaded : AtomicBoolean
+        ~itemBlock : ItemBlock
+        ~i : String
+        ~m : String
+        ~blockList : return
+        ~itemBlockList : return
+        ~itemList : return
+        ~m : ModInstance
+        ~{readonly} blockToInteger : Map<Block, Integer>
+        ~{readonly} itemToInteger : Map<Item, Integer>
+        ~{static} integerToBlock : Block[]
+        ~{static} integerToItem : Item[]
+        ~{readonly} setup : AtomicBoolean
+        +... (more fields)
+        --
+        ~AtomicBoolean() : new
+        ~register(block : Block) : public static void
+        ~checkID() : void
+        ~IllegalArgumentException() : throw new
+        ~register(item : Item) : public static void
+        ~checkID() : void
+        ~checkID(id : String) : private static void
+        ~IllegalArgumentException(format" : id + " is not in the correct) : throw new
+        ~IllegalArgumentException("\"" : "\"" + m + "\" cannot register id \"" + id +) : throw new
+        ~toBlock(id : String) : public static Block
+        ~toItem(id : String) : public static Item
+        ~getMod(id : String) : public static ModInstance
+        ~getBlocks() : public static List<Block>
+        ~getItemBlocks() : public static List<ItemBlock>
+        ~getItems() : public static List<Item>
+        +... (more methods)
+    }
+    class TransparencyManager {
+        ~{static} bitSet : BitSet
+        ~b : Block
+        ~blockID : int
+        ~blockMeta : int
+        ~blockID : return
+        ~blockID : return
+        ~block : return
+        --
+        ~setup() : protected static void
+        ~for() : void
+        ~isTransparent(idAndMeta : int) : public static boolean
+        ~isTransparent(blockID : int, blockMeta : int) : public static boolean
+        ~isTransparent(block : Block, meta : int) : public static boolean
+    }
+@enduml

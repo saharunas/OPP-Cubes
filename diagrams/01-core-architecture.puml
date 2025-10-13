@@ -1,0 +1,212 @@
+@startuml Core Architecture - OPP Cubes
+!theme plain
+title Core Architecture - Client/Server & Platform Abstraction
+
+package "Side System" {
+    enum Side {
+        +Client
+        +Server
+        --
+        +getSide() : Side
+        +getCubes() : Cubes
+        +getEventBus() : EventBus
+        +getTiming() : Timing
+        +getNetworking() : Networking
+    }
+
+    abstract class Cubes {
+        #side : Side
+        +world : World
+        +thread : Thread
+        #state : State
+        +ticksPerSecond : PerSecond
+        --
+        +{static} preInit(adapterInterface : AdapterInterface)
+        +{static} init() : void
+        +{static} getClient() : CubesClient
+        +{static} getServer() : CubesServer
+        +create() : void
+        #update() : void
+        #tick() : void
+        +write() : void
+        +stop() : void
+    }
+
+    class CubesClient {
+        +uuid : UUID
+        +player : Player
+        +inputChain : InputChain
+        +renderer : Renderer
+        +gamemode : Gamemode
+        +frameStart : long
+        +worldProgress : float
+        +worldReady : boolean
+        --
+        +create() : void
+        +render() : void
+        +resize(width : int, height : int) : void
+        +pause() : void
+        +resume() : void
+    }
+
+    class CubesServer {
+        +playerManager : PlayerManager
+        +commandManager : CommandManager
+        --
+        +create() : void
+        +setupServer() : void
+        +startServer() : void
+        +stopServer() : void
+    }
+
+    class State {
+        -setup : boolean
+        -running : boolean
+        -stopping : boolean
+        --
+        +isSetup() : boolean
+        +isRunning() : boolean
+        +isStopping() : boolean
+        +canDispose() : boolean
+        +setup() : void
+        +running() : void
+        +stopping() : void
+    }
+}
+
+package "Platform Abstraction" {
+    interface AdapterInterface {
+        +getClient() : CubesClient
+        +setClient(cubesClient : CubesClient) : void
+        +getServer() : CubesServer
+        +setServer(cubesServer : CubesServer) : void
+        +getMenu() : Menu
+        +setMenu(menu : Menu) : void
+        +getSide() : Side
+        +getThread() : Thread
+        +dispose() : void
+    }
+
+    class Adapter {
+        -{static} adapter : AdapterInterface
+        --
+        +{static} setClient(cubesClient : CubesClient) : void
+        +{static} setServer(cubesServer : CubesServer) : void
+        +{static} getMenu() : Menu
+        +{static} setMenu(menu : Menu) : void
+        +{static} dispose() : void
+        +{static} isDedicatedServer() : boolean
+        +{static} getInterface() : AdapterInterface
+        +{static} setInterface(adapterInterface : AdapterInterface) : void
+        +{static} gotoMainMenu() : void
+        +{static} gotoMenu(menu : Menu) : void
+        +{static} quit() : void
+    }
+
+    class ClientAdapter {
+        -menu : Menu
+        -cubesServer : IntegratedServer
+        -cubesClient : CubesClient
+        -options : ClientCmdLineOptions
+        -thread : Thread
+        --
+        +create() : void
+        +render() : void
+        +resize(width : int, height : int) : void
+        +setClient(cubesClient : CubesClient) : void
+        +setServer(cubesServer : CubesServer) : void
+        +setMenu(menu : Menu) : void
+        +dispose() : void
+    }
+
+    class ServerAdapter {
+        -cubesServer : DedicatedServer
+        -options : ServerCmdLineOptions
+        -thread : Thread
+        --
+        +create() : void
+        +render() : void
+        +setServer(cubesServer : CubesServer) : void
+        +dispose() : void
+    }
+
+    abstract class Compatibility {
+        #{static} compatibility : Compatibility
+        #launcher : Launcher
+        #applicationType : ApplicationType
+        --
+        +{static} get() : Compatibility
+        +preInit() : void
+        +init() : void
+        +postInit() : void
+        +sideInit(side : Side) : void
+        +getLauncher() : Launcher
+        +getApplicationType() : ApplicationType
+        +getBaseFolder() : FileHandle
+    }
+
+    abstract class Launcher {
+        +{abstract} launch(options : CubesCmdLineOptions) : void
+    }
+}
+
+package "Core System Components" {
+    class Executor {
+        -{static} clientExecutor : ExecutorService
+        -{static} serverExecutor : ExecutorService
+        --
+        +{static} init() : void
+        +{static} getClientExecutor() : ExecutorService
+        +{static} getServerExecutor() : ExecutorService
+        +{static} runOnClient(runnable : Runnable) : void
+        +{static} runOnServer(runnable : Runnable) : void
+    }
+
+    class EventBus {
+        -side : Side
+        -handlers : Map<Class, List<EventWrapper>>
+        --
+        +register(object : Object) : void
+        +unregister(object : Object) : void
+        +post(event : Event) : void
+        +{static} getGlobalEventBus() : EventBus
+        +{static} getSidedEventBus() : EventBus
+    }
+
+    abstract class Event {
+        #cancelled : boolean
+        --
+        +isCancelled() : boolean
+        +setCancelled(cancelled : boolean) : void
+    }
+}
+
+' Relationships
+Cubes <|-- CubesClient
+Cubes <|-- CubesServer
+Cubes --> State : contains
+Side --> Cubes : manages
+
+AdapterInterface <|.. ClientAdapter
+AdapterInterface <|.. ServerAdapter
+Adapter --> AdapterInterface : uses
+ClientAdapter --> CubesClient : manages
+ClientAdapter --> CubesServer : manages (integrated)
+ServerAdapter --> CubesServer : manages (dedicated)
+
+Cubes --> AdapterInterface : uses
+CubesClient --|> ApplicationListener : implements (LibGDX)
+Compatibility --> Launcher : contains
+Compatibility --> EventBus : uses
+
+Cubes --> Executor : uses
+Side --> EventBus : provides
+EventBus --> Event : processes
+
+note right of Side : "Enum that manages\nclient/server contexts\nand provides access to\nsided resources"
+
+note bottom of Adapter : "Central adapter that manages\nthe current platform implementation\nand provides static access to\nclient/server instances"
+
+note left of Compatibility : "Abstract platform compatibility\nlayer that handles platform-specific\ninitialization and resource management"
+
+@enduml

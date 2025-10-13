@@ -1,0 +1,171 @@
+@startuml World_Generation
+!theme plain
+title World Generation
+
+    class BasicTerrainGenerator {
+        ~old : boolean
+        --
+        ~generate(area : Area) : Override public void
+        ~for() : void
+        ~for() : void
+        ~set() : void
+        ~set() : void
+        ~set() : void
+        ~set() : void
+        ~set() : void
+        ~if(old : area.areaX == 0 && area.areaZ == 0 &&) : void
+        ~set() : void
+        ~set() : void
+        ~set() : void
+        ~set() : void
+        ~features(area : Area, world : WorldServer) : Override public void
+        ~spawnPoint(world : WorldServer) : Override public BlockReference
+    }
+    class GeneratorManager {
+        ~{readonly} generators : LinkedHashMap<String, TerrainGeneratorFactory>
+        ~factory : TerrainGeneratorFactory
+        ~strings : Set<String>
+        --
+        ~TerrainGeneratorFactory() : , new
+        ~getTerrainGenerator(saveOptions : SaveOptions) : Override public TerrainGenerator
+        ~SmoothWorld() : return new
+        ~TerrainGeneratorFactory() : , new
+        ~getTerrainGenerator(saveOptions : SaveOptions) : Override public TerrainGenerator
+        ~BasicTerrainGenerator() : return new
+        ~TerrainGeneratorFactory() : , new
+        ~getTerrainGenerator(saveOptions : SaveOptions) : Override public TerrainGenerator
+        ~TestTerrainGenerator() : return new
+        ~TerrainGeneratorFactory() : , new
+        ~getTerrainGenerator(saveOptions : SaveOptions) : Override public TerrainGenerator
+        ~VoidTerrainGenerator() : return new
+        ~register(str : String, generator : TerrainGeneratorFactory) : public static void
+        ~NullPointerException() : throw new
+        ~IllegalStateException(registered" : str + " has already been) : throw new
+        +... (more methods)
+    }
+    interface TerrainGeneratorFactory {
+        ~getTerrainGenerator(saveOptions : SaveOptions) : TerrainGenerator
+    }
+    class RainStatus {
+        ~{readonly} NOT_RAINING : RainStatus
+        ~{readonly} raining : boolean
+        ~{readonly} rainRate : float
+        --
+        ~toString() : Override public String
+        ~if() : void
+    }
+    abstract class TerrainGenerator {
+        ~ref : int
+        ~a : Area
+        ~ref : int
+        ~a : Area
+        --
+        ~generate(area : Area) : public abstract void
+        ~features(area : Area, world : WorldServer) : public abstract void
+        ~spawnPoint(world : WorldServer) : public abstract BlockReference
+        ~getRainStatus(x : float, z : float, rainTime : float) : public RainStatus
+        ~set(area : Area, block : Block, x : int, y : int, z : int, meta : int) : public static void
+        ~setNeighbour(area : Area, block : Block, x : int, y : int, z : int, meta : int) : public static void
+        ~set(a.minBlockX : x -, a.minBlockZ : z -) : void
+        ~setVisible(area : Area, block : Block, x : int, y : int, z : int, meta : int) : public static void
+        ~setVisibleNeighbour(area : Area, block : Block, x : int, y : int, z : int, meta : int) : public static void
+        ~setVisible(a.minBlockX : x -, a.minBlockZ : z -) : void
+    }
+    class TestTerrainGenerator {
+        ~generate(area : Area) : Override public void
+        ~for() : void
+        ~for() : void
+        ~for() : void
+        ~if(0 : y % 2 ==) : void
+        ~if(0 : x % 2 ==) : void
+        ~if(1 : x % 2 ==) : void
+        ~features(area : Area, world : WorldServer) : Override public void
+        ~spawnPoint(world : WorldServer) : Override public BlockReference
+    }
+    class VoidTerrainGenerator {
+        ~generate(area : Area) : Override public void
+        ~for() : void
+        ~for() : void
+        ~for() : void
+        ~set() : void
+        ~set() : void
+        ~features(area : Area, world : WorldServer) : Override public void
+        ~spawnPoint(world : WorldServer) : Override public BlockReference
+    }
+    class Cave {
+        ~{readonly} caveStartX : int
+        ~{readonly} caveStartY : int
+        ~{readonly} caveStartZ : int
+        ~{readonly} blocks : HashMap<AreaReference, int[]>
+        ~array : int[]
+        ~key : AreaReference
+        ~value : int[]
+        ~caveStartX : int
+        ~caveStartY : int
+        ~caveStartZ : int
+        ~mapSize : int
+        ~blocks : HashMap<AreaReference, int[]>
+        ~areaX : int
+        ~areaZ : int
+        ~valueLength : int
+        ~areaReference : AreaReference
+        ~value : int[]
+        --
+        ~apply(area : Area) : public void
+        ~for(array : int ref :) : void
+        ~write(outputStream : DataOutputStream) : public void
+        ~for() : void
+        ~read(inputStream : DataInputStream) : public static Cave
+        ~for() : void
+        ~for() : void
+    }
+    class CaveGenerator {
+        ~{readonly} roomNodesMin : int
+        ~{readonly} roomNodesMax : int
+        ~{readonly} roomChangeXZConstant : int
+        ~{readonly} roomChangeXZRandom : int
+        ~{readonly} roomChangeY : int
+        ~{readonly} roomConnectDistance2Min : int
+        ~{readonly} roomConnectDistance2Max : int
+        ~{readonly} caveStartX : int
+        ~{readonly} caveStartY : int
+        ~{readonly} caveStartZ : int
+        ~{readonly} smoothWorld : SmoothWorld
+        ~{readonly} numbers : RandomXS128
+        ~{readonly} intSet : IntSet
+        ~{readonly} blocks : HashMap<AreaReference, IntArray>
+        ~{readonly} rooms : ArrayList<RoomNode>
+        ~{readonly} tunnels : ArrayList<TunnelNode>
+        ~l : long
+        ~spawnDist : int
+        ~cave : return
+        ~areaReference : AreaReference
+        +... (more fields)
+        --
+        ~IntSet() : new
+        ~generate() : public Cave
+        ~generateNodes() : void
+        ~calculateBlocks() : void
+        ~Cave() : new
+        ~clear(blockX : int, blockY : int, blockZ : int) : private void
+        ~if(null : array ==) : void
+        ~IntArray() : new
+        ~generateNodes() : public void
+        ~while() : void
+        ~for() : void
+        ~if(null : roomNode.connect !=) : void
+        ~for() : void
+        ~for(straightTunnels : TunnelNode tunnelNode :) : void
+        ~for() : void
+        +... (more methods)
+    }
+    class TunnelNode {
+        ~start : BlockReference
+        ~end : BlockReference
+        ~startRadius : float
+        ~endRadius : float
+    }
+    TerrainGenerator <|-- BasicTerrainGenerator
+    TerrainGenerator <|-- TestTerrainGenerator
+    TerrainGenerator <|-- VoidTerrainGenerator
+@enduml

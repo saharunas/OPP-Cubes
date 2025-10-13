@@ -1,0 +1,104 @@
+@startuml Event_System
+!theme plain
+title Event System
+
+    class Event {
+        ~{readonly} cancelable : boolean
+        -canceled : boolean
+        ~{readonly} sided : boolean
+        -side : Side
+        ~cancelable : return
+        ~canceled : return
+        ~side : return
+        --
+        ~post() : public Event
+        ~isCancelable() : public boolean
+        ~isCanceled() : public boolean
+        ~setCanceled(canceled : boolean) : public void
+        ~if() : void
+        ~getSide() : public Side
+        ~setSide(side : Side) : void
+    }
+    class EventAlias {
+        ~getEventClass(s : String) : extends Event>
+        ~CubesException("'" : "No such event '" + s +) : throw new
+        ~registerAlias(alias : String, c : Class<? extends Event>) : public static void
+        ~registerAlias() : void
+        ~registerAlias() : void
+        ~registerAlias() : void
+        ~registerAlias() : void
+        ~registerAlias() : void
+        ~registerAlias() : void
+        ~registerAlias() : void
+    }
+    class EventBus {
+        ~{readonly} GLOBAL_EVENTBUS : EventBus
+        ~GLOBAL_EVENTBUS : return
+        ~{readonly} side : Side
+        ~eventHandler : EventHandler
+        ~{readonly} list : List<EventWrapper>
+        ~this : return
+        ~eventHandlers : List<EventWrapper>
+        ~eventHandlers : return
+        ~{readonly} posted : List<EventWrapper>
+        ~{readonly} list : List<EventWrapper>
+        ~iterator : Iterator<EventWrapper>
+        ~wrapper : EventWrapper
+        ~event : return
+        ~side : return
+        --
+        ~getGlobalEventBus() : public static EventBus
+        ~register(instance : Object) : public EventBus
+        ~if(null : eventHandler !=) : void
+        ~synchronized() : void
+        ~getList(eventClass : Class<? extends Event>) : List<EventWrapper>
+        ~synchronized() : void
+        ~if(null : eventHandlers ==) : void
+        ~post(event : E) : <E extends Event> E
+        ~synchronized() : void
+        ~getSide() : public Side
+    }
+    class EventWrapper {
+        ~{readonly} method : Method
+        ~{readonly} instance : Object
+        ~{readonly} eventHandler : EventHandler
+        ~true : return
+        ~msg : String
+        ~false : return
+        --
+        ~run(event : Event) : public boolean
+    }
+    class InstanceChangedEvent {
+        ~super() : void
+    }
+    class ClientChangedEvent {
+    }
+    class ServerChangedEvent {
+    }
+    class MenuChangedEvent {
+    }
+    class EntityEvent {
+        ~super() : void
+    }
+    class AddSettingsEvent {
+        ~super() : void
+    }
+    class SettingChangedEvent {
+        ~{readonly} setting : Setting
+        ~setting : return
+        --
+        ~super() : void
+        ~getSetting() : public Setting
+    }
+    class SettingsEvent {
+        ~super() : void
+    }
+    Event <|-- InstanceChangedEvent
+    InstanceChangedEvent <|-- ClientChangedEvent
+    InstanceChangedEvent <|-- ServerChangedEvent
+    InstanceChangedEvent <|-- MenuChangedEvent
+    Event <|-- EntityEvent
+    SettingsEvent <|-- AddSettingsEvent
+    SettingsEvent <|-- SettingChangedEvent
+    Event <|-- SettingsEvent
+@enduml

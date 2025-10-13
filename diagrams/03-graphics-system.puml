@@ -1,0 +1,410 @@
+@startuml Graphics System - OPP Cubes
+!theme plain
+title Graphics System - Rendering, UI & Assets
+
+package "Core Rendering" {
+    class Renderer {
+        +worldRenderer : WorldRenderer
+        +guiRenderer : GuiRenderer
+        +modelBatch : CubesModelBatch
+        --
+        +create() : void
+        +render() : void
+        +resize(width : int, height : int) : void
+        +dispose() : void
+    }
+
+    class WorldRenderer {
+        +camera : PerspectiveCamera
+        +areaRenderer : AreaRenderer
+        +breakingRenderer : BreakingRenderer
+        +selectedBlock : SelectedBlock
+        +sunRenderer : SunRenderer
+        +rainRenderer : RainRenderer
+        --
+        +render(world : World) : void
+        +update(world : World) : void
+        +resize(width : int, height : int) : void
+        +setRenderDistance(distance : int) : void
+    }
+
+    class GuiRenderer {
+        +stage : Stage
+        +batch : SpriteBatch
+        +skin : Skin
+        +hotbar : HotbarActor
+        +chat : ChatActor
+        --
+        +render() : void
+        +resize(width : int, height : int) : void
+        +playerCreated() : void
+        +dispose() : void
+    }
+
+    class CubesModelBatch {
+        +shaderProvider : CubesShaderProvider
+        --
+        +begin(camera : Camera) : void
+        +render(renderable : CubesRenderable) : void
+        +end() : void
+    }
+
+    class CubesRenderable {
+        +worldTransform : Matrix4
+        +material : Material
+        +meshPart : MeshPart
+        +shader : Shader
+        --
+        +set(renderable : Renderable) : CubesRenderable
+    }
+
+    class Graphics {
+        -{static} frameBuffer : FrameBuffer
+        -{static} camera : Camera
+        --
+        +{static} init() : void
+        +{static} resize(width : int, height : int) : void
+        +{static} getFrameBuffer() : FrameBuffer
+        +{static} getCamera() : Camera
+    }
+}
+
+package "World Graphics" {
+    class AreaRenderer {
+        -renderStatus : Map<Vector2, AreaRenderStatus>
+        -meshes : Map<Vector2, AreaMesh>
+        --
+        +render(world : World, camera : Camera) : void
+        +updateArea(areaX : int, areaZ : int) : void
+        +removeArea(areaX : int, areaZ : int) : void
+        +queueForUpdate(areaX : int, areaZ : int) : void
+    }
+
+    class AreaMesh {
+        +mesh : Mesh
+        +vertices : float[]
+        +indices : short[]
+        +vertexCount : int
+        --
+        +build(area : Area) : void
+        +render(shader : Shader) : void
+        +dispose() : void
+    }
+
+    enum AreaRenderStatus {
+        +NOT_LOADED
+        +LOADED
+        +QUEUED
+        +BUILDING
+        +BUILT
+        +RENDERING
+        --
+        +canRender() : boolean
+    }
+
+    class DebugLineRenderer {
+        -lines : List<Vector3[]>
+        -mesh : Mesh
+        --
+        +addLine(start : Vector3, end : Vector3, color : Color) : void
+        +render(camera : Camera) : void
+        +clear() : void
+    }
+
+    class SelectedBlock {
+        +position : Vector3
+        +visible : boolean
+        +wireframe : Mesh
+        --
+        +setPosition(x : int, y : int, z : int) : void
+        +render(camera : Camera) : void
+        +hide() : void
+    }
+
+    class BreakingRenderer {
+        +breakingBlocks : Map<Vector3, Float>
+        --
+        +setBreaking(x : int, y : int, z : int, progress : float) : void
+        +removeBreaking(x : int, y : int, z : int) : void
+        +render(camera : Camera) : void
+        +clear() : void
+    }
+
+    class SunRenderer {
+        +sunPosition : Vector3
+        +sunColor : Color
+        --
+        +update(time : long) : void
+        +render(camera : Camera) : void
+        +getSunDirection() : Vector3
+    }
+
+    class RainRenderer {
+        +particles : List<RainParticle>
+        +intensity : float
+        --
+        +setIntensity(intensity : float) : void
+        +update(deltaTime : float, playerPosition : Vector3) : void
+        +render(camera : Camera) : void
+    }
+}
+
+package "Block Graphics" {
+    class BlockTextureHandler {
+        -{static} textureAtlas : TextureAtlas
+        -{static} blockTextures : Map<Block, TextureRegion[]>
+        --
+        +{static} init() : void
+        +{static} getTexture(block : Block, face : BlockFace) : TextureRegion
+        +{static} hasTexture(block : Block) : boolean
+    }
+
+    class FaceVertices {
+        +vertices : float[]
+        +indices : short[]
+        --
+        +{static} createFace(face : BlockFace, x : int, y : int, z : int, texture : TextureRegion) : FaceVertices
+        +{static} createCube(x : int, y : int, z : int, textures : TextureRegion[]) : FaceVertices
+    }
+
+    class CrossFaceVertices {
+        +vertices : float[]
+        +indices : short[]
+        --
+        +{static} createCross(x : int, y : int, z : int, texture : TextureRegion) : CrossFaceVertices
+    }
+
+    enum BlockRenderType {
+        +CUBE
+        +CROSS
+        +TRANSPARENT
+        +CUSTOM
+        --
+        +getRenderMethod() : Method
+    }
+
+    class AmbientOcclusion {
+        +{static} calculateAO(area : Area, x : int, y : int, z : int, face : BlockFace) : float[]
+        +{static} getOcclusionValue(corner1 : boolean, corner2 : boolean, side1 : boolean, side2 : boolean) : float
+    }
+}
+
+package "Asset Management" {
+    class Assets {
+        -{static} assetManager : AssetManager
+        -{static} textureAtlas : TextureAtlas
+        --
+        +{static} preInit() : void
+        +{static} init() : void
+        +{static} load(asset : Asset) : void
+        +{static} get(fileName : String) : Object
+        +{static} getTextureRegion(name : String) : TextureRegion
+    }
+
+    class AssetManager {
+        -assets : Map<String, Object>
+        -loadingQueue : Queue<Asset>
+        --
+        +load(asset : Asset) : void
+        +get(fileName : String, type : Class) : Object
+        +isLoaded(fileName : String) : boolean
+        +update() : boolean
+    }
+
+    class Asset {
+        +fileName : String
+        +type : AssetType
+        +parameters : Object
+        --
+        +Asset(fileName : String, type : AssetType)
+        +load() : Object
+    }
+
+    enum AssetType {
+        +TEXTURE
+        +SOUND
+        +FONT
+        +SHADER
+        +MODEL
+        --
+        +getLoader() : AssetLoader
+    }
+
+    class TexturePacker {
+        +regions : Array<TextureRegion>
+        +atlas : TextureAtlas
+        --
+        +addTexture(name : String, texture : Texture) : void
+        +pack() : TextureAtlas
+        +dispose() : void
+    }
+
+    class PackedTextureSheet {
+        +atlas : TextureAtlas
+        +regions : Map<String, TextureRegion>
+        --
+        +getRegion(name : String) : TextureRegion
+        +hasRegion(name : String) : boolean
+    }
+}
+
+package "UI System" {
+    abstract class Menu {
+        +stage : Stage
+        +skin : Skin
+        +table : Table
+        --
+        +{abstract} create() : void
+        +render() : void
+        +resize(width : int, height : int) : void
+        +dispose() : void
+        +show() : void
+        +hide() : void
+    }
+
+    class MenuManager {
+        -{static} currentMenu : Menu
+        -{static} stage : Stage
+        --
+        +{static} setMenu(menu : Menu) : void
+        +{static} getCurrentMenu() : Menu
+        +{static} render() : void
+        +{static} resize(width : int, height : int) : void
+    }
+
+    class MainMenu {
+        +singleplayerButton : TextButton
+        +multiplayerButton : TextButton
+        +settingsButton : TextButton
+        +exitButton : TextButton
+        --
+        +create() : void
+        -createButtons() : void
+    }
+
+    class PauseMenu {
+        +resumeButton : TextButton
+        +saveButton : TextButton
+        +settingsButton : TextButton
+        +mainMenuButton : TextButton
+        --
+        +create() : void
+        +show() : void
+    }
+
+    class SettingsMenu {
+        +categories : List<SettingGroup>
+        +settingActors : List<Actor>
+        --
+        +create() : void
+        +refreshSettings() : void
+        +applySettings() : void
+    }
+
+    class Fonts {
+        +{static} hud : BitmapFont
+        +{static} menu : BitmapFont
+        +{static} chat : BitmapFont
+        --
+        +{static} init() : void
+        +{static} dispose() : void
+    }
+}
+
+package "HUD Components" {
+    class HotbarActor {
+        +inventory : Inventory
+        +selectedSlot : int
+        +slots : SlotActor[]
+        --
+        +render(batch : Batch, parentAlpha : float) : void
+        +setSelectedSlot(slot : int) : void
+        +updateInventory(inventory : Inventory) : void
+    }
+
+    class ChatActor {
+        +messages : List<String>
+        +inputField : TextField
+        +visible : boolean
+        --
+        +addMessage(message : String) : void
+        +show() : void
+        +hide() : void
+        +render(batch : Batch, parentAlpha : float) : void
+    }
+
+    class InventoryActor {
+        +inventory : Inventory
+        +slots : SlotActor[][]
+        +transferManager : InventoryTransferManager
+        --
+        +render(batch : Batch, parentAlpha : float) : void
+        +updateInventory(inventory : Inventory) : void
+        +onSlotClick(slot : int, clickType : ClickType) : void
+    }
+
+    class SlotActor {
+        +itemStack : ItemStack
+        +slotIndex : int
+        +tooltip : SlotTooltipListener
+        --
+        +setItemStack(itemStack : ItemStack) : void
+        +render(batch : Batch, parentAlpha : float) : void
+        +onEnter(event : InputEvent, x : float, y : float, pointer : int, fromActor : Actor) : void
+    }
+
+    class InventoryManager {
+        -{static} openInventory : Inventory
+        -{static} inventoryActor : InventoryActor
+        --
+        +{static} openInventory(inventory : Inventory) : void
+        +{static} closeInventory() : void
+        +{static} isInventoryOpen() : boolean
+        +{static} render() : void
+    }
+}
+
+' Relationships
+Renderer --> WorldRenderer : contains
+Renderer --> GuiRenderer : contains
+Renderer --> CubesModelBatch : uses
+
+WorldRenderer --> AreaRenderer : uses
+WorldRenderer --> BreakingRenderer : uses
+WorldRenderer --> SelectedBlock : uses
+WorldRenderer --> SunRenderer : uses
+WorldRenderer --> RainRenderer : uses
+
+AreaRenderer --> AreaMesh : creates
+AreaRenderer --> AreaRenderStatus : tracks
+AreaMesh --> FaceVertices : uses
+FaceVertices --> BlockTextureHandler : uses
+BlockTextureHandler --> BlockRenderType : uses
+
+Assets --> AssetManager : uses
+Assets --> TexturePacker : uses
+AssetManager --> Asset : manages
+Asset --> AssetType : has
+TexturePacker --> PackedTextureSheet : creates
+
+Menu <|-- MainMenu
+Menu <|-- PauseMenu
+Menu <|-- SettingsMenu
+MenuManager --> Menu : manages
+Menu --> Fonts : uses
+
+GuiRenderer --> HotbarActor : contains
+GuiRenderer --> ChatActor : contains
+InventoryManager --> InventoryActor : manages
+InventoryActor --> SlotActor : contains
+HotbarActor --> SlotActor : contains
+
+note right of Renderer : "Main rendering coordinator\nthat orchestrates world\nand GUI rendering"
+
+note bottom of AreaRenderer : "Manages rendering of\nworld chunks/areas with\nLOD and frustum culling"
+
+note left of Assets : "Central asset management\nsystem with lazy loading\nand texture atlasing"
+
+note top of Menu : "Base class for all\nUI screens with\nLibGDX Scene2D integration"
+
+@enduml

@@ -1,0 +1,73 @@
+@startuml Logging_System
+!theme plain
+title Logging System
+
+    class Log {
+        ~{static} output : LogWriter
+        ~{static} file : LogWriter
+        ~customLogWriter : LogWriter
+        --
+        ~if(null : customLogWriter !=) : void
+        ~SysOutLogWriter() : new
+        ~SysOutLogWriter() : new
+        ~error(message : String) : public static void
+        ~log() : void
+        ~log(level : LogLevel, message : String) : public static void
+        ~synchronized() : void
+        ~synchronized() : void
+        ~error(message : String, throwable : Throwable) : public static void
+        ~log() : void
+        ~log(level : LogLevel, message : String, throwable : Throwable) : public static void
+        ~synchronized() : void
+        ~synchronized() : void
+        ~error(throwable : Throwable) : public static void
+        ~log() : void
+        +... (more methods)
+    }
+    enum LogLevel {
+    }
+    interface LogWriter {
+        ~log(level : LogLevel, message : String) : public void
+        ~log(level : LogLevel, message : String, throwable : Throwable) : public void
+        ~log(level : LogLevel, throwable : Throwable) : public void
+    }
+    class FileLogWriter {
+        ~{static} file : File
+        ~fileOutputStream : FileOutputStream
+        ~printStream : PrintStream
+        --
+        ~FileOutputStream() : new
+        ~PrintStream() : new
+        ~dispose() : Override public void
+        ~println(string : String) : Override protected void
+    }
+    class SysOutLogWriter {
+        ~dispose() : Override public void
+        ~println(string : String) : Override protected void
+    }
+    abstract class TextLogWriter {
+        ~{readonly} dateFormat : SimpleDateFormat
+        ~sw : StringWriter
+        ~pw : PrintWriter
+        ~start : String
+        ~stringBuilder : StringBuilder
+        --
+        ~SimpleDateFormat(HH:mm:ss" : "dd-MMM-yy) : new
+        ~log(level : LogLevel, message : String) : Override public void
+        ~log(level : LogLevel, message : String, throwable : Throwable) : Override public void
+        ~printThrowable() : void
+        ~log(level : LogLevel, throwable : Throwable) : Override public void
+        ~printThrowable() : void
+        ~printThrowable(level : LogLevel, throwable : Throwable) : private void
+        ~StringWriter() : new
+        ~PrintWriter() : new
+        ~println(s : start +) : void
+        ~println(string : String) : protected abstract void
+        ~getString(level : LogLevel, message : String) : private synchronized String
+        ~StringBuilder() : new
+    }
+    Disposable <|-- LogWriter
+    TextLogWriter <|-- FileLogWriter
+    TextLogWriter <|-- SysOutLogWriter
+    LogWriter <|.. TextLogWriter
+@enduml

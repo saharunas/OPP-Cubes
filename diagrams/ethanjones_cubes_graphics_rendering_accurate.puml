@@ -1,0 +1,152 @@
+@startuml Rendering_Engine
+!theme plain
+title Rendering Engine
+
+    class GuiRenderer {
+        ~stage : Stage
+        ~chat : TextField
+        ~chatLog : ChatActor
+        ~touchpad : Touchpad
+        ~jumpButton : ImageButton
+        ~descendButton : ImageButton
+        ~debugButton : ImageButton
+        ~chatButton : ImageButton
+        ~blockSelectorButton : ImageButton
+        +inventoryModifierButton : ImageButton
+        +playerInv : InventoryActor
+        +hotbar : HotbarActor
+        ~crosshair : Texture
+        +debugEnabled : boolean
+        +hideGuiEnabled : boolean
+        ~{readonly} input : Input
+        ~{readonly} defaultStyle : TextField.TextFieldStyle
+        ~{readonly} chatStyle : TextField.TextFieldStyle
+        ~msg : String
+        ~packetChat : PacketChat
+        +... (more fields)
+        --
+        ~Toggle() : new
+        ~doEnable() : Override public void
+        ~doDisable() : Override public void
+        ~Stage() : new
+        ~Input() : new
+        ~TextField() : new
+        ~createInputListener() : protected InputListener
+        ~TextFieldClickListener() : return new
+        ~keyDown(event : InputEvent, keycode : int) : Override public boolean
+        ~keyTyped(textField : TextField, c : char) : Override public void
+        ~if('\r' : c == '\n' || c ==) : void
+        ~PacketChat() : new
+        ~ChatActor() : new
+        ~Touchpad() : new
+        ~ChangeListener() : new
+        +... (more methods)
+    }
+    class Input {
+        ~hideGUI : int
+        ~debug : int
+        ~chat : int
+        ~blocksMenu : int
+        ~true : return
+        ~true : return
+        ~true : return
+        ~false : return
+        ~true : return
+        ~selected : int
+        ~true : return
+        ~false : return
+        --
+        ~functionKeys(keycode : int) : private boolean
+        ~if(hideGUI : keycode ==) : void
+        ~if(debug : keycode ==) : void
+        ~if(chat : keycode ==) : void
+        ~keyDown(keycode : int) : Override public boolean
+        ~if(blocksMenu : keycode ==) : void
+        ~toggleInventory() : void
+        ~if(-1 : selected !=) : void
+    }
+    class Renderer {
+        +worldRenderer : WorldRenderer
+        +guiRenderer : GuiRenderer
+        --
+        ~WorldRenderer() : new
+        ~GuiRenderer() : new
+        ~render() : public void
+        ~dispose() : public void
+        ~resize() : public void
+        ~noCursorCatching() : public boolean
+    }
+    class WorldRenderer {
+        ~{static} poolNode : ArrayDeque<AreaNode>
+        +camera : PerspectiveCamera
+        -needToRefresh : ArrayList<AreaRenderer>
+        -queue : ArrayDeque<AreaNode>
+        -checkedNodes : IntSet
+        -effectiveViewDistance : int
+        -totalEntities : int
+        -entitiesDrawn : int
+        ~renderDistance : int
+        ~world : World
+        ~areaMap : AreaMap
+        ~pos : AreaReference
+        ~yPos : int
+        ~startingNode : AreaNode
+        ~noClip : boolean
+        ~node : AreaNode
+        ~area : Area
+        ~ySection : int
+        ~areaX : int
+        ~areaZ : int
+        +... (more fields)
+        --
+        ~IntSet() : new
+        ~update(b : boolean) : Override public void
+        ~CameraController() : new
+        ~render() : public void
+        ~if() : void
+        ~if() : void
+        ~if(null : area.areaRenderer[ySection] !=) : else
+        ~if(AreaRenderStatus.COMPLETE : traverse !=) : void
+        ~for(needToRefresh : AreaRenderer areaRenderer :) : void
+        ~if() : void
+        ~renderIfNotNull(r : Renderable) : private void
+        ~areaInFrustum(area : Area, frustum : Frustum) : public boolean
+        ~areaInFrustum(areaX : int, areaZ : int, ySection : int, frustum : Frustum) : public boolean
+        ~complete(area : Area, ySection : int, areaMap : AreaMap, status : int) : public boolean
+        ~if(AreaRenderStatus.COMPLETE : status ==) : void
+        +... (more methods)
+    }
+    class AreaNode {
+        ~area : Area
+        ~areaX : int
+        ~areaZ : int
+        ~ySection : int
+        ~hashCode : int
+        ~firstNode : boolean
+        ~hashCode : int
+        ~a : AreaNode
+        ~false : return
+        ~hashCode : return
+        --
+        ~set(area : Area, areaX : int, areaZ : int, ySection : int) : public void
+        ~equals(obj : Object) : Override public boolean
+        ~if(AreaNode : obj instanceof) : void
+        ~hashCode() : Override public int
+    }
+    class AreaRendererSorter {
+        +base : Vector3
+        ~v1 : Vector3
+        ~v2 : Vector3
+        ~d1 : float
+        ~d2 : float
+        ~{readonly} dst : float
+        ~{readonly} result : int
+        ~result : return
+        --
+        ~compare(o1 : AreaRenderer, o2 : AreaRenderer) : Override public int
+    }
+    Disposable <|.. GuiRenderer
+    InputAdapter <|-- Input
+    Disposable <|.. WorldRenderer
+    Comparator<AreaRenderer> <|.. AreaRendererSorter
+@enduml

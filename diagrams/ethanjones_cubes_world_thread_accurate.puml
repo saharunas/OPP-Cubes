@@ -1,0 +1,108 @@
+@startuml World_Threading
+!theme plain
+title World Threading
+
+    class AreaNotLoadedException {
+    }
+    interface GenerationTask {
+        ~totalGenerate() : public int
+        ~totalFeatures() : public int
+        ~doneGenerate() : public int
+        ~doneFeatures() : public int
+    }
+    class WorldGenerationRunnable {
+        +queue : LinkedBlockingQueue<WorldGenerationTask>
+        +current : AtomicReference<WorldGenerationTask>
+        ~task : WorldGenerationTask
+        ~generate : AreaReference
+        ~status : int
+        ~features : AreaReference
+        ~status : int
+        ~e : throw
+        --
+        ~run() : Override public void
+        ~while(null : task ==) : void
+        ~while(null : generate !=) : void
+        ~if(1 : status ==) : void
+        ~if(2 : status ==) : else
+        ~while(null : features !=) : void
+        ~if(1 : status ==) : void
+    }
+    class WorldGenerationTask {
+        ~{readonly} world : WorldServer
+        ~{readonly} featuresReferences : MultiAreaReference
+        ~{readonly} generateReferences : AreaReferenceSet
+        ~{readonly} parameter : WorldRequestParameter
+        ~{readonly} generateQueue : ConcurrentLinkedQueue<AreaReference>
+        ~{readonly} generationComplete : CountDownLatch
+        ~{readonly} featuresQueue : ConcurrentLinkedQueue<AreaReference>
+        ~{readonly} timeStarted : AtomicLong
+        ~{readonly} generateCounter : AtomicInteger
+        ~{readonly} featureCounter : AtomicInteger
+        ~{readonly} readCounter : AtomicInteger
+        ~{readonly} generateSize : int
+        ~{readonly} featureSize : int
+        ~generate : Set<AreaReference>
+        ~f : WorldRegion
+        ~g : WorldRegion
+        ~copy : ArrayList<AreaReference>
+        ~set : Set<AreaReference>
+        ~generateSize : return
+        ~featureSize : return
+        +... (more fields)
+        --
+        ~CountDownLatch() : new
+        ~AtomicLong() : new
+        ~AtomicInteger() : new
+        ~AtomicInteger() : new
+        ~AtomicInteger() : new
+        ~AreaReferenceSet() : new
+        ~fillGenerateQueue() : private int
+        ~if(WorldRegion : this.featuresReferences instanceof) : void
+        ~WorldRegion(1 : f.minAreaX -, 1 : f.maxAreaX +, 1 : f.minAreaZ -, 1 : f.maxAreaZ +) : new
+        ~fillFeaturesQueue() : private int
+        ~if(null : parameter.prioritise !=) : void
+        ~totalGenerate() : Override public int
+        ~totalFeatures() : Override public int
+        ~doneGenerate() : Override public int
+        ~doneFeatures() : Override public int
+        +... (more methods)
+    }
+    class WorldLockable {
+        ~{readonly} lock : LockManager<WorldLockable>
+        ~{readonly} value : int
+        --
+        ~super() : void
+        ~compareTo(o : WorldLockable) : Override public int
+    }
+    enum Type {
+        +WORLD
+    }
+    class WorldRequestParameter {
+        ~{readonly} DEFAULT : WorldRequestParameter
+        ~{readonly} prioritise : AreaReference
+        ~{readonly} afterCompletion : Runnable
+        ~{readonly} dst : float
+        --
+        ~getComparator() : public Comparator<AreaReference>
+        ~NullPointerException() : throw new
+        ~compare(o1 : AreaReference, o2 : AreaReference) : Override public int
+    }
+    class WorldSaveRunnable {
+        +queue : LinkedBlockingQueue<WorldSaveTask>
+        ~task : WorldSaveTask
+        ~area : Area
+        ~written : int
+        ~e : throw
+        --
+        ~run() : Override public void
+        ~while(null : task ==) : void
+        ~if() : void
+        ~while(null : area !=) : void
+    }
+    RuntimeException <|-- AreaNotLoadedException
+    Runnable <|.. WorldGenerationRunnable
+    GenerationTask <|.. WorldGenerationTask
+    Lockable<WorldLockable> <|-- WorldLockable
+    Runnable <|.. WorldSaveRunnable
+@enduml
