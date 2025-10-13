@@ -1,0 +1,1349 @@
+<?xml version='1.0' encoding='utf-8'?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:uml="http://www.eclipse.org/uml2/1.1.0/GenModel">
+  <uml:Model xmi:id="33b345a2-dd8b-43e9-8461-d4ea41694178" name="World System - Final Corrected">
+    <packagedElement xmi:type="uml:PrimitiveType" xmi:id="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" name="int" />
+    <packagedElement xmi:type="uml:PrimitiveType" xmi:id="a85779d6-06f4-4427-9137-f8ce9a9c211d" name="float" />
+    <packagedElement xmi:type="uml:PrimitiveType" xmi:id="81e07058-0279-4635-96c5-49754ef6e80a" name="double" />
+    <packagedElement xmi:type="uml:PrimitiveType" xmi:id="e062efff-c6ab-4ef1-809c-18418ea7ce60" name="boolean" />
+    <packagedElement xmi:type="uml:PrimitiveType" xmi:id="b7e4e72e-a3e2-424d-902e-f59132c84ec8" name="String" />
+    <packagedElement xmi:type="uml:PrimitiveType" xmi:id="788980cc-5eb1-4882-8a5f-10cd326f3cd4" name="void" />
+    <packagedElement xmi:type="uml:PrimitiveType" xmi:id="e64c392f-a36f-4004-bbf7-a426b6fbf160" name="long" />
+    <packagedElement xmi:type="uml:PrimitiveType" xmi:id="675f78e5-e9e4-495f-9a00-7048428fb18d" name="byte" />
+    <packagedElement xmi:type="uml:PrimitiveType" xmi:id="7205e5a4-78ee-459c-87f2-61d08bb077d6" name="char" />
+    <packagedElement xmi:type="uml:Class" xmi:id="0b92df5b-3183-4ea3-8ac3-a9d8ac6c1afc" name="CoordinateConverter">
+      <ownedOperation xmi:id="8d77f4e9-8b0b-4258-95d3-3747de9c5cb0" name="block" visibility="public">
+        <ownedParameter xmi:id="fa02f371-7f19-443e-8fe6-60caa0cc43a9" name="position" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="7ed6740e-2ee7-417a-847a-26bab7dd238b" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="24bb0f29-6700-42d5-a722-307e04c2eaed" name="area" visibility="public">
+        <ownedParameter xmi:id="177472f6-047b-4b88-95be-cdb2773fd736" name="position" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="e115753c-8e6d-460e-9c0b-39f6aba7de6c" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="174d6caf-cfba-44f8-af57-0ae25b4b6cdf" name="area" visibility="public">
+        <ownedParameter xmi:id="1536b07a-f7f5-4201-979d-98a4c98d5a25" name="position" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="889f98c6-f039-4815-8d35-db1d04a1a2c2" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="79249361-5acc-401d-baf2-2182d8ab35cc" name="ClientSaveManager">
+      <ownedOperation xmi:id="ea89898e-7005-4046-acee-5af79e5be2bc" name="getSavesFolder" visibility="public">
+        <ownedParameter xmi:id="cb613a16-615b-4b8e-a02f-181dfcb0f8a1" direction="return" type="FileHandle" />
+      </ownedOperation>
+      <ownedOperation xmi:id="ca4307a9-ad5e-4bb7-9083-f6ab0b2afbba" name="getSaves" visibility="public">
+        <ownedParameter xmi:id="f9e72260-d0e9-4206-9a5c-966d8f2c0928" direction="return" type="Save[]" />
+      </ownedOperation>
+      <ownedOperation xmi:id="d0feab2a-de3f-479b-b80a-15a89bb09d90" name="createSave" visibility="public">
+        <ownedParameter xmi:id="95fa07e9-299d-484b-8494-5ace122082a9" name="name" direction="in" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+        <ownedParameter xmi:id="38fc5ed6-8228-4285-b6ea-9690dc13dd0c" name="generatorID" direction="in" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+        <ownedParameter xmi:id="0f883e37-a61e-45e6-a63c-5f1e0410fb85" name="gamemode" direction="in" type="Gamemode" />
+        <ownedParameter xmi:id="2d10103d-7d70-4f83-beea-0356e1aaafc9" name="seedString" direction="in" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+        <ownedParameter xmi:id="6014df1b-cbae-4d07-84d3-a8318dae19e1" direction="return" type="Save" />
+      </ownedOperation>
+      <ownedOperation xmi:id="4f7cd6b1-c4b9-4251-8e5c-ecbaa355d225" name="createTemporarySave" visibility="public">
+        <ownedParameter xmi:id="2177fc07-5e88-423d-8262-22c1a51c03de" name="generatorID" direction="in" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+        <ownedParameter xmi:id="877dc5f2-8963-41cc-bea4-5f67da4e7bd4" name="gamemode" direction="in" type="Gamemode" />
+        <ownedParameter xmi:id="06a674b9-bf13-45c6-921e-4a2f6adc6346" name="seedString" direction="in" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+        <ownedParameter xmi:id="e022cd81-7399-47a6-817c-a41d02f04634" direction="return" type="Save" />
+      </ownedOperation>
+      <ownedOperation xmi:id="36384067-1998-4a56-af01-6bd5ecd69d2e" name="deleteSave" visibility="public">
+        <ownedParameter xmi:id="77535ff6-5067-4ce2-88bc-b2e8e674b64a" name="save" direction="in" type="Save" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="8cb31681-9bfa-442d-a95b-1e74bf316014" name="WorldClient">
+      <ownedAttribute xmi:id="548f17ab-1770-4b53-8388-428f32b093d6" name="removed" visibility="private" type="ArrayListArea" />
+      <ownedAttribute xmi:id="2ab202c7-fa1d-4f80-848f-ecfc09e6fc32" name="playerArea" visibility="private" type="AreaReference" />
+      <ownedAttribute xmi:id="2d7563d2-c29d-4e47-b538-9367af4d4bc5" name="renderDistance" visibility="private" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="ddc3c2d7-cc3e-409c-8345-35acc68b7345" name="rainStatus" visibility="public" type="RainStatus" />
+      <ownedAttribute xmi:id="8fbb19d1-de44-4c09-b4af-8cf825828859" name="tickCounter" visibility="private" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedOperation xmi:id="2fbc01ec-64fe-4f7d-a111-ce933591e308" name="WorldClient" visibility="package">
+        <ownedParameter xmi:id="ac4583ee-b3c7-4f0e-82d1-932c63839dab" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="643f639a-3fa4-4f6c-a11e-bd2e15509c9e" name="getSkyColour" visibility="public">
+        <ownedParameter xmi:id="150e9f76-ea29-454e-a95f-af11adc38930" direction="return" type="Color" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="41bfb3d3-7be7-4faf-8df5-19d36537e100" name="BlockIntersection">
+      <ownedAttribute xmi:id="82e47ff0-4ef0-4b55-a375-f7ab6a3c95d8" name="blockReference" visibility="private" type="BlockReference" />
+      <ownedAttribute xmi:id="d7e36cd7-719c-4be8-948a-6b3a0ae6788f" name="blockFace" visibility="private" type="BlockFace" />
+      <ownedAttribute xmi:id="7addaa95-b02c-4d67-b529-aed93c4696ff" name="block" visibility="private" type="Block" />
+      <ownedAttribute xmi:id="e967ecb0-60f2-47da-9bf3-452ea81751a2" name="blockMeta" visibility="private" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="9fd7079a-dc80-4ec1-9ec5-3a7ddf878868" name="rayLength" visibility="private" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+      <ownedOperation xmi:id="8df1711d-2138-416b-a0a4-db0af1873c91" name="BlockIntersection" visibility="package">
+        <ownedParameter xmi:id="e52453bd-c0af-477a-b63f-a6926b3be02e" name="blockReference" direction="in" type="BlockReference" />
+        <ownedParameter xmi:id="10ed5657-2b3f-494f-b8d4-11cd31350e87" name="blockFace" direction="in" type="BlockFace" />
+        <ownedParameter xmi:id="283bebb6-9fd5-4d90-aec5-5655aa470c75" name="block" direction="in" type="Block" />
+        <ownedParameter xmi:id="69f18a4c-33f2-4aa9-b8ba-8d69b0b0dd84" name="blockMeta" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="9056dad3-0d16-460c-ad68-47e21e14b8a9" name="rayLength" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="d6c6490e-8f42-44e2-8409-245589922e12" direction="return" type="private" />
+      </ownedOperation>
+      <ownedOperation xmi:id="73727f56-ebd0-4324-ae73-f23c5063d665" name="getBlockReference" visibility="public">
+        <ownedParameter xmi:id="c87e1e08-04c6-4319-bc62-ccdccf26457c" direction="return" type="BlockReference" />
+      </ownedOperation>
+      <ownedOperation xmi:id="665c5a77-abae-4250-ad82-9815b4f86d37" name="getBlockFace" visibility="public">
+        <ownedParameter xmi:id="fe48967e-8c45-41d6-9195-53bfe77118db" direction="return" type="BlockFace" />
+      </ownedOperation>
+      <ownedOperation xmi:id="b6a44ace-38b0-4111-9041-30d6e3aca374" name="getBlock" visibility="public">
+        <ownedParameter xmi:id="929d25c2-7e21-4e6a-9f1f-c9864bbee789" direction="return" type="Block" />
+      </ownedOperation>
+      <ownedOperation xmi:id="4fd66e31-d0be-441c-b0d2-9bb4a85fa71e" name="getBlockMeta" visibility="public">
+        <ownedParameter xmi:id="bfd28b6d-c2f1-4001-acc2-67cf00165b44" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="be7b5c67-1f59-4fff-b39f-0b179e2878a2" name="getRayLength" visibility="public">
+        <ownedParameter xmi:id="86c3d383-f80b-4d20-9251-cf82bad26bae" direction="return" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+      </ownedOperation>
+      <ownedOperation xmi:id="fcf3ef2e-b6bb-44a3-9fb1-909156619c24" name="getBlockIntersection" visibility="public">
+        <ownedParameter xmi:id="799edc86-54a8-424d-9045-85df7f53e9b6" name="origin" direction="in" type="Vector3" />
+        <ownedParameter xmi:id="e06370f1-8278-4b8e-89de-29aeab74739a" name="direction" direction="in" type="Vector3" />
+        <ownedParameter xmi:id="c5beaa4c-13bb-42d5-8436-de3f53d39662" name="world" direction="in" type="World" />
+        <ownedParameter xmi:id="1be4e416-972f-4d8d-a9bc-fa7fc5909b49" direction="return" type="41bfb3d3-7be7-4faf-8df5-19d36537e100" />
+      </ownedOperation>
+      <ownedOperation xmi:id="cfa0fa97-aa23-4809-9a2e-558d6974431c" name="intersection" visibility="public">
+        <ownedParameter xmi:id="dcd38fac-0248-4569-b444-3db76feef9c9" name="origin" direction="in" type="Vector3" />
+        <ownedParameter xmi:id="1687f699-b260-42ef-9b2f-da79dbf13d34" name="direction" direction="in" type="Vector3" />
+        <ownedParameter xmi:id="a4d5f09e-1929-48b3-a657-3838d4ef194a" name="radius" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="4e5514b7-2371-4ae2-bb50-3d529613dac2" name="world" direction="in" type="World" />
+        <ownedParameter xmi:id="47a3fd0e-5180-4d2d-b00c-015b18fef7de" direction="return" type="41bfb3d3-7be7-4faf-8df5-19d36537e100" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="c8130431-bbb6-4223-abdb-f04ee8603595" name="PlayerCollision">
+      <ownedAttribute xmi:id="e1f4608c-2ab7-4706-a619-6018753575ac" name="world" visibility="private" type="World" />
+      <ownedOperation xmi:id="4b613347-c621-4185-bcdd-fc821cb7fc1e" name="check" visibility="private">
+        <ownedParameter xmi:id="5d900ac3-041a-4055-9883-2ebdf4918136" name="position" direction="in" type="Vector3" />
+        <ownedParameter xmi:id="c3904e22-fa93-457b-8035-b568511384ef" name="xOffset" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="73c7b331-de7b-44b7-991c-511e0d7ff3d4" name="yOffset" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="34750a9f-2b49-4335-aa3c-c44b85ea16eb" name="zOffset" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="f764d42b-6ddc-4cd4-a52e-167bd65ff8fc" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="bd9d1a8c-7de6-4530-a3ec-dab82cdb142b" name="limit" visibility="private">
+        <ownedParameter xmi:id="fc547be4-64cb-4fd3-821b-284f23dbc373" name="newPos" direction="in" type="Vector3" />
+        <ownedParameter xmi:id="da9cbd75-3e25-46f9-885d-67896202ba6e" name="xOffset" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="57e62756-bc0c-4357-a59a-f92e831e9d67" name="zOffset" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="561b1f68-9659-4968-977b-884f325bf091" name="height" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="419576ae-14ba-4328-9ea8-98f9a7cc5c27" name="BasicTerrainGenerator">
+      <ownedAttribute xmi:id="1789a476-35c9-4817-99f0-2b215b953119" name="old" visibility="package" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      <ownedOperation xmi:id="51a00475-bc91-4303-916a-3cc8461e7684" name="BasicTerrainGenerator" visibility="package">
+        <ownedParameter xmi:id="f783284e-4044-4f11-94f2-693b47d1a132" name="seed" direction="in" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+        <ownedParameter xmi:id="ac4d200d-44a6-4853-943d-691db493ef86" direction="return" type="public" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="99b72e53-cb7f-463f-b812-87f45f7737ae" name="GeneratorManager">
+      <ownedOperation xmi:id="2fb70f3c-5034-4f9a-83f4-a4a77f96e234" name="register" visibility="public">
+        <ownedParameter xmi:id="3d319f4a-93d7-4fd6-bfa7-e2c652534f20" name="str" direction="in" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+        <ownedParameter xmi:id="4b17bff0-dd64-4fe7-bf9c-94052f7ec41d" name="generator" direction="in" type="TerrainGeneratorFactory" />
+      </ownedOperation>
+      <ownedOperation xmi:id="20edf1fd-6003-4a20-9163-aaa61fa51570" name="getTerrainGenerator" visibility="public">
+        <ownedParameter xmi:id="d6b5ff78-bd44-4116-8be0-9d169b711b09" name="saveOptions" direction="in" type="SaveOptions" />
+        <ownedParameter xmi:id="7fe686be-cb6d-4326-9ddc-3177a8289eaf" direction="return" type="TerrainGenerator" />
+      </ownedOperation>
+      <ownedOperation xmi:id="d8d33873-1de4-4aca-b223-03607d8767b6" name="terrainGeneratorExists" visibility="public">
+        <ownedParameter xmi:id="cee87984-cef7-4064-ae33-3df4bef06bc7" name="id" direction="in" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+        <ownedParameter xmi:id="b0a2bc0e-d0c1-4b13-9b91-4604b27f888d" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="d5651aa9-4cf0-4dac-ac2f-a39ab3018dbc" name="getName" visibility="public">
+        <ownedParameter xmi:id="50e1eba7-2735-41e3-a42f-81f59bf5a00a" name="id" direction="in" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+        <ownedParameter xmi:id="294cd502-555c-4de7-8f39-98c27adf3e4d" direction="return" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+      </ownedOperation>
+      <ownedOperation xmi:id="f3d8e1b5-d3fc-414b-9b2e-e98a6750ae03" name="ids" visibility="public">
+        <ownedParameter xmi:id="365af8e0-6415-4160-90d7-0978c6e953a7" direction="return" type="String[]" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="17507cff-1338-4ff2-a2d7-5a32b81de572" name="RainStatus">
+      <ownedAttribute xmi:id="f414e01a-239b-4739-b9bd-efa8a81ab7eb" name="raining" visibility="public" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      <ownedAttribute xmi:id="efe1272b-8a9a-43f5-82e8-77c8dc45d628" name="rainRate" visibility="public" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+      <ownedOperation xmi:id="71db5601-9499-4da8-9937-319a1e01cef9" name="RainStatus" visibility="package">
+        <ownedParameter xmi:id="40cddd6e-81cb-4319-aebc-aa6b2169bf90" name="raining" direction="in" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+        <ownedParameter xmi:id="2b47e18b-de67-4eef-b02b-e4ab7d6eee8d" name="rainRate" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="545df3a1-d31c-4637-8b2e-135c4fd0bbfb" direction="return" type="public" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="cbd8c0b8-96c0-4dfb-ba07-e61b296d6aea" name="TestTerrainGenerator" />
+    <packagedElement xmi:type="uml:Class" xmi:id="e1b86886-b86a-4436-a5e9-2799c7f27ff6" name="VoidTerrainGenerator" />
+    <packagedElement xmi:type="uml:Class" xmi:id="e64b5a8c-f3d9-45da-816e-f49c5ec3d064" name="WorldGravity">
+      <ownedOperation xmi:id="d57cff5a-4c1c-43b1-a1b8-47c58d26ada4" name="getBlockY" visibility="public">
+        <ownedParameter xmi:id="1add9d88-05c0-42b9-a0e0-fb1830caf016" name="pos" direction="in" type="Vector3" />
+        <ownedParameter xmi:id="19010e9d-0b18-437e-82da-f77751233cea" name="height" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="1de90c0f-3702-4571-a247-84dea0d48236" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="e8b747d1-0310-49b1-899b-4332a6806445" name="onBlock" visibility="public">
+        <ownedParameter xmi:id="33161cff-bee7-4b34-b02c-bc66a60c2698" name="w" direction="in" type="World" />
+        <ownedParameter xmi:id="e7d32716-33a4-4ce5-a1c2-3d3b141e5b78" name="pos" direction="in" type="Vector3" />
+        <ownedParameter xmi:id="da011e53-5aa0-45b5-9e15-3329d4d0b25f" name="height" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="ac91a1f4-ba76-4787-86c6-1fa1bbe1fa53" name="r" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="6b5a5fed-01f1-4670-9099-7a30c723e69a" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="f4246402-805c-47c8-a0ea-cefd9da4dbef" name="isBlock" visibility="private">
+        <ownedParameter xmi:id="617d4eb8-769b-4b49-9a35-50b40d993800" name="world" direction="in" type="World" />
+        <ownedParameter xmi:id="1fd4cf6e-8fb8-4452-b477-d296f9e4359d" name="x" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="495e827f-f727-4c5f-b7e6-b99e7df44886" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="ffae04c8-7255-4e9d-9e73-a03e58dadc61" name="z" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="64a655c4-cf84-4b1c-80e7-2f5a97a7a1ee" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="ad6db39f-8747-47c2-90b6-71e247e6001e" name="BlockLight">
+      <ownedOperation xmi:id="4124c38a-27ec-4622-84f2-f553e1508827" name="spreadLight" visibility="public">
+        <ownedParameter xmi:id="e472d3f6-319b-4b3c-8641-2c01f2f23f9d" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="5164ebf9-ea5e-45a8-a09f-303b0d2f99d9" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="39cb4863-b3a5-41d3-bbb0-63f8ce1975fa" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="fcfbdd86-482c-477f-8375-3b6777d8b90d" name="area" direction="in" type="Area" />
+        <ownedParameter xmi:id="04dce01d-85a7-4197-9043-a5fabd9fb634" name="w" direction="in" type="LightWorldSection" />
+      </ownedOperation>
+      <ownedOperation xmi:id="799663ae-5323-4d01-a38f-db543bb09825" name="addLight" visibility="public">
+        <ownedParameter xmi:id="71115987-c7d1-4e97-8267-6203c1e3e2e9" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="43f68694-7bd8-446b-a4c2-e13def67c7a5" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="6c8ce388-05fb-4c5b-a3c4-849b2024f615" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="ffd04b68-e63c-40da-b7f8-33457f78c701" name="l" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="3d894031-052a-423f-a8a0-873a7ff62bef" name="area" direction="in" type="Area" />
+        <ownedParameter xmi:id="5c34b814-959a-4b6c-9ba0-1da71590f82e" name="lws" direction="in" type="LightWorldSection" />
+      </ownedOperation>
+      <ownedOperation xmi:id="9021eca1-f4fb-421c-aabf-d341350c1613" name="propagateAdd" visibility="private">
+        <ownedParameter xmi:id="412116d6-d3e5-4198-bd7b-48df391d44a4" name="lightQueue" direction="in" type="ArrayDeque&lt;LightNode&gt;" />
+        <ownedParameter xmi:id="dd132ad8-baa3-41a9-a66c-d2826144b401" name="w" direction="in" type="LightWorldSection" />
+      </ownedOperation>
+      <ownedOperation xmi:id="a90b6bbf-fb49-4c65-b154-f2cc646389ab" name="tryPropagateAdd" visibility="private">
+        <ownedParameter xmi:id="5a148bdd-e51d-42fb-801d-45e92f2187b5" name="lightQueue" direction="in" type="ArrayDeque&lt;LightNode&gt;" />
+        <ownedParameter xmi:id="6fd6d4de-cc96-4040-beea-b79e324478fa" name="w" direction="in" type="LightWorldSection" />
+        <ownedParameter xmi:id="6f9938cd-55db-49e1-8880-df9e9142d111" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="f7761a4e-1614-41f8-9f0f-8bc75d1eefd2" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="ff0c0184-a22b-4891-9214-d4fc9a1ca977" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="06ae8f13-1864-47a1-b022-9a63761af320" name="l" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="c60ffdae-54f7-41dc-a053-bdf2ed1adf07" name="removeLight" visibility="public">
+        <ownedParameter xmi:id="11f1df79-6f13-4ec9-a633-b3dd728e033d" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="dde182d6-e5a7-4bb7-8a27-d1e1f0e93a2c" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="fcb5062e-f960-4397-9eef-67863d6d6a35" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="250c54fa-e1af-49ea-9c2b-6bdbccc52e53" name="area" direction="in" type="Area" />
+        <ownedParameter xmi:id="6e482ce5-e2a2-41ae-8f28-83ebf1c1f7c4" name="lws" direction="in" type="LightWorldSection" />
+      </ownedOperation>
+      <ownedOperation xmi:id="3e49c1a9-a6aa-43df-ad53-03466d8d1485" name="propagateRemove" visibility="private">
+        <ownedParameter xmi:id="38304423-1205-4a3b-af27-542680a52ea9" name="removeQueue" direction="in" type="ArrayDeque&lt;LightNode&gt;" />
+        <ownedParameter xmi:id="c8c17906-ddca-4707-a339-93aee32e496a" name="addQueue" direction="in" type="ArrayDeque&lt;LightNode&gt;" />
+        <ownedParameter xmi:id="15627eef-4da7-4e2d-b646-58d3fd726051" name="w" direction="in" type="LightWorldSection" />
+      </ownedOperation>
+      <ownedOperation xmi:id="39859da3-09b7-46f7-ba75-132f1deedfac" name="tryPropagateRemove" visibility="private">
+        <ownedParameter xmi:id="8a26592b-29af-4a0e-a84c-94c9a62695f4" name="removeQueue" direction="in" type="ArrayDeque&lt;LightNode&gt;" />
+        <ownedParameter xmi:id="c34fae90-0e91-4520-9389-9218e3404fa6" name="addQueue" direction="in" type="ArrayDeque&lt;LightNode&gt;" />
+        <ownedParameter xmi:id="f6d24fe6-6712-4369-9569-47f6c80141e4" name="w" direction="in" type="LightWorldSection" />
+        <ownedParameter xmi:id="3666ef2c-faf0-40d4-aa30-9f8f6862e4ee" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="f7cc6284-e797-4b3a-bd72-4137670f9d52" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="46ecb30d-7e1f-4d96-a881-ff2ea46d87a7" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="484fb14c-6d95-413c-85c1-9bf204578556" name="l" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="b45eecd7-3793-44a8-8bb2-7bbe03bae44d" name="LightNode">
+      <ownedAttribute xmi:id="5b6cf7c4-cd16-45f5-9870-2cb4f49326e2" name="x" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="32241ea1-bf8f-463a-9ef9-c16c33ba8e3b" name="y" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="5c8034e1-098d-4ca2-934c-babbf858bb82" name="z" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="8f88c8ff-3bc4-453f-840f-c234c2354134" name="l" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedOperation xmi:id="bf09e6db-db84-4b1e-989c-04a393582502" name="LightNode" visibility="package">
+        <ownedParameter xmi:id="eac5b101-97fa-4869-aef4-dfce132fd7f6" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="4e2b0e3b-c287-430d-8d65-e35fae10dd67" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="c22d0f21-036f-4975-9dfa-8a8eb5d5ed7a" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="e6f716d4-2181-4932-b72b-f8cde14a34d6" name="l" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="66167efd-8a76-4202-b88e-f69adb8dd6a0" direction="return" type="public" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="319a38d4-8d39-4e81-be5d-f4749ff67a91" name="LightWorldSection">
+      <ownedAttribute xmi:id="b928700c-8aa6-437d-ae06-d55948b143c3" name="initialAreaX" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="796d1f8b-74d6-46cc-a2dd-3259ccbf800b" name="initialAreaZ" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="3c521ba9-bd3a-47f0-a83f-230035db7bd8" name="initialMinBlockX" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="b958da3c-f3ad-4c1c-819f-a6a3fd2f509c" name="initialMinBlockZ" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="2167025d-b715-4c33-a0f0-95327c275187" name="initialMaxBlockX" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="d2e0d039-8712-4b5c-be61-8d378b7e2c2a" name="initialMaxBlockZ" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="17e77597-24c3-48f9-94ca-33b72f4fcd32" name="areas" visibility="public" type="Area" />
+      <ownedAttribute xmi:id="d50e7388-cb07-442e-8e5e-b29b3238daa7" name="initial" visibility="public" type="Area" />
+      <ownedAttribute xmi:id="f3347d53-5e03-43fb-aaaf-8c99309d80d4" name="lock" visibility="private" type="LockedArea" />
+      <ownedOperation xmi:id="a01ca5f2-909d-40ec-a62d-e9ed4ae8b0c0" name="LightWorldSection" visibility="package">
+        <ownedParameter xmi:id="74e5d08a-c6f3-4021-a637-6d0fada4c324" name="initial" direction="in" type="Area" />
+        <ownedParameter xmi:id="45291f57-6e24-4bcb-999b-bd06064e43fd" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="955df354-dabf-4a5d-8eea-d4595a2b57eb" name="getArea" visibility="public">
+        <ownedParameter xmi:id="583517fd-0a71-4ea7-9cea-862af10240c7" name="areaX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="4bca66b6-bac1-4894-9dae-de565ef517dc" name="areaZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="eaf54bda-791b-46b7-8c4a-fcfb3e0963f4" direction="return" type="Area" />
+      </ownedOperation>
+      <ownedOperation xmi:id="d722e171-e408-42b3-ba87-4c31bf0071d1" name="transparent" visibility="protected">
+        <ownedParameter xmi:id="fb510a43-1509-4aa2-a614-f3651932dc93" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="ca94d1ad-eafa-4dda-825d-e98d67dd334c" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="71af7998-3929-4246-9ad0-00b46e2fa6e2" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="6b739025-df54-417b-8afb-d3519ec478d4" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="4be36324-b238-4775-a2d5-f3d9b215584d" name="getSunlight" visibility="protected">
+        <ownedParameter xmi:id="f471c4eb-c135-499b-a785-d6a18d39c563" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="0ad372f5-41a1-4e76-9fad-3ceccb41640e" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="988718ad-2e2c-4bc7-a332-3e6edb82cd54" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="1d032ba7-0a09-478a-99b1-0899fb1fa529" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="949a92d8-bf71-4a58-8112-9e9d46d40d6e" name="getLight" visibility="protected">
+        <ownedParameter xmi:id="ebbfd087-a46a-41c2-94ee-69b619f0079a" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="52d488b3-c16f-4f1c-a838-df054ca5b8e5" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="dad55917-10d8-48cb-8bc9-ac67b8074b48" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="a175f8c2-6854-459e-b5a8-13ed61d64157" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="3bbb9a68-95ee-4655-8a54-198d501ef52b" name="isLightSource" visibility="protected">
+        <ownedParameter xmi:id="3bfd6d04-3c35-4f3d-b059-838de795d04c" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="f5e541ff-33df-4c30-9074-72584cd8a388" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="d0b651ea-ca58-4f16-9f97-6ae0ccb316c4" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="eea877d6-7dcb-4560-8c38-6768e2540c7c" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="50ffbc10-4103-4bb8-9a81-abb2401a1eed" name="maxY" visibility="protected">
+        <ownedParameter xmi:id="16852ce1-b71f-4644-bc87-9d9de5c221d3" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="b958f78f-6ea2-4c67-8f2b-9ddbed522f2f" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="fed0ad65-95ca-4c47-a148-34c0928d2896" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="da88f079-e65d-4673-9e4a-a80d0bb080bd" name="SunLight">
+      <ownedOperation xmi:id="42d06825-4b1e-4ad6-a2ef-fe59763881e4" name="initialSunlight" visibility="public">
+        <ownedParameter xmi:id="be5ab34f-fdc7-4faf-b31c-ea87ff5e0ddd" name="area" direction="in" type="Area" />
+      </ownedOperation>
+      <ownedOperation xmi:id="3b58c95a-f85f-4122-978d-96ab2186e353" name="addSunlight" visibility="public">
+        <ownedParameter xmi:id="d51a9775-0b5b-4e00-8d08-32aaa8c61e64" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8b6be3f1-8593-4754-9b70-c71cdfda64db" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="c57097ea-894e-43f1-8ea7-a9657654b609" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="10da1870-cdec-4b0b-b52b-49ffe7ed260f" name="area" direction="in" type="Area" />
+        <ownedParameter xmi:id="53144b38-3cb0-4ace-a559-edff551934e4" name="w" direction="in" type="319a38d4-8d39-4e81-be5d-f4749ff67a91" />
+      </ownedOperation>
+      <ownedOperation xmi:id="9b2f6c82-d73c-4197-96dd-8675fa0d9901" name="propagateAdd" visibility="private">
+        <ownedParameter xmi:id="b5ade69f-263c-42d6-9a5c-286fd36ff501" name="lightQueue" direction="in" type="ArrayDeque&lt;LightNode&gt;" />
+        <ownedParameter xmi:id="44813d9c-5053-4fce-8e48-6f2d5043a4a1" name="w" direction="in" type="319a38d4-8d39-4e81-be5d-f4749ff67a91" />
+      </ownedOperation>
+      <ownedOperation xmi:id="14227890-080f-4503-a077-d3ff7323397c" name="tryPropagateAdd" visibility="private">
+        <ownedParameter xmi:id="e45fe239-04e0-44ec-afcd-ce1ff42f591c" name="lightQueue" direction="in" type="ArrayDeque&lt;LightNode&gt;" />
+        <ownedParameter xmi:id="49383e51-75a0-4e46-b6a6-a4c509342a77" name="w" direction="in" type="319a38d4-8d39-4e81-be5d-f4749ff67a91" />
+        <ownedParameter xmi:id="82c2c7c4-bffc-491d-97b0-9d1262b1c95e" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="0c52cb54-a540-4c65-932f-a302ca2c4a47" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="05c53bd0-a789-496a-b197-2dea8f4639cf" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="1d5f7aaa-f059-4e10-aa8f-79c68e6e2948" name="ln" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="48924b69-4fcb-415a-9293-59c884d6def8" name="removeSunlight" visibility="public">
+        <ownedParameter xmi:id="a04656c1-6f5f-419b-88b8-8e1660f3800c" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8fb533c5-abaf-429f-a0e3-e9d8f9af000d" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="3655d970-0969-4ac8-aafe-2d021568689f" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="a4e9655b-7610-40b8-b2db-67ab5c72e41d" name="area" direction="in" type="Area" />
+        <ownedParameter xmi:id="4e964090-7277-4df0-9ad9-eae26bb499c5" name="lws" direction="in" type="319a38d4-8d39-4e81-be5d-f4749ff67a91" />
+      </ownedOperation>
+      <ownedOperation xmi:id="d4458ee0-5062-4415-b2d7-c0191de2d39f" name="propagateRemove" visibility="private">
+        <ownedParameter xmi:id="eb30d9a4-cf9b-43f3-8696-69ffa3c4c583" name="removeQueue" direction="in" type="ArrayDeque&lt;LightNode&gt;" />
+        <ownedParameter xmi:id="01c9f531-0297-4cda-bbd0-115afea9298e" name="addQueue" direction="in" type="ArrayDeque&lt;LightNode&gt;" />
+        <ownedParameter xmi:id="3c1d4f5f-848c-48bf-b6c6-f15d9f12e8bc" name="w" direction="in" type="319a38d4-8d39-4e81-be5d-f4749ff67a91" />
+      </ownedOperation>
+      <ownedOperation xmi:id="3cf01b81-08a6-476b-90b2-8d9cde6bdd45" name="tryPropagateRemove" visibility="private">
+        <ownedParameter xmi:id="2d3ad379-c171-4e0a-986d-69f11150b9b7" name="removeQueue" direction="in" type="ArrayDeque&lt;LightNode&gt;" />
+        <ownedParameter xmi:id="b446493b-709b-43a5-9227-03e23807a515" name="addQueue" direction="in" type="ArrayDeque&lt;LightNode&gt;" />
+        <ownedParameter xmi:id="7be776ea-92c4-4934-b540-e3ec52ab742f" name="w" direction="in" type="319a38d4-8d39-4e81-be5d-f4749ff67a91" />
+        <ownedParameter xmi:id="653363cc-e400-4965-8bd0-30b181973db3" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="bbbfa242-a331-4d3d-a8dc-d7c169100e5f" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="b8998509-cf38-429a-8191-881c5207e0a9" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="4c9ac8d1-4bef-41ab-b094-b8b951e2f91a" name="l" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="273b1d15-9f09-445e-b322-cb85beb50fb8" name="WorldLightHandler" />
+    <packagedElement xmi:type="uml:Class" xmi:id="b63755c6-45be-4dad-8da3-d56d1d407e0e" name="AreaReference">
+      <ownedAttribute xmi:id="3981ba5e-732c-4f18-bb3a-140cadbe8d1e" name="areaX" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="d27bac5c-8169-4281-b29f-36abf6bf0e64" name="areaZ" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="f34c8695-8d96-450e-8014-3cb2ac66570a" name="hashCode" visibility="private" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedOperation xmi:id="4136466d-1ab8-441b-be1e-5e3dbc54feda" name="setFromArea" visibility="public">
+        <ownedParameter xmi:id="fb32e99b-94eb-4e1e-b5f6-fba0173c8c06" name="area" direction="in" type="Area" />
+        <ownedParameter xmi:id="10d992bd-3489-4b95-bf2e-a708d49d48ab" direction="return" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+      </ownedOperation>
+      <ownedOperation xmi:id="a05b337a-bc6e-4e3d-96b2-47df4267999a" name="setFromAreaCoordinates" visibility="public">
+        <ownedParameter xmi:id="29048009-318b-4e0b-80f1-60d2587bfd39" name="areaX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="97e87e8a-4b4c-4495-9140-5645a3eda114" name="areaZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="1287a309-f051-4941-b91d-9fc78aaadd71" direction="return" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+      </ownedOperation>
+      <ownedOperation xmi:id="036ff5c5-cea9-4560-9d69-b8ff55886be2" name="setFromBlockCoordinates" visibility="public">
+        <ownedParameter xmi:id="f32a96c8-d903-42db-a06f-e1fd2545f73f" name="blockX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="4f864335-b394-43af-bacf-df11326fa764" name="blockZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="94ed7b19-ae7a-412d-a537-a19259179b0a" direction="return" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+      </ownedOperation>
+      <ownedOperation xmi:id="6b5c92c6-5ce6-4eb8-8035-b6820226ac13" name="setFromBlockReference" visibility="public">
+        <ownedParameter xmi:id="713c0e7b-0137-4f11-a3cf-14f271c3b94b" name="blockReference" direction="in" type="BlockReference" />
+        <ownedParameter xmi:id="914feadb-3ddc-4528-9b35-28d0564fd912" direction="return" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+      </ownedOperation>
+      <ownedOperation xmi:id="6710f9af-fbda-47f2-9734-f0aef4e6c66b" name="setFromPositionVector3" visibility="public">
+        <ownedParameter xmi:id="3aa4234d-2243-4110-bf44-e724cfaea282" name="vector3" direction="in" type="Vector3" />
+        <ownedParameter xmi:id="b3f54411-ca6f-4d22-8282-420f5bfd4a0f" direction="return" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+      </ownedOperation>
+      <ownedOperation xmi:id="8860ff6d-bede-4067-badc-22c66ef3fbff" name="setFromPosition" visibility="public">
+        <ownedParameter xmi:id="0cbd878f-d03e-4571-b49b-cf7886f93401" name="x" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="5e84eeeb-fa89-4950-9136-b4ba12b6b7eb" name="z" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="11a73137-cc0e-4a9a-be64-04062aa9f645" direction="return" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+      </ownedOperation>
+      <ownedOperation xmi:id="0adaf622-5460-4420-b4a0-ce524d1e4e30" name="offset" visibility="public">
+        <ownedParameter xmi:id="6daf5d5d-130a-495b-9918-6b8114c23337" name="areaX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="82de0d4b-7194-4cfc-8710-8a6482b149be" name="areaZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="73ac41bc-4db4-492b-a44f-68d15e42e5c9" direction="return" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+      </ownedOperation>
+      <ownedOperation xmi:id="5e93e245-8531-4ec0-9c81-b73fd8bfad85" name="minBlockX" visibility="public">
+        <ownedParameter xmi:id="16901def-73ab-43f9-8676-8449c129b17e" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="e7383fbc-0eaf-4291-aa48-a8c40a48cd44" name="minBlockZ" visibility="public">
+        <ownedParameter xmi:id="77694fef-b7c4-4537-89c9-2cf3f41dfbb2" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="8c070c46-7c22-45d2-a353-30e83a516e47" name="modified" visibility="public">
+        <ownedParameter xmi:id="a3d021d6-1fe5-4f11-a426-7d6e8ab78481" direction="return" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+      </ownedOperation>
+      <ownedOperation xmi:id="5c55ecc6-544e-48dc-9b61-8b752ea60202" name="distance" visibility="public">
+        <ownedParameter xmi:id="76a4eb26-88ff-4229-8dfd-fe99ecef09f8" name="areaReference" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="306cc415-4a0c-4542-bee3-898265a8c1aa" direction="return" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+      </ownedOperation>
+      <ownedOperation xmi:id="47cdef0b-d72b-4560-9287-e19328dd8334" name="distance2" visibility="public">
+        <ownedParameter xmi:id="9ea4e9f4-848c-489e-9372-dae7f5abba1f" name="areaReference" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="704213e4-1fb2-456b-bddf-91d7e563d73c" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="d012934c-1617-4396-9b95-8c124d10bd28" name="updateHashCode" visibility="public" />
+      <ownedOperation xmi:id="6b831176-bc39-486b-8bf8-00985134d8b7" name="copy" visibility="public">
+        <ownedParameter xmi:id="9db31402-67b2-4429-9d2a-7317b57e91a6" direction="return" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+      </ownedOperation>
+      <ownedOperation xmi:id="5be29788-5491-4928-b756-3bfb1c205fa2" name="setFromAreaReference" visibility="public">
+        <ownedParameter xmi:id="2dbc27a8-8e27-47fe-b4db-fd673882c65e" name="areaReference" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="d9eaeb5a-902d-4514-bf86-be9fb14dcdb6" direction="return" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="ac7a545c-8556-4c2d-a117-505e3b92b71e" name="AreaReferencePool" />
+    <packagedElement xmi:type="uml:Class" xmi:id="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" name="BlockReference">
+      <ownedAttribute xmi:id="09c6e6a8-3d83-474c-832a-47b8bc8471eb" name="blockX" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="fe05407f-f30f-4461-9f71-64e3040d82c9" name="blockY" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="f4f8a5e8-c944-4066-9cf5-22f8f3473736" name="blockZ" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="fea4ae96-0cec-41e4-bde4-a59301876f44" name="hashCode" visibility="private" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedOperation xmi:id="3f1ad630-cf22-434b-ae01-e8ca8094dc9a" name="setFromBlockCoordinates" visibility="public">
+        <ownedParameter xmi:id="26676108-8850-42f7-9555-806b5aab5aaa" name="blockX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8642eb47-30f0-4345-87b1-5a7b13d1bd39" name="blockY" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="828d7ce4-cfb3-481c-9034-01ab8c4a6965" name="blockZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="1728b33a-1424-4ff3-ac52-5cdcb415925d" direction="return" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+      </ownedOperation>
+      <ownedOperation xmi:id="d723aba9-7a43-4544-9bee-aa3b250b54d6" name="setFromPosition" visibility="public">
+        <ownedParameter xmi:id="b3bc2544-f413-49cc-ba11-f77cafd7f01b" name="x" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="3c7001f2-fee3-4c74-bd12-c2028351bd3c" name="y" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="379531d0-51ca-427e-873c-a8b5ea157b26" name="z" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="13437e0e-1711-4a2c-bf32-276051a04056" direction="return" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+      </ownedOperation>
+      <ownedOperation xmi:id="8e30a09e-e3c5-4250-9302-39efc522a5f2" name="setFromVector3" visibility="public">
+        <ownedParameter xmi:id="ed3115ab-0d62-42e9-9f31-d5908b03e4a8" name="vector3" direction="in" type="Vector3" />
+        <ownedParameter xmi:id="ca5c3891-8ae9-49af-838c-82552009533a" direction="return" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+      </ownedOperation>
+      <ownedOperation xmi:id="7cd4b9cb-3554-425c-833b-fd89f5ca6b50" name="offset" visibility="public">
+        <ownedParameter xmi:id="2468a504-ff6a-48af-9cc4-2480920e984f" name="blockX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8a4357e3-32bb-43a1-881e-952fc4d9d185" name="blockY" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="c429f3a9-1e6e-4faf-a07f-e5f0ea8c180a" name="blockZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="59e4294d-309a-497c-8809-adc358659666" direction="return" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+      </ownedOperation>
+      <ownedOperation xmi:id="186561f2-4bc5-4911-a056-1c252cd786f2" name="modified" visibility="public">
+        <ownedParameter xmi:id="490409f1-98be-47cf-ab14-faaca042401d" direction="return" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+      </ownedOperation>
+      <ownedOperation xmi:id="0ea12b3b-6760-4ad2-9f74-c981dcf0ba09" name="updateHashCode" visibility="public" />
+      <ownedOperation xmi:id="caee68b4-3dcf-4d22-9597-9874b9b36341" name="copy" visibility="public">
+        <ownedParameter xmi:id="3c10ed0f-5704-4a6a-9c95-9b3caaedb7cb" direction="return" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+      </ownedOperation>
+      <ownedOperation xmi:id="685f1811-4ae9-4f7d-a789-c10de4d25842" name="setFromBlockReference" visibility="public">
+        <ownedParameter xmi:id="d09e0951-b650-4b78-ac43-3fca0b570c5a" name="blockReference" direction="in" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+        <ownedParameter xmi:id="c62cbc33-eab9-44fe-a133-2a9dd101fa2d" direction="return" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+      </ownedOperation>
+      <ownedOperation xmi:id="5f99b46f-9d66-4946-8a7e-435de1a9b04d" name="asVector3" visibility="public">
+        <ownedParameter xmi:id="8a41a1eb-9a14-4782-a10d-7ebd125604e2" direction="return" type="Vector3" />
+      </ownedOperation>
+      <ownedOperation xmi:id="85bf88b1-f355-4fe7-8d1f-7872ee365e62" name="toString" visibility="public">
+        <ownedParameter xmi:id="f6974e8a-a746-44ff-99c6-333fb975dcc6" direction="return" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="9955cfc0-59ba-4249-af0c-97e7ddab6ff3" name="BlockReferencePool" />
+    <packagedElement xmi:type="uml:Class" xmi:id="3b17cb61-a923-4a4a-acf2-271cae49e678" name="Save">
+      <ownedAttribute xmi:id="e92b1c07-9738-4195-b148-6f6354b72dc7" name="name" visibility="public" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+      <ownedAttribute xmi:id="94d80e28-2cf0-4124-a00a-33622e328910" name="fileHandle" visibility="public" type="FileHandle" />
+      <ownedAttribute xmi:id="0842092c-56be-490c-a988-489e8b7dfd6a" name="readOnly" visibility="public" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      <ownedAttribute xmi:id="7ffc7c6e-fce8-4296-b55e-90a7e2ad3a0b" name="saveOptions" visibility="private" type="SaveOptions" />
+      <ownedOperation xmi:id="3672a69e-55f5-4fb8-806e-cc8d9616b73f" name="Save" visibility="package">
+        <ownedParameter xmi:id="a13cd7a3-2c01-4e63-82c2-affd4b49f2a5" name="name" direction="in" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+        <ownedParameter xmi:id="cb42dabd-6989-42ea-a3c8-3804b6b9456c" name="fileHandle" direction="in" type="FileHandle" />
+        <ownedParameter xmi:id="7ed8ef63-c9b1-44a1-b118-c789b06155e5" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="18191b2e-f097-4a26-b721-0bdfb2cd667d" name="Save" visibility="package">
+        <ownedParameter xmi:id="f68969fa-e5ca-4078-9a93-91e5a13e084c" name="name" direction="in" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+        <ownedParameter xmi:id="0c7822e9-b89e-483f-8419-5f2eb802dcd9" name="fileHandle" direction="in" type="FileHandle" />
+        <ownedParameter xmi:id="5df00307-fe36-4a7d-acdd-76770f0539f3" name="readOnly" direction="in" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+        <ownedParameter xmi:id="c649865f-ad21-4ed2-a867-25d2fe85ba2e" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="c9047a55-3814-4e9d-8a36-1dc501eff9e6" name="writeArea" visibility="public">
+        <ownedParameter xmi:id="6e4137a5-d850-4e94-b042-c6871a29cb89" name="area" direction="in" type="Area" />
+        <ownedParameter xmi:id="46021a44-4ad0-4bce-bb78-8feaadbf4b0d" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="4c09987e-3aa9-47c8-b4f7-8d169595fc52" name="writeAreas" visibility="public">
+        <ownedParameter xmi:id="54b6d6c3-160d-4dc7-9fe5-b287c52fa327" name="areas" direction="in" type="AreaMap" />
+      </ownedOperation>
+      <ownedOperation xmi:id="0793986d-7361-4a04-9060-6bbb735e2b8d" name="readArea" visibility="public">
+        <ownedParameter xmi:id="0205e5d2-4389-4f32-9228-febd4f30ead7" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="f53cf330-2a4a-4b12-9e98-1211c0ce2c3e" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="4028fe2a-8ce4-4bc4-bd28-bb1d0aa5d0b5" direction="return" type="Area" />
+      </ownedOperation>
+      <ownedOperation xmi:id="81430012-a15e-41d4-a50d-66e5b99d575a" name="writePlayer" visibility="public">
+        <ownedParameter xmi:id="593795f3-3f78-4ec8-aa5c-41517faf3957" name="player" direction="in" type="Player" />
+      </ownedOperation>
+      <ownedOperation xmi:id="3be124ee-285c-4f87-85b8-37537672b095" name="writePlayers" visibility="public" />
+      <ownedOperation xmi:id="6a511406-dff5-4a77-9b29-c5c0cb1acd4d" name="readPlayer" visibility="public">
+        <ownedParameter xmi:id="973c7541-c300-4543-888a-64049a0d495e" name="uuid" direction="in" type="UUID" />
+        <ownedParameter xmi:id="b870b941-fdbc-419f-8527-04da3259bf7a" name="clientIdentifier" direction="in" type="ClientIdentifier" />
+        <ownedParameter xmi:id="9a38d847-eebc-4ce3-9ec3-2f85b5a6014d" direction="return" type="Player" />
+      </ownedOperation>
+      <ownedOperation xmi:id="db2b878b-fbc1-455b-991b-738edbd1311f" name="writeCave" visibility="public">
+        <ownedParameter xmi:id="7de7c506-dee8-4c90-8d4f-8e1dc173218d" name="areaReference" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="c6a39474-c8f2-450d-9f6e-1fb0fe0d6939" name="cave" direction="in" type="Cave" />
+      </ownedOperation>
+      <ownedOperation xmi:id="94760e3a-3dd5-4d77-b7ae-1f5caaf896fd" name="readCave" visibility="public">
+        <ownedParameter xmi:id="9fc7f094-c291-410e-845a-f64919c60531" name="areaReference" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="29b611cc-fe8e-4580-a00b-4f4c143272b0" direction="return" type="Cave" />
+      </ownedOperation>
+      <ownedOperation xmi:id="1115d6d8-72d8-49fd-88fe-6b6f15fded55" name="readSaveOptions" visibility="public">
+        <ownedParameter xmi:id="c2f61a50-07ad-41c6-b29d-8f04ca832733" direction="return" type="SaveOptions" />
+      </ownedOperation>
+      <ownedOperation xmi:id="410446fc-92d1-4724-b3f6-289d8555a5b8" name="getSaveOptions" visibility="public">
+        <ownedParameter xmi:id="dbbcdf26-6a9b-48dd-855a-7a808492cad8" direction="return" type="SaveOptions" />
+      </ownedOperation>
+      <ownedOperation xmi:id="e51ce3a2-baa7-4382-adb8-be8d9e5ef9f4" name="writeSaveOptions" visibility="public">
+        <ownedParameter xmi:id="e427de7d-fc35-4faf-bcee-a90f018ca913" direction="return" type="SaveOptions" />
+      </ownedOperation>
+      <ownedOperation xmi:id="bd1f3ba8-1416-45f8-bc32-e743c1137bf1" name="setSaveOptions" visibility="public">
+        <ownedParameter xmi:id="cad7e861-9063-4af1-8e54-fdfbe938c90e" name="saveOptions" direction="in" type="SaveOptions" />
+        <ownedParameter xmi:id="cc02bf90-0f71-4ed8-ad91-cc2c188a69b5" direction="return" type="SaveOptions" />
+      </ownedOperation>
+      <ownedOperation xmi:id="51820868-0e9a-4696-8e81-533958f9b2aa" name="folderArea" visibility="public">
+        <ownedParameter xmi:id="86f69a60-f1e1-40ff-96c0-474dbf8e1072" direction="return" type="FileHandle" />
+      </ownedOperation>
+      <ownedOperation xmi:id="f873ebe7-d835-4cfd-bd40-ab63d9fa95a0" name="folderCave" visibility="public">
+        <ownedParameter xmi:id="9c4ae727-e340-49d8-ad1e-d9e4b2038e62" direction="return" type="FileHandle" />
+      </ownedOperation>
+      <ownedOperation xmi:id="11c504ed-e2fc-4dd1-9e96-ad3517fd3c07" name="folderPlayer" visibility="public">
+        <ownedParameter xmi:id="cfa2d1fb-7ba7-44b5-a35f-f1a6f4a4017f" direction="return" type="FileHandle" />
+      </ownedOperation>
+      <ownedOperation xmi:id="c1dff9f2-484a-4ec0-a3a4-346e88d74683" name="readIDManager" visibility="public" />
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="13ec1ba9-7801-42a5-8743-8d3dfdf851c3" name="SaveAreaIO">
+      <ownedOperation xmi:id="42ae780b-a8b3-463f-9f00-09d0c71a8fb3" name="read" visibility="public">
+        <ownedParameter xmi:id="5d939935-6a9c-4142-b93f-89431fd9c4ba" name="save" direction="in" type="3b17cb61-a923-4a4a-acf2-271cae49e678" />
+        <ownedParameter xmi:id="8c0d9927-af19-454a-82a1-03edfde88f8a" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="07cd20aa-ed2d-4c9c-a5d6-69b7b5f5ff56" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="e8ffbf7c-d537-4c80-a28d-83143f624199" direction="return" type="Area" />
+      </ownedOperation>
+      <ownedOperation xmi:id="2273736d-0233-45ef-ad15-4a282a807511" name="write" visibility="public">
+        <ownedParameter xmi:id="2f138656-be7f-4489-8a96-60f63a1a3c6d" name="save" direction="in" type="3b17cb61-a923-4a4a-acf2-271cae49e678" />
+        <ownedParameter xmi:id="9c92474d-91a7-4380-a35c-f1ae261589ca" name="area" direction="in" type="Area" />
+        <ownedParameter xmi:id="a7308222-3040-43ef-951f-9fee61f8097b" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="29cc2921-fec8-4264-af6f-60f0e61becad" name="file" visibility="public">
+        <ownedParameter xmi:id="54dc6135-c951-47e4-b4fe-094656036783" name="save" direction="in" type="3b17cb61-a923-4a4a-acf2-271cae49e678" />
+        <ownedParameter xmi:id="933cebf7-5068-4d54-90e8-d8d4faeaefd7" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="d914e1d2-f391-4998-b270-8957d8e3d217" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="6fc5b399-75a0-4536-8e2d-81fa2787d9a9" direction="return" type="FileHandle" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="2f1b5702-81c7-41ee-ba44-9d233d5c03e0" name="SaveOptions">
+      <ownedAttribute xmi:id="699aeda3-5e79-44f0-ba0a-78a74fe5a1da" name="worldSeed" visibility="public" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+      <ownedAttribute xmi:id="277313ef-07b8-407a-903b-c3f4b531395b" name="worldSeedString" visibility="public" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+      <ownedAttribute xmi:id="2dbf8061-18c4-4131-91cb-1157270c92f7" name="worldTime" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="1b9f03e8-9600-4143-90e9-eea7a37e652c" name="worldPlayingTime" visibility="public" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+      <ownedAttribute xmi:id="d658559d-0847-4ff4-9939-215943bc3384" name="worldType" visibility="public" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+      <ownedAttribute xmi:id="a6f29e06-3d8e-4386-805d-7d64b8816375" name="worldGamemode" visibility="public" type="Gamemode" />
+      <ownedAttribute xmi:id="3e0ad036-f7b4-42fd-bd64-fbc7ba4e5b9a" name="idManager" visibility="public" type="DataGroup" />
+      <ownedAttribute xmi:id="636b9aa1-b5cd-4300-801f-4110174f3f45" name="lastOpenedTime" visibility="public" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+      <ownedAttribute xmi:id="439c2753-3706-463e-9b4f-e54a25b576fb" name="lastVersionHash" visibility="public" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+      <ownedAttribute xmi:id="163c0551-5652-49cb-8365-1dd59f5cacf2" name="worldRainOverride" visibility="public" type="17507cff-1338-4ff2-a2d7-5a32b81de572" />
+      <ownedAttribute xmi:id="2939480e-d2b9-4cbb-8b0a-c57eb587db50" name="worldRainOverrideTime" visibility="public" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+      <ownedOperation xmi:id="cb4b235e-d3bb-421b-a6a5-7c680eca9ea1" name="setWorldSeed" visibility="public">
+        <ownedParameter xmi:id="5b94ac39-3c2d-45b1-bd96-638405804328" name="seedString" direction="in" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="547f87e1-4e80-4e01-a98b-f44078abd316" name="WorldServer">
+      <ownedAttribute xmi:id="860db0a2-b70c-4e19-8df4-62a0c938ef22" name="loadedAreaFilters" visibility="private" type="ListLoadedAreaFilter" />
+      <ownedAttribute xmi:id="74c1247d-0c75-441a-8e6a-9981e2f30ccd" name="rainStatusOverride" visibility="private" type="17507cff-1338-4ff2-a2d7-5a32b81de572" />
+      <ownedAttribute xmi:id="a88d96a5-a031-43b4-aeac-dc447e8b2031" name="rainStatusOverrideEnd" visibility="private" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+      <ownedOperation xmi:id="2a0b5939-1b1a-4b66-8fd2-1f3532630eab" name="WorldServer" visibility="package">
+        <ownedParameter xmi:id="b2d1b9ce-dcf9-45d5-b79e-11b3aed11d1d" name="save" direction="in" type="3b17cb61-a923-4a4a-acf2-271cae49e678" />
+        <ownedParameter xmi:id="89859ff6-ac26-46eb-9b03-bc26f16dc704" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="d17c8573-01a6-4c55-b762-8ec5d0c14fd3" name="getSpawnPoint" visibility="public">
+        <ownedParameter xmi:id="832db277-9d9a-4682-979b-6225acddcf37" direction="return" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+      </ownedOperation>
+      <ownedOperation xmi:id="a54f4451-401d-4102-a7f7-fd05d9ea529d" name="unloadDistantAreas" visibility="public">
+        <ownedParameter xmi:id="725dab03-9ca9-4f53-86e7-73e6cf5f28c8" name="areas" direction="in" type="Iterable&lt;Area&gt;" />
+      </ownedOperation>
+      <ownedOperation xmi:id="273b85e4-5a56-4b71-b697-0b5f17123374" name="shouldAreaBeLoaded" visibility="public">
+        <ownedParameter xmi:id="d9088b43-bf27-4e17-90a5-b451feea905f" name="areaReference" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="209d6f62-6c08-44cc-bad1-7f4bb9950651" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="a3f88fe6-4686-4137-b6f3-c315d0468754" name="addLoadedAreaFilter" visibility="public">
+        <ownedParameter xmi:id="9e93aeb3-44c9-4d84-aa57-08faf3c6df70" name="filter" direction="in" type="LoadedAreaFilter" />
+      </ownedOperation>
+      <ownedOperation xmi:id="75a3941c-2f99-4a94-b0a3-a68bf434d6b4" name="removeLoadedAreaFilter" visibility="public">
+        <ownedParameter xmi:id="a16af976-74a5-42f0-9259-1e7d24978cbd" name="filter" direction="in" type="LoadedAreaFilter" />
+        <ownedParameter xmi:id="f4b7aa9e-ccbb-4192-b9e8-2c1617d6c852" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="5c743d8e-d6e7-4279-a2e8-9f64ef34fd49" name="getRainStatus" visibility="public">
+        <ownedParameter xmi:id="a24f1bff-a475-4384-a8b1-8c47888f3211" name="x" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="1d186636-2b8e-42b4-a3c6-5983fe862f02" name="z" direction="in" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+        <ownedParameter xmi:id="e1dcb68d-a63c-432c-aaa8-d24775b3db4e" direction="return" type="17507cff-1338-4ff2-a2d7-5a32b81de572" />
+      </ownedOperation>
+      <ownedOperation xmi:id="ec2c8af2-75f7-497e-8191-5e8a05841cbb" name="overrideRainStatus" visibility="public">
+        <ownedParameter xmi:id="1cc4de2b-572d-42d4-b5af-6e22bf586614" name="rainStatus" direction="in" type="17507cff-1338-4ff2-a2d7-5a32b81de572" />
+        <ownedParameter xmi:id="5f1930dc-089b-46ca-9cdb-10d7870aba80" name="seconds" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="bfca5124-f720-44b7-9dec-0d63a7dcd516" name="removeRainStatusOverride" visibility="public" />
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="acfc5fae-d72f-428c-86f7-be8fd535d675" name="Area">
+      <ownedAttribute xmi:id="a048db1f-b13c-4b90-a576-9e19bb2511d2" name="features" visibility="public" type="AtomicReferenceObject" />
+      <ownedAttribute xmi:id="a87473ce-d049-4b16-882a-9f9e7dc12af6" name="areaX" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="e0b59dd1-3ca1-4429-9600-fdd1b7afd7e5" name="areaZ" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="39629b9b-a7bd-4c8a-b8c9-abab25f1d41f" name="minBlockX" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="66120e16-fa9f-4546-9f06-3ed11269eaff" name="minBlockZ" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="f40c3623-7b72-4f7e-9d9b-a207e538bf32" name="hashCode" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="13ca8463-abec-4c80-a092-6dfaf71ae836" name="blocks" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="31a5642d-0592-40e8-bbbe-669c7eab9c7c" name="light" visibility="public" type="675f78e5-e9e4-495f-9a00-7048428fb18d" />
+      <ownedAttribute xmi:id="584b7699-f8e4-4c1c-84a1-8ecf66bee77b" name="heightmap" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="92f7a70e-4009-419d-a550-43125e639fd5" name="areaRenderer" visibility="public" type="AreaRenderer" />
+      <ownedAttribute xmi:id="de71a170-f630-446c-8aca-d264f4ba560d" name="maxY" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="8bcd2f55-f528-4b08-948f-14866e8dae73" name="height" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="43cabb68-8c8e-46db-8e31-6ed6a985aa90" name="blockDataList" visibility="public" type="ArrayListBlockData" />
+      <ownedAttribute xmi:id="888778ad-d318-43bf-8f35-039911800060" name="modCount" visibility="private" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="e5743c99-d34c-4417-84cf-c3c0a6f5b0be" name="renderStatus" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="6cc5848c-8288-48b2-ba75-250d93636329" name="unloaded" visibility="private" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      <ownedAttribute xmi:id="313e1b75-50a5-4f93-803d-0b94cf8483d3" name="neighboursClient" visibility="private" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+      <ownedAttribute xmi:id="2e50c451-6003-4452-9462-144e7dd646b4" name="neighboursServer" visibility="private" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+      <ownedAttribute xmi:id="956e815e-9ba7-4700-9105-ff30ddfa9988" name="areaMapClient" visibility="private" type="AreaMap" />
+      <ownedAttribute xmi:id="ef5c211e-5e88-4c7d-bd19-a39e510be748" name="areaMapServer" visibility="private" type="AreaMap" />
+      <ownedAttribute xmi:id="fa4979d1-4ded-4945-a487-9cd1fa223fec" name="shared" visibility="public" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      <ownedOperation xmi:id="474b39c9-80df-4aa4-90bd-54e291282af4" name="Area" visibility="package">
+        <ownedParameter xmi:id="182f6b53-ea5e-431e-a213-198939d6ec0a" name="areaX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="afc64c95-247d-40b6-a33d-07adb04a9727" name="areaZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="9d697d28-a0a9-4de6-bc61-2411454a2632" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="12a5c594-c4dc-49a4-bc75-5523718e5056" name="Area" visibility="package">
+        <ownedParameter xmi:id="e5b6dd9f-c6d5-4ca1-9739-0b744dcb1c3c" name="toCopy" direction="in" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+        <ownedParameter xmi:id="70ecd4c4-f64a-4785-b594-54088bd3af1c" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="ae06a822-491a-4efb-b1e8-6aefa6c672e3" name="getBlock" visibility="public">
+        <ownedParameter xmi:id="77cab2f3-476b-4715-a95d-be491dc58dd5" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="96d6a891-466a-422d-973e-1ec8b71fada6" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="848b0546-ec1a-4a5f-b0ae-e504d1dac752" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="12a1475f-dfc5-49f3-b17c-10a8d369e75c" direction="return" type="Block" />
+      </ownedOperation>
+      <ownedOperation xmi:id="2114ef23-f312-41b0-8fef-da69b9379a74" name="getMeta" visibility="public">
+        <ownedParameter xmi:id="ae2f8d90-e38e-480b-b33f-56eacceaef90" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="b14cfacd-101e-4ea5-8ee6-e7fbec1045a6" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="e57611ef-2cc7-4b83-ac3d-a4ebaaae132c" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="7551f598-3ebc-4384-bd2a-9358146aa4b2" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="b81e8d17-57f2-4391-b03f-e34850fa942e" name="heightmap" visibility="public">
+        <ownedParameter xmi:id="1059d463-199d-4e1d-9f81-bd109c979870" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="2520b3b4-8696-4134-b3ef-18645bcf9b34" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="d5fba690-8d87-41eb-969c-2fa52fc02af4" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="dba42e6b-c230-4d04-b062-a99c8844acd6" name="getSunlight" visibility="public">
+        <ownedParameter xmi:id="701e6ed3-a72d-44d9-85fe-93137df5aafb" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="840f5763-e9bf-482b-aaaf-147e542b9591" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="89f8547e-2a83-4bd9-8834-69f5d0fc6037" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="5814a52c-f6e5-4b04-9f09-f7b44996485f" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="bd2bfeb8-07f6-4a38-9465-179fb0b76f32" name="getLight" visibility="public">
+        <ownedParameter xmi:id="7e5e4cc0-33c4-46dd-8703-156983c058ed" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="7f19669b-0a4c-456f-a854-211be776e0bd" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="6382f6d0-84b9-4982-aa58-8b75ae65b64c" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="64de7528-f7dc-449e-a48d-a4d9b2be2cad" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="fe521bba-30cf-4852-b818-5d785286f987" name="getMaxLight" visibility="public">
+        <ownedParameter xmi:id="dc9353b8-3239-4679-aa39-f078688f33bf" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="4f31ec11-6dd3-4c67-9eee-748563121940" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="67c289b3-84f4-4755-b6fc-7ca332710521" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="10bcde4f-7eea-4e0e-9b6d-d0ec7c9cc612" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="56e3acd7-f206-4f79-b305-35750ef3985e" name="setSunlight" visibility="public">
+        <ownedParameter xmi:id="e854c0ce-d700-4f7c-b18e-7f105a1d42b4" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="698c1455-5411-49c3-b938-502b9f234075" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="f54acc6e-6ca8-4258-bb58-d4535434158e" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8cacd1df-0a1f-4876-a07a-ad0284bed58b" name="l" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="4aa9428b-33ab-4c99-bd23-e5f324c0d513" name="setLight" visibility="public">
+        <ownedParameter xmi:id="1f20b829-103e-440a-8457-80f691e31941" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="76758ef5-e62f-4b60-99c3-5a3d17d76cb8" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="44ad1917-7f63-449a-8308-99c2a569d338" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="273d6a9b-f372-4692-a082-29d73232fabc" name="l" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="5175de3f-88e7-4656-9ead-b691838708ef" name="getLightRaw" visibility="public">
+        <ownedParameter xmi:id="b75544e5-799a-4ebb-a08b-13d3692b8390" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="5dd8e0b1-8382-4000-9242-632e719bc4a1" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="ee963f76-9026-4866-adf6-08d20d8ddf15" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="a1709cb5-1954-45d5-b829-963bdbfba1ce" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="c40cc22f-ac98-4e3c-bc2b-d87a14bec1cd" name="isBlank" visibility="public">
+        <ownedParameter xmi:id="ca90f82d-8f5f-4df8-8cf7-0845e645228f" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="4172b3be-a6ee-4106-b074-bd47a26d59eb" name="isUnloaded" visibility="public">
+        <ownedParameter xmi:id="bddcd616-bff6-40cc-bba3-da20dc040a3a" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="c2b0fac3-354a-4140-91fc-09abb52a6407" name="isReady" visibility="public">
+        <ownedParameter xmi:id="742b9707-0724-4422-be01-89afcdc50560" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="d65627e3-d6b1-4b09-957e-3ed04ece68bd" name="unready" visibility="private">
+        <ownedParameter xmi:id="3b9e3c31-ccad-48e8-9ac3-53c1fd636f10" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="ce3a95cd-de2e-4023-94a7-fe560af77497" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="7bff587d-7987-4187-b467-4e86e9dfcd1d" name="unload" visibility="public" />
+      <ownedOperation xmi:id="c5073d73-a8b7-4dae-8811-704a6b811b54" name="removeArrays" visibility="private" />
+      <ownedOperation xmi:id="3d221329-cd4d-452c-bb55-7952c1cac008" name="update" visibility="private">
+        <ownedParameter xmi:id="bb056dba-2e3c-4fc8-a738-144a29316788" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="7848384f-bcb6-4796-9516-a61d51212f91" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="832e62e6-393a-4712-b5c3-380d0a612a9e" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="f4027035-a767-4159-bae1-e80d6b2bc0d0" name="i" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="b2ebecd1-6acb-4005-9088-a07216a2c54d" name="setBlock" visibility="public">
+        <ownedParameter xmi:id="d777a80e-e379-4972-9f5c-2193de891c78" name="block" direction="in" type="Block" />
+        <ownedParameter xmi:id="e7cdc668-645e-4621-967c-4bbb96f4c981" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="1117db33-a807-40c1-9537-8bed40f0c2cc" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="7c9b77ae-39ee-41fa-905e-e87d051a2c64" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8fd837ea-df1f-4926-85fb-bf9e380c42a0" name="meta" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="091c3c9a-899d-4393-982e-ff454b217dd4" name="removeBlockData" visibility="public">
+        <ownedParameter xmi:id="a48bd26f-bd20-4894-b7cf-0af4aa333d9b" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="855eab02-98f2-4d72-9643-0d6ac531503d" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="2fd40f32-f9ce-4c52-a1db-dea07786961a" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="2a2134c5-6e5d-4aae-8998-681d6054bd2f" direction="return" type="BlockData" />
+      </ownedOperation>
+      <ownedOperation xmi:id="58bab4d9-26a6-41ba-84e9-e843cb7d8797" name="getBlockData" visibility="public">
+        <ownedParameter xmi:id="bb1d4cbe-cfad-4fc0-a542-83d1f0c12d1f" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8004d267-9443-40e7-b8d4-ca4b8aed3521" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="9ef36010-ca49-4b8d-9ee7-fed0ac72becc" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="89090f40-e0ad-4076-a108-a1bf1d97d371" direction="return" type="BlockData" />
+      </ownedOperation>
+      <ownedOperation xmi:id="0e36d777-e8e8-4ce2-9ffa-a9b0839ce951" name="addBlockData" visibility="public">
+        <ownedParameter xmi:id="84bbc5e0-f5bb-4bcd-9099-8c8ca943b629" name="block" direction="in" type="Block" />
+        <ownedParameter xmi:id="48630014-e6a3-4583-a9a5-a8e908a2618d" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="23643bc2-e0ce-42e8-b406-711cd4799876" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="0c4f913c-4733-43b7-9107-a694d26bce03" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="f8ad4025-e11d-4549-984f-796621397be1" name="meta" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="54088de6-3ad0-4c68-b689-39a557ce9729" direction="return" type="BlockData" />
+      </ownedOperation>
+      <ownedOperation xmi:id="57e689c1-95f9-4247-886d-0f1088e85189" name="addBlockData" visibility="public">
+        <ownedParameter xmi:id="910eae80-1cc8-4ada-bc38-6ec763e80cf8" name="blockData" direction="in" type="BlockData" />
+      </ownedOperation>
+      <ownedOperation xmi:id="eed374a1-6a94-4a4c-87b5-947b21e9b757" name="neighbourBlockCoordinates" visibility="public">
+        <ownedParameter xmi:id="2087bd1c-d75f-4862-b38d-e01a4c293380" name="blockX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="45bd1ba4-bf75-4963-b818-ba98128e5c7d" name="blockZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="799d0b6d-3bfe-49c8-bc67-4d688eb4e30e" direction="return" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+      </ownedOperation>
+      <ownedOperation xmi:id="558f0bc5-9cd2-4b6d-9706-86a3aa7da3cd" name="neighbour" visibility="public">
+        <ownedParameter xmi:id="7d23026a-82be-4e46-94bf-92de54b9b1ea" name="areaX" direction="in" type="final int" />
+        <ownedParameter xmi:id="40c02887-67fc-47b1-bcfc-36cd39ac7b94" name="areaZ" direction="in" type="final int" />
+        <ownedParameter xmi:id="600f6a39-1588-4c45-ae6c-af4a32efb08e" direction="return" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+      </ownedOperation>
+      <ownedOperation xmi:id="bcf3aa8d-606e-414f-9af5-2bcf2ab733b8" name="areaMap" visibility="public">
+        <ownedParameter xmi:id="7a2f82ff-53f6-4b59-8648-c143e0be9341" direction="return" type="AreaMap" />
+      </ownedOperation>
+      <ownedOperation xmi:id="8cbfa979-cd87-4a8c-91af-868c06574661" name="setAreaMap" visibility="protected">
+        <ownedParameter xmi:id="1b5e8709-b5e4-4623-b102-80366f6790c6" name="areaMap" direction="in" type="AreaMap" />
+      </ownedOperation>
+      <ownedOperation xmi:id="cdebeed1-d859-496d-b229-f62862e9c530" name="tick" visibility="public" />
+      <ownedOperation xmi:id="37258728-6cf0-45f5-9e50-c56d9bb613da" name="randomTick" visibility="private">
+        <ownedParameter xmi:id="438163d2-f1d1-4ae1-b8d2-c636ceefcafa" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="1c9114a1-e06e-49b1-a4c1-78881c974d88" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8090bfb2-066e-417e-a2bf-de3ef3ed1dd4" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="95db6bb4-c660-4743-9ec8-7de8b74f0629" name="areaMap" direction="in" type="AreaMap" />
+      </ownedOperation>
+      <ownedOperation xmi:id="c740f1ff-6c02-4c5f-870a-f5d6ef9cb4a0" name="doUpdatesThisArea" visibility="public">
+        <ownedParameter xmi:id="ea67d4c5-26b9-437c-91d1-6ca468f9f583" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="6b6c42dc-b11a-4bc5-9b83-ce1ffd9a63d2" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="fd515df3-7541-40e2-880d-ba1dc4b3e59c" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="fb7dec8e-89de-4056-868b-a2d71560d8a1" name="ref" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="610d697c-c700-45ee-8e33-19ccf41c9e34" name="doUpdatesOtherAreas" visibility="public">
+        <ownedParameter xmi:id="fefade60-b3ce-415d-86f5-9a141379ccb1" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="7eacccf6-7e88-4626-9f88-251db27e9755" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="063104d9-47de-47b4-a3b3-c6038896cc9e" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="c9126eb9-5ebd-42b3-b066-f4f3929c32d4" name="ref" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="bbe6c599-f5d6-4447-93ca-71062ba7bb2c" name="updateSurrounding" visibility="private">
+        <ownedParameter xmi:id="cce44a73-7496-4b08-8c09-15c0dd7f82b8" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="3ac38cd9-fdd5-41a1-965a-e1ce09cd302e" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="bcb3e4d2-643f-41ea-a035-d63240bd5c29" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="81c2e6bd-ed32-4502-bb43-cd29ffa7daab" name="ref" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="6da4cc29-f2ce-42cf-b5c4-2c5560a3b160" name="updateRender" visibility="public">
+        <ownedParameter xmi:id="f687acaa-e246-47bc-8e8f-87bcf421f7c7" name="section" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="534a1a78-d1f2-4e55-9958-6e50a3068b31" name="updateAll" visibility="public" />
+      <ownedOperation xmi:id="2ac6ed90-aaf1-4a7a-b25b-a064de186c89" name="initialUpdate" visibility="public" />
+      <ownedOperation xmi:id="ac8e783a-c9d0-4bcb-b36f-5ed91b6c5349" name="setupArrays" visibility="public">
+        <ownedParameter xmi:id="9b23aa52-53d1-42d5-8166-9cb114cb8c11" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="67bde3ee-4468-479c-a3ee-6ad68c7c5802" name="rebuildHeightmap" visibility="public" />
+      <ownedOperation xmi:id="1461cf57-d6d5-4f19-9ab2-7de4506f19a9" name="calculateHeight" visibility="public">
+        <ownedParameter xmi:id="6ea4073d-9056-4437-a27e-9b3646856114" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="9566164d-83a5-4e37-b66c-8e68474a06c2" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="89c3c44b-fd4f-4a58-84cb-0d3b9a2b1e5b" name="expand" visibility="private">
+        <ownedParameter xmi:id="643ff8ad-ebd3-4cc6-9372-9c5f41ba6a66" name="h" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="72688ed5-95eb-4fde-8cdb-db861c9723b3" name="featuresGenerated" visibility="public">
+        <ownedParameter xmi:id="3cababba-17b5-4aae-89cf-64025d3e4139" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="33e4cddb-a399-4ace-8499-875eaa49e562" name="shrink" visibility="public" />
+      <ownedOperation xmi:id="d7c69ca6-ecef-4bbd-abc9-0e03972e48f2" name="usedHeight" visibility="private">
+        <ownedParameter xmi:id="3f5c6f38-4992-4fff-bf6f-ffd0f698f7eb" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="c12cf472-3db4-45cf-b101-5698f4b9e721" name="getRef" visibility="public">
+        <ownedParameter xmi:id="899774f4-670b-41d7-b833-5830639bf777" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="5ca350ed-979a-43c0-abcd-1a48f0465dd1" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="0df756cd-66d0-44a8-b4e0-86f3671e1f1f" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="4f005ee1-4098-46b6-887e-b74b19f495fb" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="b2e364a3-9ecb-4595-898c-33688130fed3" name="getX" visibility="public">
+        <ownedParameter xmi:id="940dfddf-734b-4095-a962-ad2be43af5f1" name="ref" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="f0321856-b1c2-4b4d-b5e9-49fd0e9e03cc" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="8c451c51-264f-43fc-a0f5-b60a635b21be" name="getZ" visibility="public">
+        <ownedParameter xmi:id="a8a25efa-f17b-4492-9b04-cfd700131ca7" name="ref" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="7640b1b9-a3d6-42b0-9487-0863f01530ec" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="1c32daec-85d2-42bc-b741-f520cfe2d1bd" name="getY" visibility="public">
+        <ownedParameter xmi:id="8a5b7af5-3041-4a00-800e-73e5522ac705" name="ref" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="825b7e98-ec33-4627-ac7a-9b392a0d2149" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="3af3c189-b6da-406d-99bf-d92f1107fac1" name="getHeightMapRef" visibility="public">
+        <ownedParameter xmi:id="b955b233-7d87-4ba2-9937-2a2cfda96ac0" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="7ef7fcab-33e3-456b-8f0f-ddb31b0f4757" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="e74ad396-a86b-4963-bebd-82d19b6f2c24" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="76fc55ea-1e34-472e-a4fa-7b09c3f557fe" name="isShared" visibility="public">
+        <ownedParameter xmi:id="b8ab3b92-026b-46ed-8d43-b668304abd51" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="67e7122e-86b8-41d8-a6a6-3eabd6769eef" name="modify" visibility="public" />
+      <ownedOperation xmi:id="52e24fec-4c57-4e5a-8a1f-1d9756f4a34e" name="modifiedSinceSave" visibility="public">
+        <ownedParameter xmi:id="c25ae15c-3b1b-4c8a-8e00-0176393d6834" name="entities" direction="in" type="DataGroup[]" />
+        <ownedParameter xmi:id="141b2506-42a4-4fe5-be06-51d37b4b10e4" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="29f8e9e9-636f-4c37-b80e-18a3b62298cb" name="saveModCount" visibility="public" />
+      <ownedOperation xmi:id="945f9c65-2ff6-4416-94db-e36cc8b13c43" name="lockAllNeighbours" visibility="public">
+        <ownedParameter xmi:id="ad49250f-1a85-497a-b1bb-1bf26014dfbb" name="write" direction="in" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+        <ownedParameter xmi:id="6fdbd1de-ea95-49c1-992c-54f9f9f0614d" name="requireAll" direction="in" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+        <ownedParameter xmi:id="46d1ca0e-39fd-43c7-b528-760d94e1b71d" direction="return" type="Locked&lt;Area&gt;" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="25dc84e6-8b9d-44e5-b366-df579265a58e" name="AreaMap">
+      <ownedAttribute xmi:id="5dfce1a9-9214-4042-afcc-d80864f09bfa" name="map" visibility="private" type="LongMapArea" />
+      <ownedAttribute xmi:id="9af9d56a-773a-4bd6-a127-36dd298fd94f" name="sorted" visibility="private" type="ArrayListArea" />
+      <ownedAttribute xmi:id="0fab0660-0c9c-4cb9-b278-467dd0b905fe" name="modifiedSinceSort" visibility="private" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      <ownedAttribute xmi:id="b8095613-5984-40bc-8784-37a5bc34a1b2" name="world" visibility="public" type="World" />
+      <ownedOperation xmi:id="e53708f7-9b39-499b-90f5-904819780613" name="AreaMap" visibility="package">
+        <ownedParameter xmi:id="59d0e412-f721-4549-b3b5-6feff9f248e4" name="world" direction="in" type="World" />
+        <ownedParameter xmi:id="710f26ac-4db1-43f4-aaab-5793a0bfb1e4" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="64a8534a-d7c1-42f9-9f5f-fb2455f9c185" name="getArea" visibility="public">
+        <ownedParameter xmi:id="a8062867-a98c-4540-baee-85d4df21b2f1" name="areaX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="2007e068-e21b-4a45-a891-fb5d9d379b84" name="areaZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="e2946d26-fecd-44f4-9a00-1c39a0660177" direction="return" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+      </ownedOperation>
+      <ownedOperation xmi:id="b9ecdabf-e709-4d55-9ee9-61dec50a59ce" name="lockedGetArea" visibility="public">
+        <ownedParameter xmi:id="5a1cf790-c820-454a-b482-36290d5c95a4" name="areaX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="1f7a7440-7a52-4a94-b6df-f328eef24bba" name="areaZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="cf38bfd6-c62b-4efe-8e8e-ddfd58068603" direction="return" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+      </ownedOperation>
+      <ownedOperation xmi:id="3a14a696-75b0-42ca-b602-206f24cb1090" name="setArea" visibility="public">
+        <ownedParameter xmi:id="372d321c-9d48-47a2-9dfe-e1027396e883" name="areaX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="248b6ae9-26ad-4667-b5c5-df969fb159ca" name="areaZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="e495e821-6d36-4317-88ba-01a7de6544e9" name="area" direction="in" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+        <ownedParameter xmi:id="1a3b299d-71bc-4c95-b1da-2bb4959410ca" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="20c633a6-cecd-4cdd-840d-214affea5316" name="toString" visibility="public">
+        <ownedParameter xmi:id="edc70563-d0df-47fa-9b6f-bb3912e91e53" direction="return" type="b7e4e72e-a3e2-424d-902e-f59132c84ec8" />
+      </ownedOperation>
+      <ownedOperation xmi:id="cdb0fc37-9aed-4321-8153-cb76a51ca776" name="getSize" visibility="public">
+        <ownedParameter xmi:id="63ef5235-406b-453c-a8b4-22907f74159c" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="0cf625ca-7fc0-426a-8914-922b1b593a3a" name="empty" visibility="public" />
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="8e8f58c2-14eb-4b11-b998-f8c1477d0eb6" name="AreaIterator">
+      <ownedAttribute xmi:id="8b88e0c1-2ebb-4958-ae93-54a077924810" name="iterator" visibility="private" type="IteratorArea" />
+      <ownedAttribute xmi:id="c753a61a-473d-4ab9-adea-7f94f13d8573" name="current" visibility="private" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="83e05bb9-4054-4d59-8721-04d6e053e9a0" name="Entities">
+      <ownedAttribute xmi:id="9787b477-06c3-4f32-845c-0ca8b2ca692d" name="world" visibility="public" type="World" />
+      <ownedOperation xmi:id="ccd6d33d-d328-4c2a-b06e-b754e53d9408" name="Entities" visibility="package">
+        <ownedParameter xmi:id="18c29d0d-2eb8-450c-b93e-ba268ebd33e4" name="world" direction="in" type="World" />
+        <ownedParameter xmi:id="eb881250-8727-4813-bd8b-f9aaa70a79a7" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="ea0b8ad1-2a1c-455e-ab89-2c1e3d69b292" name="getEntitiesForSave" visibility="public">
+        <ownedParameter xmi:id="f277de45-ce29-4047-a1e6-439d7bf1a804" name="areaX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="c0d80542-bf5b-452a-87bf-5d4f6573c713" name="areaZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="957af4fa-d9f5-473e-95e0-166872a27aca" direction="return" type="DataGroup[]" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="0d709418-91ab-4b2a-be16-9e431efc0abb" name="AreaNotLoadedException" />
+    <packagedElement xmi:type="uml:Class" xmi:id="f2d21cc9-c619-4d5e-abed-023d58ff376c" name="WorldGenerationRunnable">
+      <ownedAttribute xmi:id="a444857a-6a11-482b-ae2c-93fee0649653" name="queue" visibility="public" type="LinkedBlockingQueueWorldGenerationTask" />
+      <ownedAttribute xmi:id="0c21b516-5ab8-4d4f-87fe-8ad4e315f3e2" name="current" visibility="public" type="AtomicReferenceWorldGenerationTask" />
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="15861d7d-f8ff-4b01-acea-f1f723489d9f" name="WorldGenerationTask">
+      <ownedAttribute xmi:id="c8011794-c57f-4ce8-ba98-819e5358075c" name="world" visibility="public" type="547f87e1-4e80-4e01-a98b-f44078abd316" />
+      <ownedAttribute xmi:id="e8af35c5-5427-4a2b-9030-c3add193bb39" name="featuresReferences" visibility="public" type="MultiAreaReference" />
+      <ownedAttribute xmi:id="339ebaa7-b4a8-42f3-a61f-2e33bfeb5019" name="generateReferences" visibility="public" type="AreaReferenceSet" />
+      <ownedAttribute xmi:id="74c09bf8-8245-4fb7-899e-ad13997f715d" name="parameter" visibility="public" type="WorldRequestParameter" />
+      <ownedAttribute xmi:id="2df29b13-a303-4fe0-a836-810b56d87320" name="generateQueue" visibility="package" type="ConcurrentLinkedQueueAreaReference" />
+      <ownedAttribute xmi:id="9dc618d3-0961-42f8-8877-da5ef8c899f5" name="generationComplete" visibility="package" type="CountDownLatch" />
+      <ownedAttribute xmi:id="ae111490-f22d-49e0-9c78-a4a06fcfa3e5" name="featuresQueue" visibility="package" type="ConcurrentLinkedQueueAreaReference" />
+      <ownedAttribute xmi:id="38e025e4-a80f-4cf8-83e3-bf6aab0c75f4" name="timeStarted" visibility="package" type="AtomicLong" />
+      <ownedAttribute xmi:id="bebf119e-1c60-4518-9cb1-754255ed5d83" name="generateCounter" visibility="package" type="AtomicInteger" />
+      <ownedAttribute xmi:id="1791ba35-de97-4999-a14a-a4ea96f055ba" name="featureCounter" visibility="package" type="AtomicInteger" />
+      <ownedAttribute xmi:id="3767e907-5628-4709-a1ef-b20dcf3c1f1e" name="readCounter" visibility="package" type="AtomicInteger" />
+      <ownedAttribute xmi:id="30e1eea6-daee-4a11-86d3-15a4629dc8fb" name="generateSize" visibility="private" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="e4101501-db66-4477-a886-3c293e1d2ca0" name="featureSize" visibility="private" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedOperation xmi:id="130bf765-c50a-4b8f-ace6-d0df6d4ee92a" name="WorldGenerationTask" visibility="package">
+        <ownedParameter xmi:id="70a0da9c-aee0-4b1b-99e7-db00cc3a9f9c" name="world" direction="in" type="547f87e1-4e80-4e01-a98b-f44078abd316" />
+        <ownedParameter xmi:id="e0a3c110-b811-400e-b996-ea32e5cd1bc1" name="reference" direction="in" type="MultiAreaReference" />
+        <ownedParameter xmi:id="5bfa3081-99b1-4ba9-af52-752be1e2f692" name="parameter" direction="in" type="WorldRequestParameter" />
+        <ownedParameter xmi:id="c7ac7c06-d1d3-43a6-9969-1202b5e0bc6c" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="96ebd4f8-24b1-4aa5-91eb-130a51b01ddf" name="fillGenerateQueue" visibility="private">
+        <ownedParameter xmi:id="331124d2-2fc1-4e0d-8202-7e8c91664639" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="ec5584f6-2027-413e-a4d4-efeccfa02f80" name="fillFeaturesQueue" visibility="private">
+        <ownedParameter xmi:id="21d145c0-402d-4b43-87df-59a9db6a6f02" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="9d5830d2-aa28-4c41-a2ed-dacb0049c57e" name="printStatistics" visibility="public" />
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="89ea5d49-10f7-405e-96bf-8abed33b475e" name="WorldLockable">
+      <ownedAttribute xmi:id="13699988-a4cf-4d76-9a3b-9ab285c18a27" name="value" visibility="private" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedOperation xmi:id="6f3d16df-4e72-4f63-8800-a246d1af2e4a" name="WorldLockable" visibility="package">
+        <ownedParameter xmi:id="ed4225fe-9fc0-4d7b-9ac6-03fa4895f496" name="type" direction="in" type="Type" />
+        <ownedParameter xmi:id="bb3fe2a4-e362-42ad-b3af-706f38ce42b6" name="side" direction="in" type="Side" />
+        <ownedParameter xmi:id="b8ef5e3f-ad19-4af3-9bf2-f88b1f0dd2f4" direction="return" type="public" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="b415bc1e-5624-49d4-8a2d-cddf1bbdd49d" name="WorldRequestParameter">
+      <ownedAttribute xmi:id="a51bb575-7ed7-4c8f-ab59-f7e79cd374d6" name="prioritise" visibility="public" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+      <ownedAttribute xmi:id="ffcbea36-c324-4beb-8cbf-ac561ddd02b2" name="afterCompletion" visibility="public" type="Runnable" />
+      <ownedOperation xmi:id="31a41029-eaa7-4813-9fd1-34023cd02fdb" name="WorldRequestParameter" visibility="package">
+        <ownedParameter xmi:id="6e6ca6d1-df05-4c66-8c3e-5b251b4298de" name="prioritise" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="d0a907ed-50df-4530-8efe-0fa0cfabc625" name="afterCompletion" direction="in" type="Runnable" />
+        <ownedParameter xmi:id="55006eec-b68f-4b01-9acc-438cf49c7736" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="fa728e78-5ae7-4f77-8b86-9fb4d686095b" name="getComparator" visibility="public">
+        <ownedParameter xmi:id="7360dcf3-b9fb-4950-9bc3-503e6d7d54cf" direction="return" type="Comparator&lt;AreaReference&gt;" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="329650aa-cfc8-489b-ae2c-1d06af8587df" name="WorldSaveRunnable">
+      <ownedAttribute xmi:id="773eed2c-b220-42d2-ba9b-1a023b79230e" name="queue" visibility="public" type="LinkedBlockingQueueWorldSaveTask" />
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="eec8079b-7295-4608-b1ca-f50d6695569a" name="WorldSaveTask">
+      <ownedAttribute xmi:id="6882f36b-35f7-4920-b574-00c02d5c4f6d" name="save" visibility="public" type="3b17cb61-a923-4a4a-acf2-271cae49e678" />
+      <ownedAttribute xmi:id="ba1deb95-2211-4bce-bbdf-323ce9b7c9ba" name="length" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="40a054e8-9594-4873-8406-357208e72dc0" name="saveAreas" visibility="package" type="ArrayListArea" />
+      <ownedAttribute xmi:id="957dcf09-141e-4d24-8e0d-84d9ef518a00" name="saveQueue" visibility="package" type="ConcurrentLinkedQueueArea" />
+      <ownedAttribute xmi:id="bf4193b5-5287-438d-8efa-ee493f43cf9f" name="saveComplete" visibility="package" type="CountDownLatch" />
+      <ownedAttribute xmi:id="c981de3d-d2d9-4031-b24d-736c6f3bf85b" name="timeStarted" visibility="package" type="AtomicLong" />
+      <ownedAttribute xmi:id="5fa766fd-e323-4e1c-a6c3-01fd4dd5ea44" name="written" visibility="package" type="AtomicInteger" />
+      <ownedOperation xmi:id="2fdb9c53-b4e8-4770-8ae1-bc8f7c2df3a8" name="WorldSaveTask" visibility="package">
+        <ownedParameter xmi:id="7e655227-3c6c-4c93-a13e-0864389dc961" name="save" direction="in" type="3b17cb61-a923-4a4a-acf2-271cae49e678" />
+        <ownedParameter xmi:id="cd2ffbb4-69f3-4992-a9de-8bef7fa548e9" name="areas" direction="in" type="Collection&lt;Area&gt;" />
+        <ownedParameter xmi:id="5368dbe5-842c-4fcd-ba69-7cfa5bec4973" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="30aab9d4-ca82-417d-898f-079e06e2f8a9" name="WorldSaveTask" visibility="package">
+        <ownedParameter xmi:id="912083a6-3b15-48d8-a23b-9359a6182b71" name="save" direction="in" type="3b17cb61-a923-4a4a-acf2-271cae49e678" />
+        <ownedParameter xmi:id="874e8a65-3068-46b1-986c-2130373d2452" name="areas" direction="in" type="25dc84e6-8b9d-44e5-b366-df579265a58e" />
+        <ownedParameter xmi:id="8b71aa46-f39f-4033-b05f-421a46a3564b" direction="return" type="public" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="b2143b0e-5bd6-4509-ba5e-c7222a71d190" name="WorldTasks">
+      <ownedOperation xmi:id="34e15c5e-0a19-4580-a1d5-6165b46db8bc" name="request" visibility="public">
+        <ownedParameter xmi:id="9890e756-a104-4148-92c3-4516d511ad9c" name="worldServer" direction="in" type="547f87e1-4e80-4e01-a98b-f44078abd316" />
+        <ownedParameter xmi:id="175ae754-ace7-4fd4-86ad-3e7a29a89d15" name="references" direction="in" type="MultiAreaReference" />
+        <ownedParameter xmi:id="f8e6f4dd-9235-45cb-ae0a-7f41cf0b60b8" name="parameter" direction="in" type="b415bc1e-5624-49d4-8a2d-cddf1bbdd49d" />
+        <ownedParameter xmi:id="c40b8823-5e3f-401d-85e4-e6f94251d820" direction="return" type="GenerationTask" />
+      </ownedOperation>
+      <ownedOperation xmi:id="af73ce75-7d28-40b0-88b4-d931f88e69df" name="save" visibility="public">
+        <ownedParameter xmi:id="3a045306-554f-4298-a763-54c63dceb647" name="s" direction="in" type="3b17cb61-a923-4a4a-acf2-271cae49e678" />
+        <ownedParameter xmi:id="0ab70f92-4bcd-4d07-9201-550ad9653b56" name="areas" direction="in" type="Collection&lt;Area&gt;" />
+      </ownedOperation>
+      <ownedOperation xmi:id="8a81ecb0-05b0-4883-b8f5-a0b5d47c3178" name="save" visibility="public">
+        <ownedParameter xmi:id="e15135cd-465f-417b-955b-f994a7e7f66a" name="s" direction="in" type="3b17cb61-a923-4a4a-acf2-271cae49e678" />
+        <ownedParameter xmi:id="3b8f5e31-1c61-45b5-99f2-a7de5b8210b8" name="areas" direction="in" type="25dc84e6-8b9d-44e5-b366-df579265a58e" />
+      </ownedOperation>
+      <ownedOperation xmi:id="0d8701f2-4ab3-4218-8e28-a935f43ea4aa" name="currentlySaving" visibility="public">
+        <ownedParameter xmi:id="4e2293e4-4cb5-45f1-b18b-9466c2aaeca4" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="d4cf3d53-3d11-4067-bc95-b8badcd3d42e" name="waitSaveFinish" visibility="public">
+        <ownedParameter xmi:id="4525d9f4-e334-4b30-aae3-176cb4bb15ae" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="0dc23143-ff23-4cfc-a3c1-674ab55bcdc4" name="generate" visibility="protected">
+        <ownedParameter xmi:id="dc067984-8341-4124-afe5-942b9ee27e52" name="areaReference" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="ddf46618-ae03-4664-8665-649bd911170a" name="world" direction="in" type="547f87e1-4e80-4e01-a98b-f44078abd316" />
+        <ownedParameter xmi:id="edd23194-9fba-4dc1-891d-90490d5676e3" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="31af85ec-010b-447d-94c8-c97d327dffa7" name="features" visibility="protected">
+        <ownedParameter xmi:id="2a338326-c5c9-4ebf-986d-0b3e16bb9446" name="areaReference" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="7aed521f-6279-48a7-b217-c406a3247da0" name="world" direction="in" type="547f87e1-4e80-4e01-a98b-f44078abd316" />
+        <ownedParameter xmi:id="db5f4a3d-03a8-4300-94e0-fa4805b9b694" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="358abe68-07cc-4e73-be4c-a555e53ca653" name="getGenerationAreaFilter" visibility="public">
+        <ownedParameter xmi:id="4f21ad29-ab54-44e8-a37f-437ffa2bd993" direction="return" type="LoadedAreaFilter" />
+      </ownedOperation>
+      <ownedOperation xmi:id="f4f3ed96-3236-4efe-9c0a-3cfc17898b84" name="dispose" visibility="public" />
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="ebde912a-2fe2-48b7-bc99-f928f75d4d63" name="AreaReferenceSet" />
+    <packagedElement xmi:type="uml:Class" xmi:id="3a6a4657-ffa7-4d20-a42f-fed65fd19596" name="WorldRegion">
+      <ownedAttribute xmi:id="8713d807-d341-4846-9965-27e03679021e" name="minAreaX" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="fc6806f8-5829-4b73-b88f-e97cea701708" name="maxAreaX" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="183047ae-1ef5-4bb7-b1a2-fc78c7a2a9c9" name="minAreaZ" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="e5cbfad9-6ffd-4b1f-9138-6166531ba559" name="maxAreaZ" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedOperation xmi:id="b436c319-f888-4fb5-94fb-36a4b990b309" name="WorldRegion" visibility="package">
+        <ownedParameter xmi:id="ecf2d985-0287-488a-86ad-44ea076ce3df" name="areaReference" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="a9213f60-25e7-44de-9f61-79d87800c404" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="4fd64772-e7e7-436a-a318-c7170af67896" name="WorldRegion" visibility="package">
+        <ownedParameter xmi:id="7d11749f-a1d5-450d-a00e-0269cfc84b42" name="areaReference" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="2b13e64c-ea7c-46b6-9f95-e7f35a1a5853" name="range" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="9a6df962-121e-4f08-b74f-06153a81055b" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="686002ce-1cce-449a-bd17-87cce38d9c8d" name="WorldRegion" visibility="package">
+        <ownedParameter xmi:id="6f7c8e4c-82c4-4e16-8cd6-780ed2d4b850" name="minAreaX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="7c2f4d41-b390-4992-bcdd-d60b3bec9be4" name="maxAreaX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="87f4fe94-4625-49e1-8f32-f62954a4ff85" name="minAreaZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="0bb9da35-bc6f-45a4-9bc7-10b6e74369dc" name="maxAreaZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="b4caaccd-6012-49fd-8042-19d2dac32ab5" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="c0762b42-abd5-420e-98d7-2bdd3fa97c46" name="contains" visibility="public">
+        <ownedParameter xmi:id="fffe7304-be26-4bba-a1a1-0315ed896bfd" name="a" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="40c5ac5c-fd33-45a5-a3fb-2ce2f4ef2742" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="5ccd98ca-c5e7-486e-9a15-f8a0afa57ff4" name="contains" visibility="public">
+        <ownedParameter xmi:id="546b4093-053e-45bd-bec6-edcf7f676bcb" name="position" direction="in" type="Vector3" />
+        <ownedParameter xmi:id="17fec01b-b07c-4a1f-a142-7aa91213565c" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="0483c154-c136-45ce-b995-525d3576c73a" name="getCenter" visibility="public">
+        <ownedParameter xmi:id="b30c9ce3-e80c-435a-84e9-2a14336917c5" direction="return" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="cc953a61-e678-4777-b713-901bd052edd3" name="Cave">
+      <ownedAttribute xmi:id="03ad3ec0-3230-47aa-be36-a34a136550ea" name="caveStartX" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="fc1546a0-fcb9-4ace-8c48-c24e166321d6" name="caveStartY" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="0fe9f295-514f-435f-8bf3-6945f63784ca" name="caveStartZ" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedOperation xmi:id="7d2d895b-c884-41df-b5d3-c6868fc67661" name="Cave" visibility="package">
+        <ownedParameter xmi:id="1f063f5c-60eb-4927-844e-1dff9eef3e18" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8a47d66d-24c7-4f0a-a4f0-f84a2908899d" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="25208e8d-9ecf-4157-96b1-87d953a9032e" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="80d4d739-dd3f-41ed-bacc-24d223b43abf" name="blocks" direction="in" type="int[]&gt;" />
+        <ownedParameter xmi:id="9f12503d-cff4-43c4-b49e-7848723a8219" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="a5afae20-06e3-4d3c-b763-3be65c39059a" name="apply" visibility="public">
+        <ownedParameter xmi:id="9acaceb5-8cf5-4048-a6a5-72a3a0e582fd" name="area" direction="in" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="2a77777e-019f-4635-9519-1223f435f37d" name="CaveGenerator">
+      <ownedAttribute xmi:id="2ac6123a-340c-4cb1-be06-75515dfa66de" name="caveStartX" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="fbd5e07b-8b4c-4029-a9f1-2bedd342b42a" name="caveStartY" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="36e1f080-945c-4541-a001-78dae4c0f489" name="caveStartZ" visibility="public" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="5382b96d-ff7c-4375-b5b6-72f067585bce" name="smoothWorld" visibility="private" type="SmoothWorld" />
+      <ownedAttribute xmi:id="385babac-5f15-4926-a40f-45e20988e502" name="numbers" visibility="private" type="RandomXS128" />
+      <ownedAttribute xmi:id="8411bec4-7626-4262-85ba-5128150170c7" name="intSet" visibility="private" type="IntSet" />
+      <ownedAttribute xmi:id="59b6c0c1-d6a6-4274-b78b-ad1e1a71c4c1" name="rooms" visibility="private" type="ArrayListRoomNode" />
+      <ownedAttribute xmi:id="bdd83942-586f-4ade-b0b7-4c88942ad444" name="tunnels" visibility="private" type="ArrayListTunnelNode" />
+      <ownedOperation xmi:id="2476ae9c-4124-4c82-aac3-315fd1dca994" name="CaveGenerator" visibility="package">
+        <ownedParameter xmi:id="712a9f6b-2472-4138-97a5-66e8e9cb9502" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="e40914b9-c94f-4d6a-932d-30dc855d2360" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="178b951c-d0cb-41d0-aa48-71bd799c82a1" name="smoothWorld" direction="in" type="SmoothWorld" />
+        <ownedParameter xmi:id="5ebe4bfc-853c-42f7-b625-bd8d0e087123" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="924b4290-f670-4b53-b508-7426391b82ac" name="generate" visibility="public">
+        <ownedParameter xmi:id="f99b1016-c6ce-4e96-8d67-dc5cecf3e85e" direction="return" type="cc953a61-e678-4777-b713-901bd052edd3" />
+      </ownedOperation>
+      <ownedOperation xmi:id="f722edc9-fb15-4d7f-9b88-bbb702c2f3d9" name="clear" visibility="private">
+        <ownedParameter xmi:id="8ebbc665-8578-4da0-a7ef-cae3c81bbff1" name="blockX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="b7988fc2-73d7-49cc-9ede-c49f95be8001" name="blockY" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="a84ae080-0a9a-4669-a6c8-5bf0e16dd4f1" name="blockZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="4f97d0c5-89d7-47a4-a8f6-b3541bcaa939" name="generateNodes" visibility="public" />
+      <ownedOperation xmi:id="18d7d9ba-18c9-4299-9ba4-402fa685df22" name="calculateBlocks" visibility="private" />
+      <ownedOperation xmi:id="312b6da0-dbb5-4d4b-92fa-692e26af6445" name="checkRoom" visibility="private">
+        <ownedParameter xmi:id="9295fe5b-7f9a-472f-80a0-7cb95dc0f969" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="94ec2440-04cc-4039-854b-6fa964231ae8" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="59995067-8bca-4605-8a10-bfcd807b31a5" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="02552682-4870-416d-95ad-5ea7b986969c" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="2734fd20-ad23-4f4b-a99e-32c4ca8d8cb3" name="getRoomChangeXZ" visibility="private">
+        <ownedParameter xmi:id="985cc561-0c2e-406e-888b-73deb5156d07" name="distance" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8c8984f3-8896-4bc0-9e42-8af5b576ee41" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="cc6231f2-a9b1-4db0-b218-9003e6495001" name="undergroundY" visibility="private">
+        <ownedParameter xmi:id="ea6d6ebe-fbe7-48b1-b6f7-e286fc048e39" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8e79bfd5-e4e9-459c-bf8a-7dedfbe1d21c" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="05fb7180-5316-4f65-bd5e-6aed969a2fd4" name="prevY" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="599fe94e-d0b6-4411-99b8-4b51992f7b97" name="changeY" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="27f5d868-36eb-4571-a984-e83c2d3c36e2" name="allowSurface" direction="in" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+        <ownedParameter xmi:id="268cf361-7982-4505-9e23-beec7485fa89" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="84f0bc12-a78f-470f-9a08-4e488a81aa59" name="inRange" visibility="private">
+        <ownedParameter xmi:id="aeff51f9-2954-407f-87ba-a938f7980fd2" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="cd49c1d5-eda4-4a91-8f7e-89e255f9056e" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="d13ddec1-0518-40b2-9052-46a3b642bd7e" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+      <ownedOperation xmi:id="255cd802-5be8-476b-953c-0d6a1a62528b" name="distanceFromSpawn" visibility="public">
+        <ownedParameter xmi:id="3bc3d818-28bd-4e93-b354-bef334fee095" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="2a0ac515-25fa-4e46-bb7e-9b130c980032" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="0a584f82-3066-4ff6-8d91-11bba831e9ca" direction="return" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+      </ownedOperation>
+      <ownedOperation xmi:id="b7e51552-3441-481b-8fbf-48fa9159d2c8" name="distance2" visibility="private">
+        <ownedParameter xmi:id="9ea821a8-ad54-4fa3-9198-3bd246a9c748" name="a" direction="in" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+        <ownedParameter xmi:id="034386c8-27a7-4ec5-999b-089af14c2e7a" name="b" direction="in" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+        <ownedParameter xmi:id="f72d43fc-6f90-4242-941b-a8cdfad924cf" direction="return" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+      </ownedOperation>
+      <ownedOperation xmi:id="234c8072-40e6-4459-b4a5-230971734c03" name="distance" visibility="private">
+        <ownedParameter xmi:id="3e24eb96-8d64-40c4-9791-4f87fdf5bacb" name="a" direction="in" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+        <ownedParameter xmi:id="f87f0d14-5c67-480e-886b-77e75216d876" name="b" direction="in" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+        <ownedParameter xmi:id="29b860bb-57c3-40ea-8aff-46041fca9df0" direction="return" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+      </ownedOperation>
+      <ownedOperation xmi:id="ba0ce529-ac52-4731-8173-36b86a7dee26" name="distance" visibility="private">
+        <ownedParameter xmi:id="5c6f8b4d-cefe-4932-b869-a5271b92bac2" name="a" direction="in" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+        <ownedParameter xmi:id="17bfd49c-e76a-4a55-ac2b-da8449f2575a" name="x2" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="bc07da11-2742-4413-ba3a-89ce48717e4b" name="y2" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="3963f9f4-9854-4e0a-a069-86ccd6880183" name="z2" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="3a168bc8-689b-43bd-830b-30dde523c9ef" direction="return" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="17b912dd-8ff7-452a-b5ef-a78425a9449c" name="TunnelNode">
+      <ownedAttribute xmi:id="32d17739-08e7-4856-8e25-73011401eda6" name="start" visibility="package" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+      <ownedAttribute xmi:id="c9a3b944-4356-46a2-9562-9e6f7125475a" name="end" visibility="package" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+      <ownedAttribute xmi:id="4d8885e1-7494-4365-974d-b94fd26419e5" name="startRadius" visibility="package" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+      <ownedAttribute xmi:id="6fb033cf-5bda-4c24-8bac-0873941c388a" name="endRadius" visibility="package" type="a85779d6-06f4-4427-9137-f8ce9a9c211d" />
+      <ownedOperation xmi:id="68e21025-961e-4e38-952d-14c622fa145d" name="TunnelNode" visibility="package">
+        <ownedParameter xmi:id="121fe112-7876-4040-8a52-a6a875a50cd7" name="start" direction="in" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+        <ownedParameter xmi:id="72bc8f9a-7050-458b-9e6f-594c1cd0c098" name="end" direction="in" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+        <ownedParameter xmi:id="c1067b27-534c-4281-bf5d-6bb795493ea6" direction="return" type="private" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="7fb48574-f283-413a-9554-daf4f1201204" name="RoomNode">
+      <ownedAttribute xmi:id="4de44b40-f519-4c80-90a4-3d5d2517f492" name="location" visibility="package" type="fa66b044-0b4e-4d47-b30d-28b8b3b107f6" />
+      <ownedAttribute xmi:id="1ff36215-cfff-4e9d-8eac-3cdc3ab278b8" name="connect" visibility="package" type="7fb48574-f283-413a-9554-daf4f1201204" />
+      <ownedAttribute xmi:id="e34ce956-9671-4839-9abf-f201b6014d5a" name="size" visibility="package" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedOperation xmi:id="380efd14-f0a1-487c-8b71-ef35a27e9dd9" name="RoomNode" visibility="package">
+        <ownedParameter xmi:id="501e9ac1-3f69-45da-ba4a-95dfe1237595" name="blockX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="6d83ce07-54a0-4c9c-b1d5-b6b6253a7f32" name="blockY" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="5b5a70fa-70bb-473b-a6a2-618f2acd6171" name="blockZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="a7f91e25-d5cc-4ce6-aa0e-ce44a7a113b8" name="size" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8004790f-0cc5-4d33-9d14-30609f291cbc" name="connect" direction="in" type="7fb48574-f283-413a-9554-daf4f1201204" />
+        <ownedParameter xmi:id="76bb00e5-668f-436d-891c-f115b7d726bd" direction="return" type="private" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="c8955df2-4741-43c7-b0c6-928c196e8ed7" name="CaveManager">
+      <ownedAttribute xmi:id="3b99b3be-0ab6-4140-a8fc-4bbfcc72a119" name="smoothWorld" visibility="private" type="SmoothWorld" />
+      <ownedAttribute xmi:id="324bbc0c-6645-4ddf-b0d2-2be6921982ac" name="spawnCave" visibility="private" type="cc953a61-e678-4777-b713-901bd052edd3" />
+      <ownedOperation xmi:id="67b1c851-bb19-4021-9ceb-d982a4b980c8" name="CaveManager" visibility="package">
+        <ownedParameter xmi:id="89c541ae-d20d-41c9-aa9a-6467a2b04618" name="smoothWorld" direction="in" type="SmoothWorld" />
+        <ownedParameter xmi:id="4583208e-3d12-4cfa-a700-ef5010b78692" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="f0b4d9ba-dd47-4e49-abd8-a946043de2c1" name="apply" visibility="public">
+        <ownedParameter xmi:id="2a0b77e0-581a-4eb8-8b1b-9cc9175f42f4" name="area" direction="in" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+      </ownedOperation>
+      <ownedOperation xmi:id="a20d7d1c-5318-4cf9-af21-c36faf5856d0" name="getSpawnCave" visibility="private">
+        <ownedParameter xmi:id="ee21e9aa-e633-44d6-8aab-a1074eb6b648" direction="return" type="cc953a61-e678-4777-b713-901bd052edd3" />
+      </ownedOperation>
+      <ownedOperation xmi:id="6c63598a-b016-49b3-9e34-5ba5a698f780" name="loadCave" visibility="private">
+        <ownedParameter xmi:id="74494f5d-c967-49a5-bac0-b7d5c1eec3e0" name="a" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="284d24a5-398a-4202-a441-14056bd98339" direction="return" type="cc953a61-e678-4777-b713-901bd052edd3" />
+      </ownedOperation>
+      <ownedOperation xmi:id="e74e7306-c489-44b6-8b5d-6801d3d47655" name="generateCave" visibility="private">
+        <ownedParameter xmi:id="bc46993e-613a-4108-aabb-f273ffe807b7" name="a" direction="in" type="final AreaReference" />
+        <ownedParameter xmi:id="1dc3dfb0-d31e-48aa-bb78-31b2b0220000" direction="return" type="cc953a61-e678-4777-b713-901bd052edd3" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="35345df7-8162-4732-a415-486e5a8fe7d9" name="Feature">
+      <ownedAttribute xmi:id="914b2cc6-291a-45ae-be76-e790f95d29af" name="seed" visibility="private" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+      <ownedAttribute xmi:id="5b81e809-c70c-438d-bd84-79f1d317b986" name="noise" visibility="private" type="OpenSimplexNoise" />
+      <ownedAttribute xmi:id="284bfe34-2765-4e28-855b-280520195b38" name="octaves" visibility="private" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      <ownedAttribute xmi:id="b9f407b7-a7a3-4e32-825b-3f21025d56a5" name="d" visibility="private" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+      <ownedOperation xmi:id="1d0d41c8-7d63-4709-a9ec-6af4d4b4ee41" name="Feature" visibility="package">
+        <ownedParameter xmi:id="31f1f300-b831-4290-8189-9b49c67300ae" name="seed" direction="in" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+        <ownedParameter xmi:id="3bf030c9-00dd-4291-a017-f14567ed1f0c" name="octaves" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8dc75ee7-17f2-4ba5-b3cd-905eb884556f" name="change" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="736faf01-966c-4153-aae8-7964f2d34ad8" direction="return" type="protected" />
+      </ownedOperation>
+      <ownedOperation xmi:id="806b4eca-536c-4330-9f94-6c2ca99420dc" name="eval" visibility="public">
+        <ownedParameter xmi:id="c7412fd1-d9f0-45f9-b506-154eb94758d9" name="x" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="8beaee4b-602d-43d0-9cca-d3963345a829" name="y" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="d352044d-e526-4b85-bd74-e0361ff7dd72" direction="return" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+      </ownedOperation>
+      <ownedOperation xmi:id="de9ca6ac-22a3-4fdd-8cd6-0fe142998237" name="eval" visibility="public">
+        <ownedParameter xmi:id="6fd9f3b7-3472-4190-8ba0-eadb1f0a71a8" name="x" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="5293add9-01a6-475f-bd05-ce4b96fa1b9c" name="y" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="5360bdfc-282b-4a94-9b02-1b6420cad0b6" name="z" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="e62dcd88-069c-458e-9c31-b1eb33ac577d" direction="return" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="9de1feb7-5d0c-463b-a7d1-85d83cc0121d" name="OpenSimplexNoise">
+      <ownedAttribute xmi:id="0084c8ea-62d7-460b-a748-e34030d77ffa" name="perm" visibility="private" type="short" />
+      <ownedAttribute xmi:id="a7a1b536-fc56-449e-8246-de5c68c025c4" name="permGradIndex3D" visibility="private" type="short" />
+      <ownedOperation xmi:id="2747f5d5-e4e0-4a0b-90d5-f7d677d4deee" name="OpenSimplexNoise" visibility="package">
+        <ownedParameter xmi:id="50a157a6-d217-40ea-9edb-01a461511cc9" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="df745b15-523d-4f34-8acd-eda91d879e39" name="OpenSimplexNoise" visibility="package">
+        <ownedParameter xmi:id="3253223d-9fb6-4339-a1c2-14f9c6ecb461" name="perm" direction="in" type="short[]" />
+        <ownedParameter xmi:id="0dff33b7-ec6d-4f12-8e6b-1833f9701edb" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="ef22ebf3-aaab-4b74-8903-dd5d2d051d3a" name="OpenSimplexNoise" visibility="package">
+        <ownedParameter xmi:id="64f3155c-16d5-4f20-a087-ce6a6c59ae51" name="seed" direction="in" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+        <ownedParameter xmi:id="df064cba-1120-4f6f-9eb5-29a94c68241a" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="18360355-c6c6-4f1a-802e-9b4165602cb4" name="eval" visibility="public">
+        <ownedParameter xmi:id="d4b2e7ad-5cb7-4ff0-ab45-319ae177cc15" name="x" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="1196c97a-fbc3-4788-a0fd-7a7d199928ab" name="y" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="395aaea8-44ef-4b94-bc16-d168fc33fd0c" direction="return" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+      </ownedOperation>
+      <ownedOperation xmi:id="2c34c377-79fe-4591-8ce3-adac78805af7" name="eval" visibility="public">
+        <ownedParameter xmi:id="a41ff94d-4a3c-4dea-af8d-4d2b01eaa8fe" name="x" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="d2e3e2cc-745d-4948-a22e-d64541b736cb" name="y" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="5d04ec3f-f591-4215-b5da-51f276b2ed5a" name="z" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="235bcc8d-067f-4c75-87fb-a43cec9ff130" direction="return" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+      </ownedOperation>
+      <ownedOperation xmi:id="b7b89b3e-973b-4ec0-92f9-43f4ec30be69" name="eval" visibility="public">
+        <ownedParameter xmi:id="b41cc76d-be34-430c-9076-e5e1db7d45e4" name="x" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="7905536b-12d2-4381-a485-2c68edd58396" name="y" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="5f252f75-5ea3-4091-98c9-3a1c0a377398" name="z" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="6d57ff77-fa10-491a-a705-92104f2c531e" name="w" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="8b661521-6bee-47d9-a468-ad8ac2c6c0c1" direction="return" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+      </ownedOperation>
+      <ownedOperation xmi:id="099e65a6-5624-4521-a48c-60ffa9213345" name="extrapolate" visibility="private">
+        <ownedParameter xmi:id="4aac0ded-6118-4cdd-87f4-484912a83d33" name="xsb" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="ec83ec0b-e171-4595-bf5e-a0ed6b40c68a" name="ysb" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="dfd3d9a7-5147-4be0-90d7-e1f22209d98d" name="dx" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="4fcc9f1e-cf73-4a5e-93a5-239f870fe0f5" name="dy" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="9aaca79f-7bab-4ce0-847e-761c97a1a924" direction="return" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+      </ownedOperation>
+      <ownedOperation xmi:id="723470d3-161e-4511-8431-af0b003c0357" name="extrapolate" visibility="private">
+        <ownedParameter xmi:id="bc1a0e81-1a56-4635-b73c-974d08fcebc4" name="xsb" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="5032bbeb-b773-4772-9a8e-76639ab59c9a" name="ysb" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="e4150f7f-5790-492d-ba73-d84bb98b5f47" name="zsb" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="a584abaf-c90c-4980-8f2a-3aa8a075ea5f" name="dx" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="1a345aa4-2b74-4fbd-90db-0efc76a6a9f5" name="dy" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="2b9d6b78-01d6-4072-8740-8991e752b084" name="dz" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="0fc14955-b44e-4c18-84da-aafeb817fa95" direction="return" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+      </ownedOperation>
+      <ownedOperation xmi:id="6614c7ea-6df4-47a9-a759-8194b3d88e6b" name="extrapolate" visibility="private">
+        <ownedParameter xmi:id="721351e8-418a-4c49-8e99-a3186c216727" name="xsb" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="2c9f4173-96ff-415b-8c79-ed98a3ef1675" name="ysb" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="e1a027f4-1aff-498d-8c84-1356b5c4ce0b" name="zsb" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="d2ca0f63-96ad-4fa2-9d59-1d3d21c45713" name="wsb" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="b070b697-90b6-48c5-9081-595d92d279a6" name="dx" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="e5131f01-19bd-4de4-94aa-284902b17f22" name="dy" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="f7c2e3a0-36c5-42f3-8780-a85fcfbd8a02" name="dz" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="ffb7c4d8-35a0-4c41-bf73-44063397b892" name="dw" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="dbb003b9-124b-42a1-916a-3f7324b174b0" direction="return" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+      </ownedOperation>
+      <ownedOperation xmi:id="c980446f-c314-46c3-8660-acf47292db7b" name="fastFloor" visibility="private">
+        <ownedParameter xmi:id="06226807-2beb-4047-910f-917482bcc183" name="x" direction="in" type="81e07058-0279-4635-96c5-49754ef6e80a" />
+        <ownedParameter xmi:id="3d43c517-17db-4914-9e43-da6995ce7014" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="716997f8-ac11-44dd-834a-e5d7ad6d9595" name="SmoothWorld">
+      <ownedAttribute xmi:id="6d7afb60-e40c-46a0-88a2-842d166724fe" name="randomSeed" visibility="private" type="Random" />
+      <ownedAttribute xmi:id="de43786f-c522-4914-8bfa-a454b0fff12b" name="baseSeed" visibility="public" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+      <ownedAttribute xmi:id="b2ae247f-dfae-4448-9d5a-3438f856e62f" name="height" visibility="private" type="35345df7-8162-4732-a415-486e5a8fe7d9" />
+      <ownedAttribute xmi:id="065afbac-fcdc-4174-ba76-5d2a3deb1b3a" name="heightVariation" visibility="private" type="35345df7-8162-4732-a415-486e5a8fe7d9" />
+      <ownedAttribute xmi:id="2ec9d0e0-7fd1-4cbb-a4ac-3dfd83e32a29" name="trees" visibility="private" type="35345df7-8162-4732-a415-486e5a8fe7d9" />
+      <ownedAttribute xmi:id="c76c8b49-555e-4b5b-b75a-efb68494c86d" name="rain" visibility="private" type="35345df7-8162-4732-a415-486e5a8fe7d9" />
+      <ownedAttribute xmi:id="0d54f988-0b30-44d3-9345-bac73c87b31e" name="caves" visibility="private" type="c8955df2-4741-43c7-b0c6-928c196e8ed7" />
+      <ownedOperation xmi:id="a4c9156a-9d75-4859-bfb6-617a7e86697d" name="SmoothWorld" visibility="package">
+        <ownedParameter xmi:id="1e8b3d50-0cf6-4e03-909e-a5d3a828edc8" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="d1e59eda-948d-4ef7-b6f6-6166df31aded" name="SmoothWorld" visibility="package">
+        <ownedParameter xmi:id="d9a45166-fa41-4d98-b723-880d763b2532" name="baseSeed" direction="in" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+        <ownedParameter xmi:id="6697b3fd-6370-418f-9bff-1d045d1db46d" direction="return" type="public" />
+      </ownedOperation>
+      <ownedOperation xmi:id="bb797243-ca63-4a31-a3c4-b7ff086a8dea" name="genTree" visibility="public">
+        <ownedParameter xmi:id="818d1a8e-a6cf-4dee-8400-a5eb2c034e73" name="area" direction="in" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+        <ownedParameter xmi:id="be2adf29-0478-47cb-885f-cf9b9ba64c2a" name="aX" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="3a6cb7cd-4784-4927-b260-cdd56fcbd5b5" name="aZ" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="b73a5bec-ffe0-4b6e-aec6-9a89eb18f95c" name="getSurfaceHeight" visibility="public">
+        <ownedParameter xmi:id="f333b8fe-b0e1-4109-8f35-f0b4f6536f73" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="023b167a-17ba-4cfe-ab21-fa72b8eeb1b7" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="d77f3b52-077a-4268-81ed-3eb31d7d9181" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="296c5e46-d738-422d-b773-16c137d87e96" name="getDirtHeight" visibility="public">
+        <ownedParameter xmi:id="57d6c4d3-8114-4d1e-9edb-29dd11e88517" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="d91cf018-bdba-42c4-9946-3f429504fd9d" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="b784864b-e1c2-4324-b47f-a77d26579208" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="99be075a-dc71-4a19-b883-1477ec6bf0f9" name="getTreeHeight" visibility="public">
+        <ownedParameter xmi:id="2de19cbe-845c-4cc4-83ca-2f608b20e86c" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="2dd06f0d-6073-409e-8f42-787634d5a5d9" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="54b9bba6-1695-4554-b23e-c619bf84a99d" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="6efe0518-b637-4d64-8d11-1bd674aca055" name="pseudorandomBits" visibility="public">
+        <ownedParameter xmi:id="a7ea78a7-6638-4031-aa6f-29af66235c0e" name="x" direction="in" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+        <ownedParameter xmi:id="16a59d09-629a-4241-9e49-319c78450d9e" name="z" direction="in" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+        <ownedParameter xmi:id="7695d7fa-42e8-409c-a898-30d0d1b33b7a" name="bits" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="0ef842d0-3a72-42eb-a116-86b625a43c1b" name="murmurHash3" direction="in" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+        <ownedParameter xmi:id="6a417758-ca86-4abe-9aa6-01072b5887b4" direction="return" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+      </ownedOperation>
+      <ownedOperation xmi:id="16368960-9007-4c66-bf13-7ca837655048" name="pseudorandomInt" visibility="public">
+        <ownedParameter xmi:id="94539149-5b2a-4472-ab56-f42d7cbcd41c" name="x" direction="in" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+        <ownedParameter xmi:id="352bbce8-e115-4f45-9d28-eea5adbb6a13" name="z" direction="in" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+        <ownedParameter xmi:id="9e69f1b1-b273-4581-9d88-48b1f90df533" name="inclusiveBound" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8a78db17-05e6-4f99-a5c8-2c53cfa7240c" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="ed52c047-e239-4589-b06d-c04cb77da9cf" name="murmurHash3" visibility="public">
+        <ownedParameter xmi:id="bb51c578-6e53-4783-8a62-61da4bcd1df6" name="x" direction="in" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+        <ownedParameter xmi:id="aaa4bbb4-f5be-4803-9019-7345f7704d13" direction="return" type="e64c392f-a36f-4004-bbf7-a426b6fbf160" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="e55d774f-011b-4ef5-9f61-e71dfa8a8916" name="TreeGenerator">
+      <ownedOperation xmi:id="b7c012b6-b930-4ce9-8bd8-0b22800639f2" name="generateTree" visibility="public">
+        <ownedParameter xmi:id="487c2039-9c2e-478e-9631-dfbffa01018e" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="8593a1ee-ed9b-4969-92a4-cc2dc5e32bf1" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="82ee398b-dfb1-4494-a6ce-115a0c56b091" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="60ac6ca9-2957-4717-9580-d5065ebb5718" name="h" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="4b942be4-116f-4ff1-a3c7-3cc96050adf6" name="area" direction="in" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+      </ownedOperation>
+      <ownedOperation xmi:id="01535db5-d31d-464b-9c5b-42ea6cb0a7c1" name="setBlock" visibility="protected">
+        <ownedParameter xmi:id="a5c19c4d-869c-4d7d-99f5-0bee7ee80ef7" name="area" direction="in" type="acfc5fae-d72f-428c-86f7-be8fd535d675" />
+        <ownedParameter xmi:id="213fc53a-915d-46fc-8ab9-fe049e2e35a2" name="block" direction="in" type="Block" />
+        <ownedParameter xmi:id="33279fb5-250d-408a-ace0-134ddb84e564" name="x" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="c0b09360-99f0-43eb-b45a-88507b722044" name="y" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="4e877a35-9c68-4390-bd81-36f8bd855a8f" name="z" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+        <ownedParameter xmi:id="89e137f3-fae1-43e8-8c84-72758955d5d4" name="meta" direction="in" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Interface" xmi:id="64a61871-333a-4f0b-aed1-32fbbf830745" name="TerrainGeneratorFactory">
+      <ownedOperation xmi:id="1d91dedb-055b-42a9-9aa1-c0941784cac6" name="getTerrainGenerator" visibility="package">
+        <ownedParameter xmi:id="38b14480-3436-4896-80ef-738a2fbf00db" name="saveOptions" direction="in" type="2f1b5702-81c7-41ee-ba44-9d233d5c03e0" />
+        <ownedParameter xmi:id="8fab053e-6879-45dc-8e36-ce72d2eea7a1" direction="return" type="TerrainGenerator" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Interface" xmi:id="22fa4c4e-fa51-420d-b232-f18094a60a10" name="LoadedAreaFilter">
+      <ownedOperation xmi:id="0e322e69-4f23-403c-b0a9-5eb1bf448ed6" name="load" visibility="package">
+        <ownedParameter xmi:id="b3aa924b-8354-41dd-9904-5548cbb52426" name="areaReference" direction="in" type="b63755c6-45be-4dad-8da3-d56d1d407e0e" />
+        <ownedParameter xmi:id="544a7063-913f-42c4-9032-612251901f28" direction="return" type="e062efff-c6ab-4ef1-809c-18418ea7ce60" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Interface" xmi:id="ece7db4d-20ae-4782-add7-d614ba53b207" name="GenerationTask">
+      <ownedOperation xmi:id="3f393980-554e-4720-aa6e-8e219317fb50" name="totalGenerate" visibility="public">
+        <ownedParameter xmi:id="afc88253-5c54-486f-9051-e0342f420188" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="4fb3b550-5a26-4d75-a02d-8d302bae0df7" name="totalFeatures" visibility="public">
+        <ownedParameter xmi:id="847ca638-062b-4651-b792-f57012d646f5" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="2ab6e238-7325-4a79-92cb-03be411214b4" name="doneGenerate" visibility="public">
+        <ownedParameter xmi:id="9bd226e7-9014-4dc8-b20b-bf5a81f16cc3" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+      <ownedOperation xmi:id="585c3ad3-3ada-4e3f-ac04-eb4fd1e99d1f" name="doneFeatures" visibility="public">
+        <ownedParameter xmi:id="9ac2953b-97e3-49b9-9fbd-3be24ffc930d" direction="return" type="de44d5a3-d8ba-4b22-89ef-9ed75ee9dbe2" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Interface" xmi:id="857f07f5-c833-4960-8bdb-a310da4c17a6" name="MultiAreaReference">
+      <ownedOperation xmi:id="6e9f66fc-7680-499d-9d10-87c0d9052e43" name="getAreaReferences" visibility="public">
+        <ownedParameter xmi:id="336ad9cd-f916-42d2-99e7-9c327de03c1c" direction="return" type="Set&lt;AreaReference&gt;" />
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Enumeration" xmi:id="76e9f27f-31e0-45b4-9be5-97aebf021610" name="XYZ" />
+    <packagedElement xmi:type="uml:Enumeration" xmi:id="35d876dc-8443-40e5-97bd-f3ef637873ad" name="Gamemode" />
+    <packagedElement xmi:type="uml:Enumeration" xmi:id="f3dbf4db-a385-41fd-b3e4-e13c0a869059" name="Type">
+      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="e47c5533-4abd-4573-ad5c-c78cd5952e1e" name="WORLD" />
+      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="c50d8f58-a0c7-4655-b6c7-3fa8327fd66e" name="AREAMAP" />
+      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="b9ddc34b-df1b-463c-9347-45c9b5197a11" name="ENTITIES" />
+    </packagedElement>
+  </uml:Model>
+</xmi:XMI>
