@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Final Fixed XMI converter that properly parses PlantUML attribute syntax
+Complete XMI generator with proper associations from attribute analysis
 """
 
 import xml.etree.ElementTree as ET
@@ -8,12 +8,13 @@ import re
 from pathlib import Path
 import uuid
 
-class FinalFixedXMIConverter:
+class CompleteXMIGenerator:
     def __init__(self):
         self.class_map = {}
         self.interface_map = {}
         self.enum_map = {}
         self.primitive_types = {}
+        self.associations = []
         
     def create_xmi_document(self, title="World System"):
         """Create XMI document with ultra-compatible namespaces"""
@@ -46,11 +47,19 @@ class FinalFixedXMIConverter:
             self.primitive_types[prim_name] = prim_id
     
     def parse_plantuml_file(self, file_path):
-        """Parse PlantUML file and extract all elements with IMPROVED attribute parsing"""
+        """Parse PlantUML file and extract all elements with associations from attributes"""
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        return self.parse_plantuml_content(content)
+        elements = self.parse_plantuml_content(content)
+        
+        # Generate associations from class attributes
+        self.generate_associations_from_attributes(elements['classes'])
+        
+        # Add generated associations to relationships
+        elements['relationships'].extend(self.associations)
+        
+        return elements
     
     def parse_plantuml_content(self, content):
         """Parse PlantUML content with improved attribute parsing"""
@@ -71,8 +80,8 @@ class FinalFixedXMIConverter:
                 continue
                 
             # Class definitions
-            if line.startswith('class '):
-                match = re.match(r'class\s+(\w+)(?:\s+extends\s+(\w+))?(?:\s+implements\s+([\w,\s]+))?\s*\{?', line)
+            if line.startswith('class ') or line.startswith('abstract class '):
+                match = re.match(r'(?:abstract\s+)?class\s+(\w+)(?:\s+extends\s+(\w+))?(?:\s+implements\s+([\w,\s]+))?\s*\{?', line)
                 if match:
                     class_name = match.group(1)
                     extends = match.group(2)
@@ -141,13 +150,98 @@ class FinalFixedXMIConverter:
                 current_element = None
                 current_type = None
             
-            # Relationships - INCLUDE ALL TYPES for Magic Systems
+            # Existing relationships from PlantUML
             elif any(rel in line for rel in ['-->', '--', '-', '*--', 'o--', '<|--', '..|>', '..>']):
                 relationship = self.parse_relationship(line)
                 if relationship:
                     elements['relationships'].append(relationship)
         
         return elements
+    
+    def generate_associations_from_attributes(self, classes):
+        """Generate associations based on class attributes"""
+        print("Generating associations from class attributes...")
+        
+        # Build set of known class names
+        known_classes = set()
+        for class_name, class_info in classes.items():
+            known_classes.add(class_name)
+        
+        # Generate associations from attributes
+        for class_name, class_info in classes.items():
+            for attr in class_info['attributes']:
+                target_type = self.extract_base_type(attr['type'])
+                
+                if target_type in known_classes and target_type != class_name:
+                    # Determine association type
+                    if attr.get('is_readonly', False) or 'final' in attr.get('type', '').lower():
+                        assoc_type = "composition"
+                    elif self.is_collection_type(attr['type']):
+                        assoc_type = "aggregation"
+                    else:
+                        assoc_type = "association"
+                    
+                    association = {
+                        'source': class_name,
+                        'target': target_type,
+                        'type': assoc_type,
+                        'attribute': attr['name']
+                    }
+                    
+                    self.associations.append(association)
+                    print(f"  {class_name} -> {target_type} ({assoc_type}) via {attr['name']}")
+    
+    def extract_base_type(self, type_str):
+        """Extract the base class name from complex types"""
+        if not type_str:
+            return ""
+            
+        # Remove array notation
+        type_str = type_str.replace('[]', '')
+        
+        # Remove generic parameters but keep the content for analysis
+        if '<' in type_str and '>' in type_str:
+            # Extract content between < >
+            generic_content = re.search(r'<([^>]+)>', type_str)
+            if generic_content:
+                inner_type = generic_content.group(1)
+                # If it contains comma, take the last part (like Map<K,V> -> V)
+                if ',' in inner_type:
+                    type_str = inner_type.split(',')[-1].strip()
+                else:
+                    type_str = inner_type.strip()
+            else:
+                type_str = type_str.split('<')[0]
+        
+        # Clean up whitespace
+        type_str = type_str.strip()
+        
+        # Handle fully qualified names
+        if '.' in type_str:
+            type_str = type_str.split('.')[-1]
+        
+        return type_str
+    
+    def is_collection_type(self, type_str):
+        """Check if type is a collection type"""
+        collection_types = [
+            'List', 'ArrayList', 'LinkedList', 'Vector',
+            'Set', 'HashSet', 'TreeSet', 'LinkedHashSet',
+            'Map', 'HashMap', 'TreeMap', 'LinkedHashMap', 'LongMap',
+            'Collection', 'Queue', 'Deque', 'ArrayDeque',
+            'ConcurrentLinkedQueue', 'LinkedBlockingQueue',
+            'AtomicReference'
+        ]
+        
+        for coll_type in collection_types:
+            if coll_type in type_str:
+                return True
+        
+        # Check for array notation
+        if '[]' in type_str:
+            return True
+            
+        return False
     
     def parse_attribute_line(self, line):
         """Parse PlantUML attribute line with all modifiers"""
@@ -277,9 +371,7 @@ class FinalFixedXMIConverter:
         self.class_map[class_info['name']] = class_id
         
         # Add ALL attributes
-        print(f"Creating {class_info['name']} with {len(class_info['attributes'])} attributes")
         for attr_info in class_info['attributes']:
-            print(f"  Adding attribute: {attr_info['name']} : {attr_info['type']}")
             self.create_attribute_element(class_elem, attr_info)
         
         # Add methods
@@ -381,160 +473,180 @@ class FinalFixedXMIConverter:
                 return_param.set("type", return_type)
     
     def create_associations(self, model, relationships):
-        """Create ALL association elements for Magic Systems"""
-        for rel in relationships:
-            if rel['source'] in self.class_map and rel['target'] in self.class_map:
+        """Create ALL association elements for Magic Systems with proper structure"""
+        print(f"\nCreating {len(relationships)} associations...")
+        
+        for i, rel in enumerate(relationships):
+            source_id = self.class_map.get(rel['source'])
+            target_id = self.class_map.get(rel['target'])
+            
+            if source_id and target_id:
+                print(f"  {i+1}. {rel['source']} -> {rel['target']} ({rel['type']})")
+                
                 if rel['type'] == 'composition':
-                    self.create_composition_association(model, rel)
+                    self.create_composition_association(model, rel, source_id, target_id)
                 elif rel['type'] == 'aggregation':
-                    self.create_aggregation_association(model, rel)
+                    self.create_aggregation_association(model, rel, source_id, target_id)
                 elif rel['type'] == 'association':
-                    self.create_simple_association(model, rel)
+                    self.create_simple_association(model, rel, source_id, target_id)
                 elif rel['type'] == 'generalization':
-                    self.create_generalization_element(model, rel)
+                    self.create_generalization_element(model, rel, source_id, target_id)
                 elif rel['type'] == 'realization':
-                    self.create_realization_element(model, rel)
+                    self.create_realization_element(model, rel, source_id, target_id)
                 elif rel['type'] == 'dependency':
-                    self.create_dependency_association(model, rel)
+                    self.create_dependency_association(model, rel, source_id, target_id)
+            else:
+                print(f"  Skipping {rel['source']} -> {rel['target']} (classes not found)")
     
-    def create_simple_association(self, model, relationship):
+    def create_simple_association(self, model, relationship, source_id, target_id):
         """Create simple UML Association for Magic Systems"""
         assoc = ET.SubElement(model, "packagedElement")
         assoc.set("xmi:type", "uml:Association")
-        assoc.set("xmi:id", str(uuid.uuid4()))
+        assoc_id = str(uuid.uuid4())
+        assoc.set("xmi:id", assoc_id)
         assoc.set("name", f"{relationship['source']}_to_{relationship['target']}")
         
-        # Source end
-        source_end = ET.SubElement(assoc, "memberEnd")
+        # Create member ends
         source_end_id = str(uuid.uuid4())
-        source_end.set("xmi:idref", source_end_id)
-        
-        # Target end  
-        target_end = ET.SubElement(assoc, "memberEnd")
         target_end_id = str(uuid.uuid4())
-        target_end.set("xmi:idref", target_end_id)
         
-        # Create property elements for ends
-        source_prop = ET.SubElement(assoc, "ownedEnd")
-        source_prop.set("xmi:id", source_end_id)
-        source_prop.set("type", self.class_map[relationship['source']])
+        # Source member end
+        source_member = ET.SubElement(assoc, "memberEnd")
+        source_member.set("xmi:idref", source_end_id)
         
-        target_prop = ET.SubElement(assoc, "ownedEnd")
-        target_prop.set("xmi:id", target_end_id)
-        target_prop.set("type", self.class_map[relationship['target']])
+        # Target member end
+        target_member = ET.SubElement(assoc, "memberEnd")
+        target_member.set("xmi:idref", target_end_id)
+        
+        # Source owned end
+        source_end = ET.SubElement(assoc, "ownedEnd")
+        source_end.set("xmi:id", source_end_id)
+        source_end.set("type", source_id)
+        source_end.set("name", "")
+        
+        # Target owned end
+        target_end = ET.SubElement(assoc, "ownedEnd")
+        target_end.set("xmi:id", target_end_id)
+        target_end.set("type", target_id)
+        target_end.set("name", relationship.get('attribute', ''))
     
-    def create_composition_association(self, model, relationship):
+    def create_composition_association(self, model, relationship, source_id, target_id):
         """Create UML Composition Association"""
         assoc = ET.SubElement(model, "packagedElement")
         assoc.set("xmi:type", "uml:Association")
-        assoc.set("xmi:id", str(uuid.uuid4()))
+        assoc_id = str(uuid.uuid4())
+        assoc.set("xmi:id", assoc_id)
         assoc.set("name", f"{relationship['source']}_composedOf_{relationship['target']}")
         
-        # Source end (composite)
-        source_end = ET.SubElement(assoc, "memberEnd")
+        # Create member ends
         source_end_id = str(uuid.uuid4())
-        source_end.set("xmi:idref", source_end_id)
-        
-        # Target end (composed)
-        target_end = ET.SubElement(assoc, "memberEnd")
         target_end_id = str(uuid.uuid4())
-        target_end.set("xmi:idref", target_end_id)
         
-        # Source property (composite)
-        source_prop = ET.SubElement(assoc, "ownedEnd")
-        source_prop.set("xmi:id", source_end_id)
-        source_prop.set("type", self.class_map[relationship['source']])
-        source_prop.set("aggregation", "composite")
+        # Source member end
+        source_member = ET.SubElement(assoc, "memberEnd")
+        source_member.set("xmi:idref", source_end_id)
         
-        # Target property (composed)
-        target_prop = ET.SubElement(assoc, "ownedEnd")
-        target_prop.set("xmi:id", target_end_id)
-        target_prop.set("type", self.class_map[relationship['target']])
+        # Target member end
+        target_member = ET.SubElement(assoc, "memberEnd")
+        target_member.set("xmi:idref", target_end_id)
+        
+        # Source owned end (composite)
+        source_end = ET.SubElement(assoc, "ownedEnd")
+        source_end.set("xmi:id", source_end_id)
+        source_end.set("type", source_id)
+        source_end.set("aggregation", "composite")
+        source_end.set("name", "")
+        
+        # Target owned end (part)
+        target_end = ET.SubElement(assoc, "ownedEnd")
+        target_end.set("xmi:id", target_end_id)
+        target_end.set("type", target_id)
+        target_end.set("name", relationship.get('attribute', ''))
     
-    def create_aggregation_association(self, model, relationship):
+    def create_aggregation_association(self, model, relationship, source_id, target_id):
         """Create UML Aggregation Association"""
         assoc = ET.SubElement(model, "packagedElement")
         assoc.set("xmi:type", "uml:Association")
-        assoc.set("xmi:id", str(uuid.uuid4()))
+        assoc_id = str(uuid.uuid4())
+        assoc.set("xmi:id", assoc_id)
         assoc.set("name", f"{relationship['source']}_aggregates_{relationship['target']}")
         
-        # Source end (aggregate)
-        source_end = ET.SubElement(assoc, "memberEnd")
+        # Create member ends
         source_end_id = str(uuid.uuid4())
-        source_end.set("xmi:idref", source_end_id)
-        
-        # Target end (aggregated)
-        target_end = ET.SubElement(assoc, "memberEnd")
         target_end_id = str(uuid.uuid4())
-        target_end.set("xmi:idref", target_end_id)
         
-        # Source property (aggregate)
-        source_prop = ET.SubElement(assoc, "ownedEnd")
-        source_prop.set("xmi:id", source_end_id)
-        source_prop.set("type", self.class_map[relationship['source']])
-        source_prop.set("aggregation", "shared")
+        # Source member end
+        source_member = ET.SubElement(assoc, "memberEnd")
+        source_member.set("xmi:idref", source_end_id)
         
-        # Target property (aggregated)
-        target_prop = ET.SubElement(assoc, "ownedEnd")
-        target_prop.set("xmi:id", target_end_id)
-        target_prop.set("type", self.class_map[relationship['target']])
+        # Target member end
+        target_member = ET.SubElement(assoc, "memberEnd")
+        target_member.set("xmi:idref", target_end_id)
+        
+        # Source owned end (aggregate)
+        source_end = ET.SubElement(assoc, "ownedEnd")
+        source_end.set("xmi:id", source_end_id)
+        source_end.set("type", source_id)
+        source_end.set("aggregation", "shared")
+        source_end.set("name", "")
+        
+        # Target owned end (part)
+        target_end = ET.SubElement(assoc, "ownedEnd")
+        target_end.set("xmi:id", target_end_id)
+        target_end.set("type", target_id)
+        target_end.set("name", relationship.get('attribute', ''))
     
-    def create_dependency_association(self, model, relationship):
+    def create_dependency_association(self, model, relationship, source_id, target_id):
         """Create UML Dependency"""
         dep = ET.SubElement(model, "packagedElement")
         dep.set("xmi:type", "uml:Dependency")
         dep.set("xmi:id", str(uuid.uuid4()))
-        dep.set("client", self.class_map[relationship['source']])
-        dep.set("supplier", self.class_map[relationship['target']])
+        dep.set("client", source_id)
+        dep.set("supplier", target_id)
         dep.set("name", f"{relationship['source']}_depends_on_{relationship['target']}")
     
-    def create_generalization_element(self, model, relationship):
+    def create_generalization_element(self, model, relationship, source_id, target_id):
         """Create UML Generalization"""
-        source_id = self.class_map.get(relationship['source']) or self.interface_map.get(relationship['source'])
-        target_id = self.class_map.get(relationship['target']) or self.interface_map.get(relationship['target'])
-        
-        if source_id and target_id:
-            gen = ET.SubElement(model, "packagedElement")
-            gen.set("xmi:type", "uml:Generalization")
-            gen.set("xmi:id", str(uuid.uuid4()))
-            gen.set("specific", source_id)
-            gen.set("general", target_id)
+        gen = ET.SubElement(model, "packagedElement")
+        gen.set("xmi:type", "uml:Generalization")
+        gen.set("xmi:id", str(uuid.uuid4))
+        gen.set("specific", source_id)
+        gen.set("general", target_id)
     
-    def create_realization_element(self, model, relationship):
+    def create_realization_element(self, model, relationship, source_id, target_id):
         """Create UML InterfaceRealization"""
-        source_id = self.class_map.get(relationship['source'])
-        target_id = self.interface_map.get(relationship['target'])
-        
-        if source_id and target_id:
-            real = ET.SubElement(model, "packagedElement")
-            real.set("xmi:type", "uml:InterfaceRealization")
-            real.set("xmi:id", str(uuid.uuid4()))
-            real.set("implementingClassifier", source_id)
-            real.set("contract", target_id)
+        real = ET.SubElement(model, "packagedElement")
+        real.set("xmi:type", "uml:InterfaceRealization")
+        real.set("xmi:id", str(uuid.uuid4()))
+        real.set("implementingClassifier", source_id)
+        real.set("contract", target_id)
     
     def convert_to_xmi(self, plantuml_file, output_file):
-        """Convert PlantUML file to corrected XMI with ALL attributes"""
+        """Convert PlantUML file to XMI with proper associations"""
         print(f"Converting {plantuml_file} to {output_file}...")
         
-        # Parse PlantUML with improved parsing
+        # Parse PlantUML with association generation
         elements = self.parse_plantuml_file(plantuml_file)
         
         # Create XMI document
-        root, model = self.create_xmi_document("World System - Final Corrected")
+        root, model = self.create_xmi_document("World System - Complete with Associations")
         
         # Create classes first (so we can reference them in associations)
+        print(f"Creating {len(elements['classes'])} classes...")
         for class_info in elements['classes'].values():
             self.create_class_element(model, class_info)
         
         # Create interfaces
+        print(f"Creating {len(elements['interfaces'])} interfaces...")
         for interface_info in elements['interfaces'].values():
             self.create_interface_element(model, interface_info)
         
         # Create enums
+        print(f"Creating {len(elements['enums'])} enums...")
         for enum_info in elements['enums'].values():
             self.create_enumeration_element(model, enum_info)
         
-        # Create ALL relationships for Magic Systems
+        # Create ALL relationships including generated ones
         self.create_associations(model, elements['relationships'])
         
         # Write XMI file
@@ -544,7 +656,8 @@ class FinalFixedXMIConverter:
         print(f"  Classes: {len(elements['classes'])}")
         print(f"  Interfaces: {len(elements['interfaces'])}")
         print(f"  Enums: {len(elements['enums'])}")
-        print(f"  Relationships: {len(elements['relationships'])}")
+        print(f"  Total Relationships: {len(elements['relationships'])}")
+        print(f"  Generated from attributes: {len(self.associations)}")
     
     def write_xmi_file(self, root, output_file):
         """Write XMI to file with proper formatting"""
@@ -572,23 +685,23 @@ class FinalFixedXMIConverter:
                 elem.tail = i
 
 def main():
-    """Generate final corrected XMI with ALL attributes properly parsed"""
-    converter = FinalFixedXMIConverter()
+    """Generate complete XMI with associations from attributes"""
+    converter = CompleteXMIGenerator()
     
     # Input file
     puml_file = "world_system_corrected.puml"
     
-    # Generate final corrected XMI with ALL attributes
-    print("Creating FINAL corrected XMI with ALL attributes...")
-    converter.convert_to_xmi(puml_file, "world_system_FINAL_with_all_attributes.xmi")
+    # Generate complete XMI with ALL associations
+    print("Creating complete XMI with associations from attributes...")
+    converter.convert_to_xmi(puml_file, "world_system_COMPLETE_with_associations.xmi")
     
-    print("\n🎉 FINAL XMI with ALL attributes created!")
-    print("Try importing: world_system_FINAL_with_all_attributes.xmi")
+    print("\n🎉 Complete XMI with associations created!")
+    print("Try importing: world_system_COMPLETE_with_associations.xmi")
     print("This version includes:")
-    print("  ✓ ALL class attributes properly parsed from PlantUML")
-    print("  ✓ Handles {readonly}, {static} modifiers")
-    print("  ✓ Proper complex type parsing (Area[], Locked<Area>, etc.)")
-    print("  ✓ Debug output shows attribute count per class")
+    print("  ✓ ALL class attributes")
+    print("  ✓ Associations generated from class attributes")  
+    print("  ✓ Proper UML association structure for Magic Systems")
+    print("  ✓ Composition, aggregation, and regular associations")
 
 if __name__ == "__main__":
     main()
