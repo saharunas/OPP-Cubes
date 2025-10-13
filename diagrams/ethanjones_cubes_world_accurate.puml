@@ -1,6 +1,6 @@
-@startuml World_System
+@startuml World_and_Map_System
 !theme plain
-title World System
+title World and Map System
 
     class CoordinateConverter {
         ~SIZE_BLOCKS_POW2 : return position >>
@@ -8,6 +8,126 @@ title World System
         ~block(position : float) : public static int
         ~area(position : float) : public static int
         ~area(position : int) : public static int
+    }
+    class AreaMap {
+        ~{readonly} map : LongMap<Area>
+        ~{readonly} sorted : ArrayList<Area>
+        ~modifiedSinceSort : boolean
+        ~{readonly} world : World
+        --
+        ~super() : void
+        ~getArea(areaX : int, areaZ : int) : public Area
+        ~lockedGetArea(areaX : int, areaZ : int) : public Area
+        ~setArea(areaX : int, areaZ : int, area : Area) : public boolean
+        ~iterator() : public AreaIterator
+        ~toString() : public String
+    }
+    class Entities {
+        ~{readonly} world : World
+        ~{readonly} map : HashMap<UUID, Entity>
+        --
+        ~super() : void
+        ~getEntitiesForSave(areaX : int, areaZ : int) : public DataGroup[]
+        ~addEntity(entity : Entity) : public void
+        ~removeEntity(entity : Entity) : public boolean
+    }
+    class Area {
+        ~{readonly} SIZE_BLOCKS : int
+        ~{readonly} SIZE_BLOCKS_SQUARED : int
+        ~{readonly} SIZE_BLOCKS_CUBED : int
+        ~{readonly} areaX : int
+        ~{readonly} areaZ : int
+        ~{readonly} minBlockX : int
+        ~{readonly} minBlockZ : int
+        +blocks : int[]
+        +light : byte[]
+        +heightmap : int[]
+        +areaRenderer : AreaRenderer[]
+        +maxY : int
+        +height : int
+        +blockDataList : ArrayList<BlockData>
+        --
+        ~super() : void
+        ~getBlock(x : int, y : int, z : int) : public Block
+        ~setBlock(block : Block, x : int, y : int, z : int, meta : int) : public boolean
+        ~getMeta(x : int, y : int, z : int) : public int
+        ~getSunlight(x : int, y : int, z : int) : public int
+        ~getLight(x : int, y : int, z : int) : public int
+        ~modify() : public void
+        ~isReady() : public boolean
+    }
+    class Save {
+        ~{readonly} name : String
+        ~{readonly} fileHandle : FileHandle
+        ~{readonly} readOnly : boolean
+        -saveOptions : SaveOptions
+        --
+        ~super() : void
+        ~writeArea(area : Area) : public boolean
+        ~writeAreas(areas : AreaMap) : public void
+        ~readArea(x : int, z : int) : public Area
+        ~getSaveOptions() : public SaveOptions
+        ~writeSaveOptions() : public void
+        ~writePlayer(player : Player) : public void
+        ~readPlayer(uuid : UUID, clientIdentifier : ClientIdentifier) : public Player
+    }
+    class SaveOptions {
+        +worldSeed : long
+        +worldSeedString : String
+        +worldTime : int
+        +worldPlayingTime : long
+        +worldType : String
+        +worldGamemode : Gamemode
+        +idManager : DataGroup
+        +worldRainOverride : RainStatus
+        --
+        ~write() : public DataGroup
+        ~read(dataGroup : DataGroup) : public void
+        ~setWorldSeed(seedString : String) : public void
+    }
+    class AreaReference {
+        +areaX : int
+        +areaZ : int
+        -hashCode : int
+        --
+        ~setFromArea(area : Area) : public AreaReference
+        ~setFromAreaCoordinates(areaX : int, areaZ : int) : public AreaReference
+        ~setFromBlockCoordinates(blockX : int, blockZ : int) : public AreaReference
+        ~setFromPosition(x : float, z : float) : public AreaReference
+        ~offset(areaX : int, areaZ : int) : public AreaReference
+        ~minBlockX() : public int
+        ~minBlockZ() : public int
+    }
+    enum Side {
+        Client
+        Server
+        --
+    }
+    class Entity {
+        ~{static} GRAVITY : float
+        +uuid : UUID
+        +height : float
+        ~{readonly} position : Vector3
+        ~{readonly} angle : Vector3
+        ~{readonly} motion : Vector3
+        ~{readonly} id : String
+        --
+        ~update() : public boolean
+        ~write() : public DataGroup
+        ~read(dataGroup : DataGroup) : public void
+        ~dispose() : public void
+    }
+    class WorldServer {
+        -loadedAreaFilters : List<LoadedAreaFilter>
+        -rainStatusOverride : RainStatus
+        -rainStatusOverrideEnd : long
+        --
+        ~super() : void
+        ~getSpawnPoint() : public BlockReference
+        ~tick() : public void
+        ~shouldAreaBeLoaded(areaReference : AreaReference) : public boolean
+        ~requestRegion(references : MultiAreaReference, parameter : WorldRequestParameter) : public GenerationTask
+        ~save() : public void
     }
     abstract class World {
         ~{readonly} MAX_TIME : int
@@ -390,11 +510,81 @@ title World System
         --
         ~blockChanged(event : BlockChangedEvent) : public void
     }
+    ' Inheritance relationships
     WorldLockable <|-- World
+    WorldLockable <|-- AreaMap  
+    WorldLockable <|-- Entities
+    Lockable <|-- Area
     Disposable <|.. World
+    Disposable <|.. Entity
+    Pool.Poolable <|.. AreaReference
     World <|-- WorldClient
+    World <|-- WorldServer
     TerrainGenerator <|-- BasicTerrainGenerator
     TerrainGenerator <|-- TestTerrainGenerator
     TerrainGenerator <|-- VoidTerrainGenerator
     AutoCloseable <|.. LightWorldSection
+    
+    ' Core World Composition (most critical relationships)
+    World *-- AreaMap : contains
+    World *-- Entities : contains  
+    World *-- TerrainGenerator : uses
+    World *-- Save : contains
+    World *-- Side : contains
+    
+    ' AreaMap relationships
+    AreaMap *-- "*" Area : manages
+    AreaMap --> World : references
+    
+    ' Entities relationships  
+    Entities *-- "*" Entity : contains
+    Entities --> World : references
+    
+    ' Area relationships
+    Area --> AreaMap : belongs to
+    Area *-- "*" AreaRenderer : rendering
+    Area *-- "*" BlockData : block data
+    
+    ' TerrainGenerator dependencies
+    TerrainGenerator ..> Area : generate()
+    TerrainGenerator ..> WorldServer : features()
+    
+    ' WorldClient specific associations
+    WorldClient *-- "*" Area : removed areas
+    WorldClient --> AreaReference : playerArea
+    WorldClient --> RainStatus : current status
+    
+    ' WorldServer specific
+    WorldServer --> "*" LoadedAreaFilter : area filters
+    
+    ' Save system relationships
+    Save *-- SaveOptions : configuration
+    Save ..> Area : reads/writes
+    Save ..> AreaMap : saves all areas
+    ClientSaveManager ..> Save : creates/manages
+    
+    ' AreaReference relationships
+    AreaReference ..> Area : references
+    AreaReference ..> CoordinateConverter : uses
+    
+    ' Collision system
+    PlayerCollision --> World : checks blocks
+    PlayerCollision --> Entity : player entity
+    BlockIntersection ..> World : raycast query
+    
+    ' Lighting system relationships
+    LightWorldSection --> "*" Area : processes
+    BlockLight ..> Area : lighting calculations
+    SunLight ..> Area : sunlight calculations
+    WorldLightHandler --> Area : handles changes
+    
+    ' Generator management
+    GeneratorManager *-- "*" TerrainGeneratorFactory : registry
+    TerrainGeneratorFactory ..> TerrainGenerator : creates
+    
+    ' Gravity and physics
+    WorldGravity ..> World : queries blocks
+    
+    ' Coordinate conversion utilities
+    CoordinateConverter ..> Area : coordinate math
 @enduml

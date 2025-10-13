@@ -219,19 +219,30 @@ class JavaSourceParser:
                 i += 1
                 continue
             
-            # Skip method declarations (have parentheses)
-            if '(' in line and ')' in line and not line.endswith(';'):
-                i += 1
-                continue
+            # Skip method declarations (have parentheses followed by opening brace or semicolon)
+            if '(' in line and ')' in line and ('{' in line or line.endswith(';')):
+                # But allow field declarations that might have method calls in initialization
+                if not re.match(r'^.*\s+\w+\s*=.*$', line):
+                    i += 1
+                    continue
             
-            # Check for field declaration
+            # Multi-line field handling - look ahead for continuation
+            current_line = line
+            while (not current_line.endswith(';') and not current_line.endswith('{') and 
+                   i + 1 < len(lines) and not lines[i + 1].strip().startswith('public') and 
+                   not lines[i + 1].strip().startswith('private') and not lines[i + 1].strip().startswith('protected')):
+                i += 1
+                if i < len(lines):
+                    current_line += ' ' + lines[i].strip()
+            
+            # Enhanced field pattern to handle complex types
             field_match = re.match(
-                r'((?:public|private|protected|static|final|volatile|transient)\s+)*'  # modifiers
-                r'([\w\[\]<>\.,\s]+?)\s+'  # type
+                r'((?:public|private|protected|static|final|volatile|transient|synchronized)\s+)*'  # modifiers
+                r'((?:[\w\.<>]+(?:\[\])*(?:\s*<[^>]*>)?)+)\s+'  # type (including generics and arrays)
                 r'(\w+)'  # name
                 r'(?:\s*=\s*[^;]+)?'  # optional initialization
                 r'\s*;',  # semicolon
-                line
+                current_line
             )
             
             if field_match:
@@ -246,8 +257,8 @@ class JavaSourceParser:
                 is_final = "final" in modifiers
                 is_volatile = "volatile" in modifiers
                 
-                # Clean type name
-                type_str = self.clean_type_name(type_str)
+                # Clean type name but preserve important structure
+                type_str = self.clean_field_type(type_str)
                 
                 field = JavaMember(
                     name=field_name,
@@ -263,6 +274,25 @@ class JavaSourceParser:
             i += 1
         
         return fields
+    
+    def clean_field_type(self, type_name):
+        """Clean up field type name while preserving generics and arrays"""
+        if not type_name:
+            return "void"
+        
+        # Remove extra whitespace but preserve structure
+        type_name = ' '.join(type_name.split())
+        
+        # Fix array notation spacing
+        type_name = type_name.replace(' []', '[]')
+        type_name = type_name.replace('[ ]', '[]')
+        
+        # Clean up generic spacing
+        type_name = re.sub(r'\s*<\s*', '<', type_name)
+        type_name = re.sub(r'\s*>\s*', '>', type_name)
+        type_name = re.sub(r'\s*,\s*', ', ', type_name)
+        
+        return type_name
     
     def extract_methods(self, class_body, class_name):
         """Extract method declarations"""
@@ -504,9 +534,11 @@ class PlantUMLGenerator:
         return "\n".join(lines)
     
     def generate_relationships(self, classes):
-        """Generate inheritance and implementation relationships"""
+        """Generate inheritance, composition, aggregation, and dependency relationships"""
         relationships = []
+        class_names = {cls.name for cls in classes}
         
+        # Inheritance and implementation relationships
         for cls in classes:
             if cls.extends:
                 relationships.append(f"    {cls.extends} <|-- {cls.name}")
@@ -514,7 +546,92 @@ class PlantUMLGenerator:
             for interface in cls.implements:
                 relationships.append(f"    {interface} <|.. {cls.name}")
         
+        # Composition and aggregation relationships from attributes
+        for cls in classes:
+            for attr in cls.attributes:
+                # Clean up the type name to get the base type
+                base_type = self.extract_base_type(attr.type)
+                
+                if base_type in class_names:
+                    # Determine relationship type based on attribute characteristics
+                    if attr.is_final and not attr.is_static:
+                        # Final non-static attributes are typically composition
+                        if self.is_collection_type(attr.type):
+                            relationships.append(f"    {cls.name} *-- \"{self.get_multiplicity(attr.type)}\" {base_type}")
+                        else:
+                            relationships.append(f"    {cls.name} *-- {base_type}")
+                    elif self.is_collection_type(attr.type):
+                        # Collections are typically aggregation
+                        relationships.append(f"    {cls.name} o-- \"{self.get_multiplicity(attr.type)}\" {base_type}")
+                    elif not attr.is_static:
+                        # Regular attributes are association
+                        relationships.append(f"    {cls.name} --> {base_type}")
+        
+        # Method parameter dependencies (for key methods only)
+        for cls in classes:
+            for method in cls.methods:
+                # Only show dependencies for important methods (not getters/setters)
+                if self.is_important_method(method):
+                    for param in method.parameters:
+                        base_type = self.extract_base_type(param['type'])
+                        if base_type in class_names and base_type != cls.name:
+                            relationship = f"    {cls.name} ..> {base_type} : {method.name}()"
+                            if relationship not in relationships:
+                                relationships.append(relationship)
+        
         return "\n".join(relationships) + "\n" if relationships else ""
+    
+    def extract_base_type(self, type_str):
+        """Extract base type from complex type declarations"""
+        if not type_str:
+            return ""
+        
+        # Remove array brackets
+        type_str = type_str.replace('[]', '')
+        
+        # Handle generics: Map<String, Area> -> Area, List<Entity> -> Entity
+        if '<' in type_str and '>' in type_str:
+            # For collections, try to get the value type
+            generic_content = type_str[type_str.find('<') + 1:type_str.rfind('>')]
+            if ',' in generic_content:
+                # Map-like: take the second type (value type)
+                parts = generic_content.split(',')
+                return parts[-1].strip()
+            else:
+                # List-like: take the single type
+                return generic_content.strip()
+        
+        # Remove package names: ethanjones.cubes.world.Area -> Area
+        if '.' in type_str:
+            return type_str.split('.')[-1]
+        
+        return type_str.strip()
+    
+    def is_collection_type(self, type_str):
+        """Check if type represents a collection"""
+        collection_indicators = ['[]', 'List', 'ArrayList', 'Map', 'HashMap', 'Set', 'HashSet', 'Collection', 'LongMap']
+        return any(indicator in type_str for indicator in collection_indicators)
+    
+    def get_multiplicity(self, type_str):
+        """Get multiplicity notation for collections"""
+        if '[]' in type_str or 'List' in type_str or 'ArrayList' in type_str:
+            return "*"
+        elif 'Map' in type_str or 'HashMap' in type_str:
+            return "*"
+        elif 'Set' in type_str:
+            return "*"
+        return "*"
+    
+    def is_important_method(self, method):
+        """Determine if method is important enough to show dependencies"""
+        # Skip getters, setters, and basic methods
+        if (method.name.startswith('get') or method.name.startswith('set') or 
+            method.name.startswith('is') or method.name in ['toString', 'hashCode', 'equals']):
+            return False
+        
+        # Show dependencies for methods with meaningful business logic
+        important_patterns = ['generate', 'create', 'add', 'remove', 'process', 'handle', 'load', 'save', 'update']
+        return any(pattern in method.name.lower() for pattern in important_patterns)
 
 def main():
     parser = argparse.ArgumentParser(description='Generate accurate PlantUML diagrams from Java source code')
