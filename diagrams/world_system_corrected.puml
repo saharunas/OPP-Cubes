@@ -1,0 +1,1241 @@
+@startuml World_System_-_Corrected
+!theme plain
+title World System - Corrected
+
+    class CoordinateConverter {
+        +{static} block(position : float) : int
+        +{static} area(position : float) : int
+        +{static} area(position : int) : int
+    }
+    abstract class World {
+        +{static} {readonly} MAX_TIME : int
+        +{readonly} map : AreaMap
+        +{readonly} entities : Entities
+        +{readonly} terrainGenerator : TerrainGenerator
+        +{readonly} save : Save
+        +{readonly} side : Side
+        #time : int
+        #playingTime : long
+        #{readonly} disposed : AtomicBoolean
+        +{readonly} lua : LuaTable
+        --
+        ~World(save : Save, side : Side) : public
+        +setArea(area : Area) : boolean
+        +setArea(areaX : int, areaZ : int, area : Area) : boolean
+        +heightmap(x : int, z : int) : int
+        +getBlock(x : int, y : int, z : int) : Block
+        +getBlockData(x : int, y : int, z : int) : BlockData
+        +getMeta(x : int, y : int, z : int) : int
+        +getLight(x : int, y : int, z : int) : int
+        +getSunLight(x : int, y : int, z : int) : int
+        +getLightRaw(x : int, y : int, z : int) : int
+        +getArea(areaX : int, areaZ : int, request : boolean) : Area
+        +getArea(areaX : int, areaZ : int) : Area
+        +getArea(areaReference : AreaReference, request : boolean) : Area
+        +getArea(areaReference : AreaReference) : Area
+        +{abstract} requestRegion(references : MultiAreaReference, parameter : WorldRequestParameter) : GenerationTask
+        +setBlock(block : Block, x : int, y : int, z : int) : void
+        +setBlock(block : Block, x : int, y : int, z : int, meta : int) : void
+        +setBlocks(block : Block, x1 : int, y1 : int, z1 : int, x2 : int, y2 : int, z2 : int, meta : int) : void
+        +tick() : void
+        +getWorldSunlight() : float
+        +isDay() : boolean
+        +setTime(time : int) : void
+        +getTime() : int
+        +getTerrainGenerator() : TerrainGenerator
+        +isDisposed() : boolean
+        +getEntity(uuid : UUID) : Entity
+        +addEntity(entity : Entity) : void
+        +removeEntity(uuid : UUID) : void
+        +updateEntity(data : DataGroup) : void
+        +syncEntity(uuid : UUID) : void
+        +addEntityFromSave(dataGroup : DataGroup) : void
+        +save() : void
+    }
+    class ClientSaveManager {
+        +{static} getSavesFolder() : FileHandle
+        +{static} getSaves() : Save[]
+        +{static} createSave(name : String, generatorID : String, gamemode : Gamemode, seedString : String) : Save
+        +{static} createTemporarySave(generatorID : String, gamemode : Gamemode, seedString : String) : Save
+        +{static} deleteSave(save : Save) : void
+    }
+    class WorldClient {
+        -removed : ArrayList<Area>
+        -playerArea : AreaReference
+        -{readonly} renderDistance : int
+        +rainStatus : RainStatus
+        -tickCounter : int
+        --
+        ~WorldClient() : public
+        +getSkyColour() : Color
+    }
+    class BlockIntersection {
+        -{readonly} blockReference : BlockReference
+        -{readonly} blockFace : BlockFace
+        -{readonly} block : Block
+        -{readonly} blockMeta : int
+        -{readonly} rayLength : float
+        --
+        ~BlockIntersection(blockReference : BlockReference, blockFace : BlockFace, block : Block, blockMeta : int, rayLength : float) : private
+        +getBlockReference() : BlockReference
+        +getBlockFace() : BlockFace
+        +getBlock() : Block
+        +getBlockMeta() : int
+        +getRayLength() : float
+        +{static} getBlockIntersection(origin : Vector3, direction : Vector3, world : World) : BlockIntersection
+        +{static} intersection(origin : Vector3, direction : Vector3, radius : int, world : World) : BlockIntersection
+    }
+    enum XYZ {
+    }
+    class PlayerCollision {
+        -world : World
+        -{static} {readonly} r : float
+        --
+        -check(position : Vector3, xOffset : float, yOffset : float, zOffset : float) : boolean
+        -limit(newPos : Vector3, xOffset : float, zOffset : float, height : float) : void
+    }
+    class BasicTerrainGenerator {
+        ~old : boolean
+        --
+        ~BasicTerrainGenerator(seed : String) : public
+    }
+    class GeneratorManager {
+        +{static} register(str : String, generator : TerrainGeneratorFactory) : void
+        +{static} getTerrainGenerator(saveOptions : SaveOptions) : TerrainGenerator
+        +{static} terrainGeneratorExists(id : String) : boolean
+        +{static} getName(id : String) : String
+        +{static} ids() : String[]
+    }
+    interface TerrainGeneratorFactory {
+        ~getTerrainGenerator(saveOptions : SaveOptions) : TerrainGenerator
+    }
+    class RainStatus {
+        +{static} {readonly} NOT_RAINING : RainStatus
+        +{readonly} raining : boolean
+        +{readonly} rainRate : float
+        --
+        ~RainStatus(raining : boolean, rainRate : float) : public
+    }
+    abstract class TerrainGenerator {
+        +{abstract} generate(area : Area) : void
+        +{abstract} features(area : Area, world : WorldServer) : void
+        +{abstract} spawnPoint(world : WorldServer) : BlockReference
+        +getRainStatus(x : float, z : float, rainTime : float) : RainStatus
+        +{static} set(area : Area, block : Block, x : int, y : int, z : int, meta : int) : void
+        +{static} setNeighbour(area : Area, block : Block, x : int, y : int, z : int, meta : int) : void
+        +{static} setVisible(area : Area, block : Block, x : int, y : int, z : int, meta : int) : void
+        +{static} setVisibleNeighbour(area : Area, block : Block, x : int, y : int, z : int, meta : int) : void
+    }
+    class TestTerrainGenerator {
+    }
+    class VoidTerrainGenerator {
+    }
+    class WorldGravity {
+        +{static} getBlockY(pos : Vector3, height : float) : int
+        +{static} onBlock(w : World, pos : Vector3, height : float, r : float) : boolean
+        -{static} isBlock(world : World, x : float, y : int, z : float) : boolean
+    }
+    class BlockLight {
+        +{static} {readonly} FULL_LIGHT : byte
+        --
+        +{static} spreadLight(x : int, y : int, z : int, area : Area, w : LightWorldSection) : void
+        +{static} addLight(x : int, y : int, z : int, l : int, area : Area, lws : LightWorldSection) : void
+        -{static} propagateAdd(lightQueue : ArrayDeque<LightNode>, w : LightWorldSection) : void
+        -{static} tryPropagateAdd(lightQueue : ArrayDeque<LightNode>, w : LightWorldSection, x : int, y : int, z : int, l : int) : void
+        +{static} removeLight(x : int, y : int, z : int, area : Area, lws : LightWorldSection) : void
+        -{static} propagateRemove(removeQueue : ArrayDeque<LightNode>, addQueue : ArrayDeque<LightNode>, w : LightWorldSection) : void
+        -{static} tryPropagateRemove(removeQueue : ArrayDeque<LightNode>, addQueue : ArrayDeque<LightNode>, w : LightWorldSection, x : int, y : int, z : int, l : int) : void
+    }
+    class LightNode {
+        +x : int
+        +y : int
+        +z : int
+        +l : int
+        --
+        ~LightNode(x : int, y : int, z : int, l : int) : public
+    }
+    class LightWorldSection {
+        +{readonly} initialAreaX : int
+        +{readonly} initialAreaZ : int
+        +{readonly} initialMinBlockX : int
+        +{readonly} initialMinBlockZ : int
+        +{readonly} initialMaxBlockX : int
+        +{readonly} initialMaxBlockZ : int
+        +{readonly} areas : Area[]
+        +{readonly} initial : Area
+        -lock : Locked<Area>
+        --
+        ~LightWorldSection(initial : Area) : public
+        +getArea(areaX : int, areaZ : int) : Area
+        #transparent(x : int, y : int, z : int) : boolean
+        #getSunlight(x : int, y : int, z : int) : int
+        #getLight(x : int, y : int, z : int) : int
+        #isLightSource(x : int, y : int, z : int) : boolean
+        #maxY(x : int, z : int) : int
+    }
+    class SunLight {
+        +{static} {readonly} MAX_SUNLIGHT : int
+        --
+        +{static} initialSunlight(area : Area) : void
+        +{static} addSunlight(x : int, y : int, z : int, area : Area, w : LightWorldSection) : void
+        -{static} propagateAdd(lightQueue : ArrayDeque<LightNode>, w : LightWorldSection) : void
+        -{static} tryPropagateAdd(lightQueue : ArrayDeque<LightNode>, w : LightWorldSection, x : int, y : int, z : int, ln : int) : void
+        +{static} removeSunlight(x : int, y : int, z : int, area : Area, lws : LightWorldSection) : void
+        -{static} propagateRemove(removeQueue : ArrayDeque<LightNode>, addQueue : ArrayDeque<LightNode>, w : LightWorldSection) : void
+        -{static} tryPropagateRemove(removeQueue : ArrayDeque<LightNode>, addQueue : ArrayDeque<LightNode>, w : LightWorldSection, x : int, y : int, z : int, l : int) : void
+    }
+    class WorldLightHandler {
+    }
+    class AreaReference {
+        +areaX : int
+        +areaZ : int
+        -hashCode : int
+        --
+        +setFromArea(area : Area) : AreaReference
+        +setFromAreaCoordinates(areaX : int, areaZ : int) : AreaReference
+        +setFromBlockCoordinates(blockX : int, blockZ : int) : AreaReference
+        +setFromBlockReference(blockReference : BlockReference) : AreaReference
+        +setFromPositionVector3(vector3 : Vector3) : AreaReference
+        +setFromPosition(x : float, z : float) : AreaReference
+        +offset(areaX : int, areaZ : int) : AreaReference
+        +minBlockX() : int
+        +minBlockZ() : int
+        +modified() : AreaReference
+        +distance(areaReference : AreaReference) : double
+        +distance2(areaReference : AreaReference) : int
+        +updateHashCode() : void
+        +copy() : AreaReference
+        +setFromAreaReference(areaReference : AreaReference) : AreaReference
+    }
+    class AreaReferencePool {
+    }
+    class BlockReference {
+        +blockX : int
+        +blockY : int
+        +blockZ : int
+        -hashCode : int
+        --
+        +setFromBlockCoordinates(blockX : int, blockY : int, blockZ : int) : BlockReference
+        +setFromPosition(x : float, y : float, z : float) : BlockReference
+        +setFromVector3(vector3 : Vector3) : BlockReference
+        +offset(blockX : int, blockY : int, blockZ : int) : BlockReference
+        +modified() : BlockReference
+        +updateHashCode() : void
+        +copy() : BlockReference
+        +setFromBlockReference(blockReference : BlockReference) : BlockReference
+        +asVector3() : Vector3
+        +toString() : String
+    }
+    class BlockReferencePool {
+    }
+    enum Gamemode {
+    }
+    class Save {
+        +{readonly} name : String
+        +{readonly} fileHandle : FileHandle
+        +{readonly} readOnly : boolean
+        -saveOptions : SaveOptions
+        --
+        ~Save(name : String, fileHandle : FileHandle) : public
+        ~Save(name : String, fileHandle : FileHandle, readOnly : boolean) : public
+        +writeArea(area : Area) : boolean
+        +writeAreas(areas : AreaMap) : void
+        +readArea(x : int, z : int) : Area
+        +writePlayer(player : Player) : void
+        +writePlayers() : void
+        +readPlayer(uuid : UUID, clientIdentifier : ClientIdentifier) : Player
+        +writeCave(areaReference : AreaReference, cave : Cave) : void
+        +readCave(areaReference : AreaReference) : Cave
+        +readSaveOptions() : SaveOptions
+        +getSaveOptions() : SaveOptions
+        +writeSaveOptions() : SaveOptions
+        +setSaveOptions(saveOptions : SaveOptions) : SaveOptions
+        +folderArea() : FileHandle
+        +folderCave() : FileHandle
+        +folderPlayer() : FileHandle
+        +readIDManager() : void
+    }
+    class SaveAreaIO {
+        +{static} read(save : Save, x : int, z : int) : Area
+        +{static} write(save : Save, area : Area) : boolean
+        +{static} file(save : Save, x : int, z : int) : FileHandle
+    }
+    class SaveOptions {
+        +worldSeed : long
+        +worldSeedString : String
+        +worldTime : int
+        +worldPlayingTime : long
+        +worldType : String
+        +worldGamemode : Gamemode
+        +idManager : DataGroup
+        +lastOpenedTime : long
+        +lastVersionHash : String
+        +worldRainOverride : RainStatus
+        +worldRainOverrideTime : long
+        --
+        +setWorldSeed(seedString : String) : void
+    }
+    interface LoadedAreaFilter {
+        ~load(areaReference : AreaReference) : boolean
+    }
+    class WorldServer {
+        -{static} loadedAreaFilters : List<LoadedAreaFilter>
+        -rainStatusOverride : RainStatus
+        -rainStatusOverrideEnd : long
+        --
+        ~WorldServer(save : Save) : public
+        +getSpawnPoint() : BlockReference
+        +unloadDistantAreas(areas : Iterable<Area>) : void
+        +shouldAreaBeLoaded(areaReference : AreaReference) : boolean
+        +addLoadedAreaFilter(filter : LoadedAreaFilter) : void
+        +removeLoadedAreaFilter(filter : LoadedAreaFilter) : boolean
+        +getRainStatus(x : float, z : float) : RainStatus
+        +overrideRainStatus(rainStatus : RainStatus, seconds : int) : void
+        +removeRainStatusOverride() : void
+    }
+    class Area {
+        +{static} {readonly} BLOCK_VISIBLE : int
+        +{static} {readonly} SIZE_BLOCKS : int
+        +{static} {readonly} SIZE_BLOCKS_POW2 : int
+        +{static} {readonly} SIZE_BLOCKS_SQUARED : int
+        +{static} {readonly} SIZE_BLOCKS_CUBED : int
+        +{static} {readonly} HALF_SIZE_BLOCKS : int
+        +{static} {readonly} MAX_Y : int
+        +{static} {readonly} NUM_RANDOM_UPDATES : int
+        +{static} {readonly} MAX_X_OFFSET : int
+        +{static} {readonly} MIN_X_OFFSET : int
+        +{static} {readonly} MAX_Y_OFFSET : int
+        +{static} {readonly} MIN_Y_OFFSET : int
+        +{static} {readonly} MAX_Z_OFFSET : int
+        +{static} {readonly} MIN_Z_OFFSET : int
+        -{static} {readonly} LOCK_MANAGER : LockManager<Area>
+        +{readonly} features : AtomicReference<Object>
+        +{readonly} areaX : int
+        +{readonly} areaZ : int
+        +{readonly} minBlockX : int
+        +{readonly} minBlockZ : int
+        +{readonly} hashCode : int
+        +blocks : int[]
+        +light : byte[]
+        +heightmap : int[]
+        +areaRenderer : AreaRenderer[]
+        +maxY : int
+        +height : int
+        +blockDataList : ArrayList<BlockData>
+        -modCount : int
+        +renderStatus : int[]
+        -unloaded : boolean
+        -neighboursClient : Area[]
+        -neighboursServer : Area[]
+        -areaMapClient : AreaMap
+        -areaMapServer : AreaMap
+        +{readonly} shared : boolean
+        --
+        ~Area(areaX : int, areaZ : int) : public
+        ~Area(toCopy : Area) : public
+        +getBlock(x : int, y : int, z : int) : Block
+        +getMeta(x : int, y : int, z : int) : int
+        +heightmap(x : int, z : int) : int
+        +getSunlight(x : int, y : int, z : int) : int
+        +getLight(x : int, y : int, z : int) : int
+        +getMaxLight(x : int, y : int, z : int) : int
+        +setSunlight(x : int, y : int, z : int, l : int) : void
+        +setLight(x : int, y : int, z : int, l : int) : void
+        +getLightRaw(x : int, y : int, z : int) : int
+        +isBlank() : boolean
+        +isUnloaded() : boolean
+        +isReady() : boolean
+        -unready(y : int) : boolean
+        +unload() : void
+        -removeArrays() : void
+        -update(x : int, y : int, z : int, i : int) : void
+        +setBlock(block : Block, x : int, y : int, z : int, meta : int) : void
+        +removeBlockData(x : int, y : int, z : int) : BlockData
+        +getBlockData(x : int, y : int, z : int) : BlockData
+        +addBlockData(block : Block, x : int, y : int, z : int, meta : int) : BlockData
+        +addBlockData(blockData : BlockData) : void
+        +neighbourBlockCoordinates(blockX : int, blockZ : int) : Area
+        +neighbour(areaX : final int, areaZ : final int) : Area
+        +areaMap() : AreaMap
+        #setAreaMap(areaMap : AreaMap) : void
+        +tick() : void
+        -randomTick(x : int, y : int, z : int, areaMap : AreaMap) : void
+        +doUpdatesThisArea(x : int, y : int, z : int, ref : int) : void
+        +doUpdatesOtherAreas(x : int, y : int, z : int, ref : int) : void
+        -updateSurrounding(x : int, y : int, z : int, ref : int) : void
+        +updateRender(section : int) : void
+        +updateAll() : void
+        +initialUpdate() : void
+        +setupArrays(y : int) : void
+        +rebuildHeightmap() : void
+        +calculateHeight(x : int, z : int) : void
+        -expand(h : int) : void
+        +featuresGenerated() : boolean
+        +shrink() : void
+        -usedHeight() : int
+        +{static} getRef(x : int, y : int, z : int) : int
+        +{static} getX(ref : int) : int
+        +{static} getZ(ref : int) : int
+        +{static} getY(ref : int) : int
+        +{static} getHeightMapRef(x : int, z : int) : int
+        +{static} isShared() : boolean
+        +modify() : void
+        +modifiedSinceSave(entities : DataGroup[]) : boolean
+        +saveModCount() : void
+        +lockAllNeighbours(write : boolean, requireAll : boolean) : Locked<Area>
+    }
+    class AreaMap {
+        -{readonly} map : LongMap<Area>
+        -{readonly} sorted : ArrayList<Area>
+        -modifiedSinceSort : boolean
+        +{readonly} world : World
+        --
+        ~AreaMap(world : World) : public
+        +getArea(areaX : int, areaZ : int) : Area
+        +lockedGetArea(areaX : int, areaZ : int) : Area
+        +setArea(areaX : int, areaZ : int, area : Area) : boolean
+        +toString() : String
+        +getSize() : int
+        +empty() : void
+    }
+    class AreaIterator {
+        -iterator : Iterator<Area>
+        -current : Area
+        --
+    }
+    class Entities {
+        +{readonly} world : World
+        --
+        ~Entities(world : World) : public
+        +getEntitiesForSave(areaX : int, areaZ : int) : DataGroup[]
+    }
+    class AreaNotLoadedException {
+    }
+    interface GenerationTask {
+        +totalGenerate() : int
+        +totalFeatures() : int
+        +doneGenerate() : int
+        +doneFeatures() : int
+    }
+    class WorldGenerationRunnable {
+        +queue : LinkedBlockingQueue<WorldGenerationTask>
+        +current : AtomicReference<WorldGenerationTask>
+        --
+    }
+    class WorldGenerationTask {
+        +{readonly} world : WorldServer
+        +{readonly} featuresReferences : MultiAreaReference
+        +{readonly} generateReferences : AreaReferenceSet
+        +{readonly} parameter : WorldRequestParameter
+        ~{readonly} generateQueue : ConcurrentLinkedQueue<AreaReference>
+        ~{readonly} generationComplete : CountDownLatch
+        ~{readonly} featuresQueue : ConcurrentLinkedQueue<AreaReference>
+        ~{readonly} timeStarted : AtomicLong
+        ~{readonly} generateCounter : AtomicInteger
+        ~{readonly} featureCounter : AtomicInteger
+        ~{readonly} readCounter : AtomicInteger
+        -{readonly} generateSize : int
+        -{readonly} featureSize : int
+        --
+        ~WorldGenerationTask(world : WorldServer, reference : MultiAreaReference, parameter : WorldRequestParameter) : public
+        -fillGenerateQueue() : int
+        -fillFeaturesQueue() : int
+        +printStatistics() : void
+    }
+    class WorldLockable {
+        -{static} {readonly} lock : LockManager<WorldLockable>
+        -{readonly} value : int
+        --
+        ~WorldLockable(type : Type, side : Side) : public
+    }
+    enum Type {
+        WORLD
+        AREAMAP
+        ENTITIES
+    }
+    class WorldRequestParameter {
+        +{static} {readonly} DEFAULT : WorldRequestParameter
+        +{readonly} prioritise : AreaReference
+        +{readonly} afterCompletion : Runnable
+        --
+        ~WorldRequestParameter(prioritise : AreaReference, afterCompletion : Runnable) : public
+        +getComparator() : Comparator<AreaReference>
+    }
+    class WorldSaveRunnable {
+        +queue : LinkedBlockingQueue<WorldSaveTask>
+        --
+    }
+    class WorldSaveTask {
+        +{readonly} save : Save
+        +{readonly} length : int
+        ~{readonly} saveAreas : ArrayList<Area>
+        ~{readonly} saveQueue : ConcurrentLinkedQueue<Area>
+        ~{readonly} saveComplete : CountDownLatch
+        ~{readonly} timeStarted : AtomicLong
+        ~{readonly} written : AtomicInteger
+        --
+        ~WorldSaveTask(save : Save, areas : Collection<Area>) : public
+        ~WorldSaveTask(save : Save, areas : AreaMap) : public
+    }
+    class WorldTasks {
+        +{static} {readonly} GENERATION_THREADS : int
+        +{static} {readonly} SAVE_THREADS : int
+        -{static} {readonly} gen : WorldGenerationRunnable
+        -{static} {readonly} save : WorldSaveRunnable
+        -{static} {readonly} genThreadPool : ThreadPool
+        -{static} {readonly} saveThreadPool : ThreadPool
+        --
+        +{static} request(worldServer : WorldServer, references : MultiAreaReference, parameter : WorldRequestParameter) : GenerationTask
+        +{static} save(s : Save, areas : Collection<Area>) : void
+        +{static} save(s : Save, areas : AreaMap) : void
+        +{static} currentlySaving() : boolean
+        +{static} waitSaveFinish() : boolean
+        #{static} generate(areaReference : AreaReference, world : WorldServer) : int
+        #{static} features(areaReference : AreaReference, world : WorldServer) : int
+        +{static} getGenerationAreaFilter() : LoadedAreaFilter
+        +{static} dispose() : void
+    }
+    class AreaReferenceSet {
+    }
+    interface MultiAreaReference {
+        +getAreaReferences() : Set<AreaReference>
+    }
+    class WorldRegion {
+        +{readonly} minAreaX : int
+        +{readonly} maxAreaX : int
+        +{readonly} minAreaZ : int
+        +{readonly} maxAreaZ : int
+        --
+        ~WorldRegion(areaReference : AreaReference) : public
+        ~WorldRegion(areaReference : AreaReference, range : int) : public
+        ~WorldRegion(minAreaX : int, maxAreaX : int, minAreaZ : int, maxAreaZ : int) : public
+        +contains(a : AreaReference) : boolean
+        +contains(position : Vector3) : boolean
+        +getCenter() : AreaReference
+    }
+    class Cave {
+        +{readonly} caveStartX : int
+        +{readonly} caveStartY : int
+        +{readonly} caveStartZ : int
+        --
+        ~Cave(x : int, y : int, z : int, blocks : int[]>) : public
+        +apply(area : Area) : void
+    }
+    class CaveGenerator {
+        +{static} {readonly} roomNodesMin : int
+        +{static} {readonly} roomNodesMax : int
+        +{static} {readonly} roomChangeXZConstant : int
+        +{static} {readonly} roomChangeXZRandom : int
+        +{static} {readonly} roomChangeY : int
+        +{static} {readonly} roomConnectDistance2Min : int
+        +{static} {readonly} roomConnectDistance2Max : int
+        +{readonly} caveStartX : int
+        +{readonly} caveStartY : int
+        +{readonly} caveStartZ : int
+        -{readonly} smoothWorld : SmoothWorld
+        -{readonly} numbers : RandomXS128
+        -{readonly} intSet : IntSet
+        -{readonly} rooms : ArrayList<RoomNode>
+        -{readonly} tunnels : ArrayList<TunnelNode>
+        --
+        ~CaveGenerator(x : int, z : int, smoothWorld : SmoothWorld) : public
+        +generate() : Cave
+        -clear(blockX : int, blockY : int, blockZ : int) : void
+        +generateNodes() : void
+        -calculateBlocks() : void
+        -checkRoom(x : int, y : int, z : int) : boolean
+        -getRoomChangeXZ(distance : int) : int
+        -undergroundY(x : int, z : int, prevY : int, changeY : int, allowSurface : boolean) : int
+        -inRange(x : int, z : int) : boolean
+        +distanceFromSpawn(x : int, z : int) : float
+        -{static} distance2(a : BlockReference, b : BlockReference) : float
+        -{static} distance(a : BlockReference, b : BlockReference) : float
+        -{static} distance(a : BlockReference, x2 : int, y2 : int, z2 : int) : float
+    }
+    class TunnelNode {
+        ~start : BlockReference
+        ~end : BlockReference
+        ~startRadius : float
+        ~endRadius : float
+        --
+        ~TunnelNode(start : BlockReference, end : BlockReference) : private
+    }
+    class RoomNode {
+        ~location : BlockReference
+        ~connect : RoomNode
+        ~size : int
+        --
+        ~RoomNode(blockX : int, blockY : int, blockZ : int, size : int, connect : RoomNode) : private
+    }
+    class CaveManager {
+        +{static} {readonly} caveAreaRadius : int
+        +{static} {readonly} caveBlockRadius : int
+        +{static} {readonly} caveSafeBlockRadius : int
+        -{readonly} smoothWorld : SmoothWorld
+        -spawnCave : Cave
+        --
+        ~CaveManager(smoothWorld : SmoothWorld) : public
+        +apply(area : Area) : void
+        -getSpawnCave() : Cave
+        -loadCave(a : AreaReference) : Cave
+        -generateCave(a : final AreaReference) : Cave
+    }
+    class Feature {
+        -{readonly} seed : long
+        -{readonly} noise : OpenSimplexNoise
+        -{readonly} octaves : int
+        -{readonly} d : double[]
+        --
+        ~Feature(seed : long, octaves : int, change : double) : protected
+        +eval(x : double, y : double) : double
+        +eval(x : double, y : double, z : double) : double
+    }
+    class OpenSimplexNoise {
+        -{static} {readonly} STRETCH_CONSTANT_2D : double
+        -{static} {readonly} SQUISH_CONSTANT_2D : double
+        -{static} {readonly} STRETCH_CONSTANT_3D : double
+        -{static} {readonly} SQUISH_CONSTANT_3D : double
+        -{static} {readonly} STRETCH_CONSTANT_4D : double
+        -{static} {readonly} SQUISH_CONSTANT_4D : double
+        -{static} {readonly} NORM_CONSTANT_2D : double
+        -{static} {readonly} NORM_CONSTANT_3D : double
+        -{static} {readonly} NORM_CONSTANT_4D : double
+        -{static} {readonly} DEFAULT_SEED : long
+        -perm : short[]
+        -permGradIndex3D : short[]
+        --
+        ~OpenSimplexNoise() : public
+        ~OpenSimplexNoise(perm : short[]) : public
+        ~OpenSimplexNoise(seed : long) : public
+        +eval(x : double, y : double) : double
+        +eval(x : double, y : double, z : double) : double
+        +eval(x : double, y : double, z : double, w : double) : double
+        -extrapolate(xsb : int, ysb : int, dx : double, dy : double) : double
+        -extrapolate(xsb : int, ysb : int, zsb : int, dx : double, dy : double, dz : double) : double
+        -extrapolate(xsb : int, ysb : int, zsb : int, wsb : int, dx : double, dy : double, dz : double, dw : double) : double
+        -{static} fastFloor(x : double) : int
+    }
+    class SmoothWorld {
+        +{static} {readonly} minSurfaceHeight : int
+        -{static} randomSeed : Random
+        +{readonly} baseSeed : long
+        -{readonly} height : Feature
+        -{readonly} heightVariation : Feature
+        -{readonly} trees : Feature
+        -{readonly} rain : Feature
+        -{readonly} caves : CaveManager
+        --
+        ~SmoothWorld() : public
+        ~SmoothWorld(baseSeed : long) : public
+        +genTree(area : Area, aX : int, aZ : int) : void
+        +getSurfaceHeight(x : int, z : int) : int
+        +getDirtHeight(x : int, z : int) : int
+        +getTreeHeight(x : int, z : int) : int
+        +pseudorandomBits(x : long, z : long, bits : int, murmurHash3 : boolean) : long
+        +pseudorandomInt(x : long, z : long, inclusiveBound : int) : int
+        +{static} murmurHash3(x : long) : long
+    }
+    class TreeGenerator {
+        +generateTree(x : int, y : int, z : int, h : int, area : Area) : void
+        #setBlock(area : Area, block : Block, x : int, y : int, z : int, meta : int) : void
+    }
+    class Area {
+        +{static} {readonly} BLOCK_VISIBLE : int
+        +{static} {readonly} SIZE_BLOCKS : int
+        +{static} {readonly} SIZE_BLOCKS_POW2 : int
+        +{static} {readonly} SIZE_BLOCKS_SQUARED : int
+        +{static} {readonly} SIZE_BLOCKS_CUBED : int
+        +{static} {readonly} HALF_SIZE_BLOCKS : int
+        +{static} {readonly} MAX_Y : int
+        +{static} {readonly} NUM_RANDOM_UPDATES : int
+        +{static} {readonly} MAX_X_OFFSET : int
+        +{static} {readonly} MIN_X_OFFSET : int
+        +{static} {readonly} MAX_Y_OFFSET : int
+        +{static} {readonly} MIN_Y_OFFSET : int
+        +{static} {readonly} MAX_Z_OFFSET : int
+        +{static} {readonly} MIN_Z_OFFSET : int
+        -{static} {readonly} LOCK_MANAGER : LockManager<Area>
+        +{readonly} features : AtomicReference<Object>
+        +{readonly} areaX : int
+        +{readonly} areaZ : int
+        +{readonly} minBlockX : int
+        +{readonly} minBlockZ : int
+        +{readonly} hashCode : int
+        +blocks : int[]
+        +light : byte[]
+        +heightmap : int[]
+        +areaRenderer : AreaRenderer[]
+        +maxY : int
+        +height : int
+        +blockDataList : ArrayList<BlockData>
+        -modCount : int
+        +renderStatus : int[]
+        -unloaded : boolean
+        -neighboursClient : Area[]
+        -neighboursServer : Area[]
+        -areaMapClient : AreaMap
+        -areaMapServer : AreaMap
+        +{readonly} shared : boolean
+        --
+        ~Area(areaX : int, areaZ : int) : public
+        ~Area(toCopy : Area) : public
+        +getBlock(x : int, y : int, z : int) : Block
+        +getMeta(x : int, y : int, z : int) : int
+        +heightmap(x : int, z : int) : int
+        +getSunlight(x : int, y : int, z : int) : int
+        +getLight(x : int, y : int, z : int) : int
+        +getMaxLight(x : int, y : int, z : int) : int
+        +setSunlight(x : int, y : int, z : int, l : int) : void
+        +setLight(x : int, y : int, z : int, l : int) : void
+        +getLightRaw(x : int, y : int, z : int) : int
+        +isBlank() : boolean
+        +isUnloaded() : boolean
+        +isReady() : boolean
+        -unready(y : int) : boolean
+        +unload() : void
+        -removeArrays() : void
+        -update(x : int, y : int, z : int, i : int) : void
+        +setBlock(block : Block, x : int, y : int, z : int, meta : int) : void
+        +removeBlockData(x : int, y : int, z : int) : BlockData
+        +getBlockData(x : int, y : int, z : int) : BlockData
+        +addBlockData(block : Block, x : int, y : int, z : int, meta : int) : BlockData
+        +addBlockData(blockData : BlockData) : void
+        +neighbourBlockCoordinates(blockX : int, blockZ : int) : Area
+        +neighbour(areaX : final int, areaZ : final int) : Area
+        +areaMap() : AreaMap
+        #setAreaMap(areaMap : AreaMap) : void
+        +tick() : void
+        -randomTick(x : int, y : int, z : int, areaMap : AreaMap) : void
+        +doUpdatesThisArea(x : int, y : int, z : int, ref : int) : void
+        +doUpdatesOtherAreas(x : int, y : int, z : int, ref : int) : void
+        -updateSurrounding(x : int, y : int, z : int, ref : int) : void
+        +updateRender(section : int) : void
+        +updateAll() : void
+        +initialUpdate() : void
+        +setupArrays(y : int) : void
+        +rebuildHeightmap() : void
+        +calculateHeight(x : int, z : int) : void
+        -expand(h : int) : void
+        +featuresGenerated() : boolean
+        +shrink() : void
+        -usedHeight() : int
+        +{static} getRef(x : int, y : int, z : int) : int
+        +{static} getX(ref : int) : int
+        +{static} getZ(ref : int) : int
+        +{static} getY(ref : int) : int
+        +{static} getHeightMapRef(x : int, z : int) : int
+        +{static} isShared() : boolean
+        +modify() : void
+        +modifiedSinceSave(entities : DataGroup[]) : boolean
+        +saveModCount() : void
+        +lockAllNeighbours(write : boolean, requireAll : boolean) : Locked<Area>
+    }
+    class AreaMap {
+        -{readonly} map : LongMap<Area>
+        -{readonly} sorted : ArrayList<Area>
+        -modifiedSinceSort : boolean
+        +{readonly} world : World
+        --
+        ~AreaMap(world : World) : public
+        +getArea(areaX : int, areaZ : int) : Area
+        +lockedGetArea(areaX : int, areaZ : int) : Area
+        +setArea(areaX : int, areaZ : int, area : Area) : boolean
+        +toString() : String
+        +getSize() : int
+        +empty() : void
+    }
+    class AreaIterator {
+        -iterator : Iterator<Area>
+        -current : Area
+        --
+    }
+    class Entities {
+        +{readonly} world : World
+        --
+        ~Entities(world : World) : public
+        +getEntitiesForSave(areaX : int, areaZ : int) : DataGroup[]
+    }
+    enum Gamemode {
+    }
+    class Save {
+        +{readonly} name : String
+        +{readonly} fileHandle : FileHandle
+        +{readonly} readOnly : boolean
+        -saveOptions : SaveOptions
+        --
+        ~Save(name : String, fileHandle : FileHandle) : public
+        ~Save(name : String, fileHandle : FileHandle, readOnly : boolean) : public
+        +writeArea(area : Area) : boolean
+        +writeAreas(areas : AreaMap) : void
+        +readArea(x : int, z : int) : Area
+        +writePlayer(player : Player) : void
+        +writePlayers() : void
+        +readPlayer(uuid : UUID, clientIdentifier : ClientIdentifier) : Player
+        +writeCave(areaReference : AreaReference, cave : Cave) : void
+        +readCave(areaReference : AreaReference) : Cave
+        +readSaveOptions() : SaveOptions
+        +getSaveOptions() : SaveOptions
+        +writeSaveOptions() : SaveOptions
+        +setSaveOptions(saveOptions : SaveOptions) : SaveOptions
+        +folderArea() : FileHandle
+        +folderCave() : FileHandle
+        +folderPlayer() : FileHandle
+        +readIDManager() : void
+    }
+    class SaveAreaIO {
+        +{static} read(save : Save, x : int, z : int) : Area
+        +{static} write(save : Save, area : Area) : boolean
+        +{static} file(save : Save, x : int, z : int) : FileHandle
+    }
+    class SaveOptions {
+        +worldSeed : long
+        +worldSeedString : String
+        +worldTime : int
+        +worldPlayingTime : long
+        +worldType : String
+        +worldGamemode : Gamemode
+        +idManager : DataGroup
+        +lastOpenedTime : long
+        +lastVersionHash : String
+        +worldRainOverride : RainStatus
+        +worldRainOverrideTime : long
+        --
+        +setWorldSeed(seedString : String) : void
+    }
+    class BlockLight {
+        +{static} {readonly} FULL_LIGHT : byte
+        --
+        +{static} spreadLight(x : int, y : int, z : int, area : Area, w : LightWorldSection) : void
+        +{static} addLight(x : int, y : int, z : int, l : int, area : Area, lws : LightWorldSection) : void
+        -{static} propagateAdd(lightQueue : ArrayDeque<LightNode>, w : LightWorldSection) : void
+        -{static} tryPropagateAdd(lightQueue : ArrayDeque<LightNode>, w : LightWorldSection, x : int, y : int, z : int, l : int) : void
+        +{static} removeLight(x : int, y : int, z : int, area : Area, lws : LightWorldSection) : void
+        -{static} propagateRemove(removeQueue : ArrayDeque<LightNode>, addQueue : ArrayDeque<LightNode>, w : LightWorldSection) : void
+        -{static} tryPropagateRemove(removeQueue : ArrayDeque<LightNode>, addQueue : ArrayDeque<LightNode>, w : LightWorldSection, x : int, y : int, z : int, l : int) : void
+    }
+    class LightNode {
+        +x : int
+        +y : int
+        +z : int
+        +l : int
+        --
+        ~LightNode(x : int, y : int, z : int, l : int) : public
+    }
+    class LightWorldSection {
+        +{readonly} initialAreaX : int
+        +{readonly} initialAreaZ : int
+        +{readonly} initialMinBlockX : int
+        +{readonly} initialMinBlockZ : int
+        +{readonly} initialMaxBlockX : int
+        +{readonly} initialMaxBlockZ : int
+        +{readonly} areas : Area[]
+        +{readonly} initial : Area
+        -lock : Locked<Area>
+        --
+        ~LightWorldSection(initial : Area) : public
+        +getArea(areaX : int, areaZ : int) : Area
+        #transparent(x : int, y : int, z : int) : boolean
+        #getSunlight(x : int, y : int, z : int) : int
+        #getLight(x : int, y : int, z : int) : int
+        #isLightSource(x : int, y : int, z : int) : boolean
+        #maxY(x : int, z : int) : int
+    }
+    class SunLight {
+        +{static} {readonly} MAX_SUNLIGHT : int
+        --
+        +{static} initialSunlight(area : Area) : void
+        +{static} addSunlight(x : int, y : int, z : int, area : Area, w : LightWorldSection) : void
+        -{static} propagateAdd(lightQueue : ArrayDeque<LightNode>, w : LightWorldSection) : void
+        -{static} tryPropagateAdd(lightQueue : ArrayDeque<LightNode>, w : LightWorldSection, x : int, y : int, z : int, ln : int) : void
+        +{static} removeSunlight(x : int, y : int, z : int, area : Area, lws : LightWorldSection) : void
+        -{static} propagateRemove(removeQueue : ArrayDeque<LightNode>, addQueue : ArrayDeque<LightNode>, w : LightWorldSection) : void
+        -{static} tryPropagateRemove(removeQueue : ArrayDeque<LightNode>, addQueue : ArrayDeque<LightNode>, w : LightWorldSection, x : int, y : int, z : int, l : int) : void
+    }
+    class WorldLightHandler {
+    }
+    class AreaNotLoadedException {
+    }
+    interface GenerationTask {
+        +totalGenerate() : int
+        +totalFeatures() : int
+        +doneGenerate() : int
+        +doneFeatures() : int
+    }
+    class WorldGenerationRunnable {
+        +queue : LinkedBlockingQueue<WorldGenerationTask>
+        +current : AtomicReference<WorldGenerationTask>
+        --
+    }
+    class WorldGenerationTask {
+        +{readonly} world : WorldServer
+        +{readonly} featuresReferences : MultiAreaReference
+        +{readonly} generateReferences : AreaReferenceSet
+        +{readonly} parameter : WorldRequestParameter
+        ~{readonly} generateQueue : ConcurrentLinkedQueue<AreaReference>
+        ~{readonly} generationComplete : CountDownLatch
+        ~{readonly} featuresQueue : ConcurrentLinkedQueue<AreaReference>
+        ~{readonly} timeStarted : AtomicLong
+        ~{readonly} generateCounter : AtomicInteger
+        ~{readonly} featureCounter : AtomicInteger
+        ~{readonly} readCounter : AtomicInteger
+        -{readonly} generateSize : int
+        -{readonly} featureSize : int
+        --
+        ~WorldGenerationTask(world : WorldServer, reference : MultiAreaReference, parameter : WorldRequestParameter) : public
+        -fillGenerateQueue() : int
+        -fillFeaturesQueue() : int
+        +printStatistics() : void
+    }
+    class WorldLockable {
+        -{static} {readonly} lock : LockManager<WorldLockable>
+        -{readonly} value : int
+        --
+        ~WorldLockable(type : Type, side : Side) : public
+    }
+    enum Type {
+        WORLD
+        AREAMAP
+        ENTITIES
+    }
+    class WorldRequestParameter {
+        +{static} {readonly} DEFAULT : WorldRequestParameter
+        +{readonly} prioritise : AreaReference
+        +{readonly} afterCompletion : Runnable
+        --
+        ~WorldRequestParameter(prioritise : AreaReference, afterCompletion : Runnable) : public
+        +getComparator() : Comparator<AreaReference>
+    }
+    class WorldSaveRunnable {
+        +queue : LinkedBlockingQueue<WorldSaveTask>
+        --
+    }
+    class WorldSaveTask {
+        +{readonly} save : Save
+        +{readonly} length : int
+        ~{readonly} saveAreas : ArrayList<Area>
+        ~{readonly} saveQueue : ConcurrentLinkedQueue<Area>
+        ~{readonly} saveComplete : CountDownLatch
+        ~{readonly} timeStarted : AtomicLong
+        ~{readonly} written : AtomicInteger
+        --
+        ~WorldSaveTask(save : Save, areas : Collection<Area>) : public
+        ~WorldSaveTask(save : Save, areas : AreaMap) : public
+    }
+    class WorldTasks {
+        +{static} {readonly} GENERATION_THREADS : int
+        +{static} {readonly} SAVE_THREADS : int
+        -{static} {readonly} gen : WorldGenerationRunnable
+        -{static} {readonly} save : WorldSaveRunnable
+        -{static} {readonly} genThreadPool : ThreadPool
+        -{static} {readonly} saveThreadPool : ThreadPool
+        --
+        +{static} request(worldServer : WorldServer, references : MultiAreaReference, parameter : WorldRequestParameter) : GenerationTask
+        +{static} save(s : Save, areas : Collection<Area>) : void
+        +{static} save(s : Save, areas : AreaMap) : void
+        +{static} currentlySaving() : boolean
+        +{static} waitSaveFinish() : boolean
+        #{static} generate(areaReference : AreaReference, world : WorldServer) : int
+        #{static} features(areaReference : AreaReference, world : WorldServer) : int
+        +{static} getGenerationAreaFilter() : LoadedAreaFilter
+        +{static} dispose() : void
+    }
+    class BlockIntersection {
+        -{readonly} blockReference : BlockReference
+        -{readonly} blockFace : BlockFace
+        -{readonly} block : Block
+        -{readonly} blockMeta : int
+        -{readonly} rayLength : float
+        --
+        ~BlockIntersection(blockReference : BlockReference, blockFace : BlockFace, block : Block, blockMeta : int, rayLength : float) : private
+        +getBlockReference() : BlockReference
+        +getBlockFace() : BlockFace
+        +getBlock() : Block
+        +getBlockMeta() : int
+        +getRayLength() : float
+        +{static} getBlockIntersection(origin : Vector3, direction : Vector3, world : World) : BlockIntersection
+        +{static} intersection(origin : Vector3, direction : Vector3, radius : int, world : World) : BlockIntersection
+    }
+    enum XYZ {
+    }
+    class PlayerCollision {
+        -world : World
+        -{static} {readonly} r : float
+        --
+        -check(position : Vector3, xOffset : float, yOffset : float, zOffset : float) : boolean
+        -limit(newPos : Vector3, xOffset : float, zOffset : float, height : float) : void
+    }
+    class BasicTerrainGenerator {
+        ~old : boolean
+        --
+        ~BasicTerrainGenerator(seed : String) : public
+    }
+    class GeneratorManager {
+        +{static} register(str : String, generator : TerrainGeneratorFactory) : void
+        +{static} getTerrainGenerator(saveOptions : SaveOptions) : TerrainGenerator
+        +{static} terrainGeneratorExists(id : String) : boolean
+        +{static} getName(id : String) : String
+        +{static} ids() : String[]
+    }
+    interface TerrainGeneratorFactory {
+        ~getTerrainGenerator(saveOptions : SaveOptions) : TerrainGenerator
+    }
+    class RainStatus {
+        +{static} {readonly} NOT_RAINING : RainStatus
+        +{readonly} raining : boolean
+        +{readonly} rainRate : float
+        --
+        ~RainStatus(raining : boolean, rainRate : float) : public
+    }
+    abstract class TerrainGenerator {
+        +{abstract} generate(area : Area) : void
+        +{abstract} features(area : Area, world : WorldServer) : void
+        +{abstract} spawnPoint(world : WorldServer) : BlockReference
+        +getRainStatus(x : float, z : float, rainTime : float) : RainStatus
+        +{static} set(area : Area, block : Block, x : int, y : int, z : int, meta : int) : void
+        +{static} setNeighbour(area : Area, block : Block, x : int, y : int, z : int, meta : int) : void
+        +{static} setVisible(area : Area, block : Block, x : int, y : int, z : int, meta : int) : void
+        +{static} setVisibleNeighbour(area : Area, block : Block, x : int, y : int, z : int, meta : int) : void
+    }
+    class TestTerrainGenerator {
+    }
+    class VoidTerrainGenerator {
+    }
+    class Cave {
+        +{readonly} caveStartX : int
+        +{readonly} caveStartY : int
+        +{readonly} caveStartZ : int
+        --
+        ~Cave(x : int, y : int, z : int, blocks : int[]>) : public
+        +apply(area : Area) : void
+    }
+    class CaveGenerator {
+        +{static} {readonly} roomNodesMin : int
+        +{static} {readonly} roomNodesMax : int
+        +{static} {readonly} roomChangeXZConstant : int
+        +{static} {readonly} roomChangeXZRandom : int
+        +{static} {readonly} roomChangeY : int
+        +{static} {readonly} roomConnectDistance2Min : int
+        +{static} {readonly} roomConnectDistance2Max : int
+        +{readonly} caveStartX : int
+        +{readonly} caveStartY : int
+        +{readonly} caveStartZ : int
+        -{readonly} smoothWorld : SmoothWorld
+        -{readonly} numbers : RandomXS128
+        -{readonly} intSet : IntSet
+        -{readonly} rooms : ArrayList<RoomNode>
+        -{readonly} tunnels : ArrayList<TunnelNode>
+        --
+        ~CaveGenerator(x : int, z : int, smoothWorld : SmoothWorld) : public
+        +generate() : Cave
+        -clear(blockX : int, blockY : int, blockZ : int) : void
+        +generateNodes() : void
+        -calculateBlocks() : void
+        -checkRoom(x : int, y : int, z : int) : boolean
+        -getRoomChangeXZ(distance : int) : int
+        -undergroundY(x : int, z : int, prevY : int, changeY : int, allowSurface : boolean) : int
+        -inRange(x : int, z : int) : boolean
+        +distanceFromSpawn(x : int, z : int) : float
+        -{static} distance2(a : BlockReference, b : BlockReference) : float
+        -{static} distance(a : BlockReference, b : BlockReference) : float
+        -{static} distance(a : BlockReference, x2 : int, y2 : int, z2 : int) : float
+    }
+    class TunnelNode {
+        ~start : BlockReference
+        ~end : BlockReference
+        ~startRadius : float
+        ~endRadius : float
+        --
+        ~TunnelNode(start : BlockReference, end : BlockReference) : private
+    }
+    class RoomNode {
+        ~location : BlockReference
+        ~connect : RoomNode
+        ~size : int
+        --
+        ~RoomNode(blockX : int, blockY : int, blockZ : int, size : int, connect : RoomNode) : private
+    }
+    class CaveManager {
+        +{static} {readonly} caveAreaRadius : int
+        +{static} {readonly} caveBlockRadius : int
+        +{static} {readonly} caveSafeBlockRadius : int
+        -{readonly} smoothWorld : SmoothWorld
+        -spawnCave : Cave
+        --
+        ~CaveManager(smoothWorld : SmoothWorld) : public
+        +apply(area : Area) : void
+        -getSpawnCave() : Cave
+        -loadCave(a : AreaReference) : Cave
+        -generateCave(a : final AreaReference) : Cave
+    }
+    class Feature {
+        -{readonly} seed : long
+        -{readonly} noise : OpenSimplexNoise
+        -{readonly} octaves : int
+        -{readonly} d : double[]
+        --
+        ~Feature(seed : long, octaves : int, change : double) : protected
+        +eval(x : double, y : double) : double
+        +eval(x : double, y : double, z : double) : double
+    }
+    class OpenSimplexNoise {
+        -{static} {readonly} STRETCH_CONSTANT_2D : double
+        -{static} {readonly} SQUISH_CONSTANT_2D : double
+        -{static} {readonly} STRETCH_CONSTANT_3D : double
+        -{static} {readonly} SQUISH_CONSTANT_3D : double
+        -{static} {readonly} STRETCH_CONSTANT_4D : double
+        -{static} {readonly} SQUISH_CONSTANT_4D : double
+        -{static} {readonly} NORM_CONSTANT_2D : double
+        -{static} {readonly} NORM_CONSTANT_3D : double
+        -{static} {readonly} NORM_CONSTANT_4D : double
+        -{static} {readonly} DEFAULT_SEED : long
+        -perm : short[]
+        -permGradIndex3D : short[]
+        --
+        ~OpenSimplexNoise() : public
+        ~OpenSimplexNoise(perm : short[]) : public
+        ~OpenSimplexNoise(seed : long) : public
+        +eval(x : double, y : double) : double
+        +eval(x : double, y : double, z : double) : double
+        +eval(x : double, y : double, z : double, w : double) : double
+        -extrapolate(xsb : int, ysb : int, dx : double, dy : double) : double
+        -extrapolate(xsb : int, ysb : int, zsb : int, dx : double, dy : double, dz : double) : double
+        -extrapolate(xsb : int, ysb : int, zsb : int, wsb : int, dx : double, dy : double, dz : double, dw : double) : double
+        -{static} fastFloor(x : double) : int
+    }
+    class SmoothWorld {
+        +{static} {readonly} minSurfaceHeight : int
+        -{static} randomSeed : Random
+        +{readonly} baseSeed : long
+        -{readonly} height : Feature
+        -{readonly} heightVariation : Feature
+        -{readonly} trees : Feature
+        -{readonly} rain : Feature
+        -{readonly} caves : CaveManager
+        --
+        ~SmoothWorld() : public
+        ~SmoothWorld(baseSeed : long) : public
+        +genTree(area : Area, aX : int, aZ : int) : void
+        +getSurfaceHeight(x : int, z : int) : int
+        +getDirtHeight(x : int, z : int) : int
+        +getTreeHeight(x : int, z : int) : int
+        +pseudorandomBits(x : long, z : long, bits : int, murmurHash3 : boolean) : long
+        +pseudorandomInt(x : long, z : long, inclusiveBound : int) : int
+        +{static} murmurHash3(x : long) : long
+    }
+    class TreeGenerator {
+        +generateTree(x : int, y : int, z : int, h : int, area : Area) : void
+        #setBlock(area : Area, block : Block, x : int, y : int, z : int, meta : int) : void
+    }
+    class AreaReference {
+        +areaX : int
+        +areaZ : int
+        -hashCode : int
+        --
+        +setFromArea(area : Area) : AreaReference
+        +setFromAreaCoordinates(areaX : int, areaZ : int) : AreaReference
+        +setFromBlockCoordinates(blockX : int, blockZ : int) : AreaReference
+        +setFromBlockReference(blockReference : BlockReference) : AreaReference
+        +setFromPositionVector3(vector3 : Vector3) : AreaReference
+        +setFromPosition(x : float, z : float) : AreaReference
+        +offset(areaX : int, areaZ : int) : AreaReference
+        +minBlockX() : int
+        +minBlockZ() : int
+        +modified() : AreaReference
+        +distance(areaReference : AreaReference) : double
+        +distance2(areaReference : AreaReference) : int
+        +updateHashCode() : void
+        +copy() : AreaReference
+        +setFromAreaReference(areaReference : AreaReference) : AreaReference
+    }
+    class AreaReferencePool {
+    }
+    class BlockReference {
+        +blockX : int
+        +blockY : int
+        +blockZ : int
+        -hashCode : int
+        --
+        +setFromBlockCoordinates(blockX : int, blockY : int, blockZ : int) : BlockReference
+        +setFromPosition(x : float, y : float, z : float) : BlockReference
+        +setFromVector3(vector3 : Vector3) : BlockReference
+        +offset(blockX : int, blockY : int, blockZ : int) : BlockReference
+        +modified() : BlockReference
+        +updateHashCode() : void
+        +copy() : BlockReference
+        +setFromBlockReference(blockReference : BlockReference) : BlockReference
+        +asVector3() : Vector3
+        +toString() : String
+    }
+    class BlockReferencePool {
+    }
+    class AreaReferenceSet {
+    }
+    interface MultiAreaReference {
+        +getAreaReferences() : Set<AreaReference>
+    }
+    class WorldRegion {
+        +{readonly} minAreaX : int
+        +{readonly} maxAreaX : int
+        +{readonly} minAreaZ : int
+        +{readonly} maxAreaZ : int
+        --
+        ~WorldRegion(areaReference : AreaReference) : public
+        ~WorldRegion(areaReference : AreaReference, range : int) : public
+        ~WorldRegion(minAreaX : int, maxAreaX : int, minAreaZ : int, maxAreaZ : int) : public
+        +contains(a : AreaReference) : boolean
+        +contains(position : Vector3) : boolean
+        +getCenter() : AreaReference
+    }
+    World --|> WorldLockable
+    World ..|> Disposable
+    WorldClient --|> World
+    BasicTerrainGenerator --|> TerrainGenerator
+    TestTerrainGenerator --|> TerrainGenerator
+    VoidTerrainGenerator --|> TerrainGenerator
+    LightWorldSection ..|> AutoCloseable
+    AreaReference ..|> Pool.Poolable
+    AreaReference ..|> Cloneable
+    AreaReferencePool --|> Pool<AreaReference>
+    BlockReference ..|> Pool.Poolable
+    BlockReferencePool --|> Pool<BlockReference>
+    SaveOptions ..|> DataParser
+    WorldServer --|> World
+    Area --|> Lockable<Area>
+    AreaMap --|> WorldLockable
+    AreaMap ..|> Iterable<Area>
+    AreaIterator ..|> Iterator<Area>
+    Entities --|> WorldLockable
+    AreaNotLoadedException --|> RuntimeException
+    WorldGenerationRunnable ..|> Runnable
+    WorldGenerationTask ..|> GenerationTask
+    WorldLockable --|> Lockable<WorldLockable>
+    WorldSaveRunnable ..|> Runnable
+    AreaReferenceSet --|> HashSet<AreaReference>
+    AreaReferenceSet ..|> MultiAreaReference
+    WorldRegion ..|> MultiAreaReference
+    SmoothWorld --|> TerrainGenerator
+    Area --|> Lockable<Area>
+    AreaMap --|> WorldLockable
+    AreaMap ..|> Iterable<Area>
+    AreaIterator ..|> Iterator<Area>
+    Entities --|> WorldLockable
+    SaveOptions ..|> DataParser
+    LightWorldSection ..|> AutoCloseable
+    AreaNotLoadedException --|> RuntimeException
+    WorldGenerationRunnable ..|> Runnable
+    WorldGenerationTask ..|> GenerationTask
+    WorldLockable --|> Lockable<WorldLockable>
+    WorldSaveRunnable ..|> Runnable
+    BasicTerrainGenerator --|> TerrainGenerator
+    TestTerrainGenerator --|> TerrainGenerator
+    VoidTerrainGenerator --|> TerrainGenerator
+    SmoothWorld --|> TerrainGenerator
+    AreaReference ..|> Pool.Poolable
+    AreaReference ..|> Cloneable
+    AreaReferencePool --|> Pool<AreaReference>
+    BlockReference ..|> Pool.Poolable
+    BlockReferencePool --|> Pool<BlockReference>
+    AreaReferenceSet --|> HashSet<AreaReference>
+    AreaReferenceSet ..|> MultiAreaReference
+    WorldRegion ..|> MultiAreaReference
+@enduml
