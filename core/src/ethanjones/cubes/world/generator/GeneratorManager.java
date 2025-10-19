@@ -1,6 +1,7 @@
 package ethanjones.cubes.world.generator;
 
 import ethanjones.cubes.core.localization.Localization;
+import ethanjones.cubes.world.generator.GeneratorManager.TerrainGeneratorFactory;
 import ethanjones.cubes.world.generator.smooth.SmoothWorld;
 import ethanjones.cubes.world.save.SaveOptions;
 
@@ -11,30 +12,19 @@ public class GeneratorManager {
   private static final LinkedHashMap<String, TerrainGeneratorFactory> generators = new LinkedHashMap<String, TerrainGeneratorFactory>();
 
   static {
-    generators.put("core:smooth", new TerrainGeneratorFactory() {
+    // Single strategy-based generator that handles all terrain types
+    TerrainGeneratorFactory strategyFactory = new TerrainGeneratorFactory() {
       @Override
       public TerrainGenerator getTerrainGenerator(SaveOptions saveOptions) {
-        return new SmoothWorld(saveOptions.worldSeed);
+        return new StrategyTerrainGenerator(saveOptions);
       }
-    });
-    generators.put("core:basic", new TerrainGeneratorFactory() {
-      @Override
-      public TerrainGenerator getTerrainGenerator(SaveOptions saveOptions) {
-        return new BasicTerrainGenerator(saveOptions.worldSeedString);
-      }
-    });
-    generators.put("core:test", new TerrainGeneratorFactory() {
-      @Override
-      public TerrainGenerator getTerrainGenerator(SaveOptions saveOptions) {
-        return new TestTerrainGenerator();
-      }
-    });
-    generators.put("core:void", new TerrainGeneratorFactory() {
-      @Override
-      public TerrainGenerator getTerrainGenerator(SaveOptions saveOptions) {
-        return new VoidTerrainGenerator();
-      }
-    });
+    };
+    
+    // Register all terrain types to use the strategy generator
+    generators.put("core:smooth", strategyFactory);
+    generators.put("core:basic", strategyFactory);
+    generators.put("core:test", strategyFactory);
+    generators.put("core:void", strategyFactory);
   }
 
   public static void register(String str, TerrainGeneratorFactory generator) {
