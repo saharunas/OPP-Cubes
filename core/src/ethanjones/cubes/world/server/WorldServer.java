@@ -16,6 +16,7 @@ import ethanjones.cubes.networking.server.ClientIdentifier;
 import ethanjones.cubes.side.common.Cubes;
 import ethanjones.cubes.side.common.Side;
 import ethanjones.cubes.world.World;
+import ethanjones.cubes.world.WorldBuilder;
 import ethanjones.cubes.world.generator.RainStatus;
 import ethanjones.cubes.world.reference.AreaReference;
 import ethanjones.cubes.world.reference.BlockReference;
@@ -40,21 +41,22 @@ public class WorldServer extends World {
   private RainStatus rainStatusOverride;
   private long rainStatusOverrideEnd;
 
-  public WorldServer(Save save) {
-    super(save, Side.Server);
-    if (save == null) throw new IllegalArgumentException("Null save on server");
-    
-    if (this.save.fileHandle != null) {
-      Log.info("Save '" + this.save.name + "' in '" + this.save.fileHandle.file().getAbsolutePath() + "'");
-    } else {
-      Log.info("Save '" + this.save.name + "'");
+    public WorldServer(WorldBuilder builder) {
+        super(builder.save, builder.side);
+
+        if (builder.save == null) throw new IllegalArgumentException("Null save on server");
+
+        if (this.save.fileHandle != null) {
+            Log.info("Save '" + this.save.name + "' in '" + this.save.fileHandle.file().getAbsolutePath() + "'");
+        } else {
+            Log.info("Save '" + this.save.name + "'");
+        }
+
+        loadedAreaFilters.add(WorldTasks.getGenerationAreaFilter());
+
+        this.rainStatusOverride = builder.save.getSaveOptions().worldRainOverride;
+        this.rainStatusOverrideEnd = builder.save.getSaveOptions().worldRainOverrideTime;
     }
-
-    loadedAreaFilters.add(WorldTasks.getGenerationAreaFilter());
-
-    this.rainStatusOverride = save.getSaveOptions().worldRainOverride;
-    this.rainStatusOverrideEnd = save.getSaveOptions().worldRainOverrideTime;
-  }
   
   public BlockReference getSpawnPoint() {
     return terrainGenerator.spawnPoint(this);

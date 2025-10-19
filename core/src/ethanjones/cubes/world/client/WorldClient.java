@@ -10,6 +10,7 @@ import ethanjones.cubes.side.common.Cubes;
 import ethanjones.cubes.side.common.Side;
 import ethanjones.cubes.world.CoordinateConverter;
 import ethanjones.cubes.world.World;
+import ethanjones.cubes.world.WorldBuilder;
 import ethanjones.cubes.world.generator.RainStatus;
 import ethanjones.cubes.world.reference.AreaReference;
 import ethanjones.cubes.world.reference.multi.MultiAreaReference;
@@ -33,10 +34,10 @@ public class WorldClient extends World {
   public RainStatus rainStatus = RainStatus.NOT_RAINING;
   private int tickCounter = 0;
 
-  public WorldClient() {
-    super(null, Side.Client);
-    Log.debug("Area Sharing: " + Area.isShared());
-  }
+    public WorldClient(WorldBuilder builder) {
+        super(builder.save, builder.side);
+        Log.debug("Area Sharing: " + Area.isShared());
+    }
 
   @Override
   public void tick() {
