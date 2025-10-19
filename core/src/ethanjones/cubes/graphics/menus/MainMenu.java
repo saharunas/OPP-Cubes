@@ -1,15 +1,16 @@
 package ethanjones.cubes.graphics.menus;
 
+import ethanjones.cubes.ui.factory.ThemeManager;
+import ethanjones.cubes.ui.factory.UIThemeFactory;
+
 import ethanjones.cubes.core.localization.Localization;
 import ethanjones.cubes.core.logging.Log;
 import ethanjones.cubes.core.platform.Adapter;
 import ethanjones.cubes.core.platform.Compatibility;
 import ethanjones.cubes.core.system.Branding;
 import ethanjones.cubes.graphics.assets.Assets;
-import ethanjones.cubes.graphics.menu.Fonts;
 import ethanjones.cubes.graphics.menu.Menu;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
@@ -23,6 +24,8 @@ import static ethanjones.cubes.graphics.Graphics.GUI_WIDTH;
 
 public class MainMenu extends Menu {
 
+  private final UIThemeFactory theme;
+
   private static Value cellHeight = new Value() {
     @Override
     public float get(Actor context) {
@@ -35,6 +38,7 @@ public class MainMenu extends Menu {
       return GUI_WIDTH / 2;
     }
   };
+
   Image logo;
   Label version;
   Label author;
@@ -45,12 +49,17 @@ public class MainMenu extends Menu {
   TextButton quit;
 
   public MainMenu() {
+    //false = Light, true = Dark  
+    this.theme = ThemeManager.get(skin, true);
+
     logo = new Image(new TextureRegionDrawable(Assets.getTextureRegion("core:logo.png")), Scaling.fillY, Align.center);
-    version = new Label(Branding.DEBUG, new Label.LabelStyle(Fonts.smallHUD, Color.WHITE));
-    author = new Label(Branding.AUTHOR, new Label.LabelStyle(Fonts.smallHUD, Color.WHITE));
-    buttons = new Table();
+    version = theme.createSmallLabel(Branding.DEBUG);
+    author  = theme.createSmallLabel(Branding.AUTHOR);
+
+    buttons = theme.createPanel();
     buttons.defaults().height(cellHeight).width(cellWidth).pad(4).fillX().fillY();
-    buttons.add(singleplayer = new TextButton(Localization.get("menu.main.singleplayer"), skin)).row();
+
+    buttons.add(singleplayer = theme.createButton(Localization.get("menu.main.singleplayer"))).row();
     singleplayer.addListener(new ChangeListener() {
       @Override
       public void changed(ChangeEvent event, Actor actor) {
@@ -61,21 +70,27 @@ public class MainMenu extends Menu {
         }
       }
     });
-    buttons.add(multiplayer = new TextButton(Localization.get("menu.main.multiplayer"), skin)).row();
+
+    // FIXED: use multiplayer key, and no skin arg
+    buttons.add(multiplayer = theme.createButton(Localization.get("menu.main.multiplayer"))).row();
     multiplayer.addListener(new ChangeListener() {
       @Override
       public void changed(ChangeEvent event, Actor actor) {
         Adapter.setMenu(new MultiplayerConnectMenu());
       }
     });
-    buttons.add(settings = new TextButton(Localization.get("menu.main.settings"), skin)).row();
+
+    // FIXED: no skin arg
+    buttons.add(settings = theme.createButton(Localization.get("menu.main.settings"))).row();
     settings.addListener(new ChangeListener() {
       @Override
       public void changed(ChangeEvent event, Actor actor) {
         Adapter.setMenu(new SettingsMenu());
       }
     });
-    buttons.add(quit = new TextButton(Localization.get("menu.main.quit"), skin)).row();
+
+    // FIXED: use quit key, and no skin arg
+    buttons.add(quit = theme.createButton(Localization.get("menu.main.quit"))).row();
     quit.addListener(new ChangeListener() {
       @Override
       public void changed(ChangeEvent event, Actor actor) {
@@ -88,7 +103,7 @@ public class MainMenu extends Menu {
     stage.addActor(version);
     stage.addActor(author);
     stage.addActor(buttons);
-    
+
     logo.addListener(new ActorGestureListener() {
       @Override
       public boolean longPress(Actor actor, float x, float y) {
