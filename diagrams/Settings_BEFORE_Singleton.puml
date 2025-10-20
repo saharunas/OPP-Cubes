@@ -1,0 +1,173 @@
+@startuml Settings_BEFORE_Singleton
+
+' ===================================================================
+' BEFORE: Settings as Static Utility Class (NO Singleton Pattern)
+' ===================================================================
+
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FFFFFF
+skinparam class {
+    BackgroundColor #FFEECC
+    BorderColor #000000
+    ArrowColor #000000
+    FontSize 12
+}
+
+' Main Settings class (BEFORE - Static Utility)
+class Settings {
+    {static} - settings : Map<String, Setting>
+    {static} + GRAPHICS_VIEW_DISTANCE : String
+    {static} + USERNAME : String
+    {static} + NETWORKING_PORT : String
+    {static} + DEBUG_GL_PROFILER : String
+    {static} + GRAPHICS_FOG : String
+    ..
+    {static} + init() : void
+    {static} + write() : void
+    {static} + getSetting(name : String) : Setting
+    {static} + getIntegerSetting(name : String) : IntegerSetting
+    {static} + getBooleanSetting(name : String) : BooleanSetting
+    {static} + getStringSetting(name : String) : StringSetting
+    {static} + getIntegerSettingValue(name : String) : int
+    {static} + getBooleanSettingValue(name : String) : boolean
+    {static} + getStringSettingValue(name : String) : String
+}
+
+note right of Settings
+  **BEFORE: Static Utility Class**
+  
+  Problems:
+  - All methods are static
+  - Global state (settings map)
+  - Hard to test (cannot mock)
+  - No instance = No Singleton Pattern
+  - Thread safety concerns
+  - Cannot control instantiation
+end note
+
+' Abstract Setting class
+abstract class Setting {
+    {abstract} + getActor(...) : Actor
+    {abstract} + toString() : String
+    {abstract} + toJson() : JsonValue
+    {abstract} + readJson(json : JsonValue) : void
+    + onChange() : void
+    + shouldDisplay() : boolean
+}
+
+' Concrete Setting Types
+class IntegerSetting {
+    - value : int
+    - min : int
+    - max : int
+    + get() : int
+    + set(value : int) : void
+}
+
+class BooleanSetting {
+    - value : boolean
+    + get() : boolean
+    + set(value : boolean) : void
+}
+
+class StringSetting {
+    - value : String
+    + get() : String
+    + set(value : String) : void
+}
+
+class FloatSetting {
+    - value : float
+    - min : float
+    - max : float
+    + get() : float
+    + set(value : float) : void
+}
+
+class DropDownSetting {
+    - options : List<String>
+    - selected : String
+    + getSelected() : String
+    + setSelected(value : String) : void
+}
+
+' Classes that use Settings
+class Cubes {
+    + setup() : void
+    + cleanup() : void
+}
+
+class WorldClient {
+    - renderDistance : int
+}
+
+class PacketConnect {
+    + username : String
+    + renderDistance : int
+}
+
+class ClientDebug {
+    + update() : void
+}
+
+class Area {
+    {static} + isShared() : boolean
+}
+
+' Relationships
+
+' Settings contains many Setting objects (Composition)
+Settings "1" *-- "*" Setting : contains >
+
+' Inheritance hierarchy
+Setting <|-- IntegerSetting : extends
+Setting <|-- BooleanSetting : extends
+Setting <|-- StringSetting : extends
+Setting <|-- FloatSetting : extends
+Setting <|-- DropDownSetting : extends
+
+' Dependencies (static method calls)
+Cubes ..> Settings : << static calls >>\nSettings.init()\nSettings.write()
+WorldClient ..> Settings : << static calls >>\nSettings.getIntegerSettingValue()
+PacketConnect ..> Settings : << static calls >>\nSettings.getStringSettingValue()
+ClientDebug ..> Settings : << static calls >>\nSettings.getBooleanSetting()
+Area ..> Settings : << static calls >>\nSettings.getBooleanSettingValue()
+
+' Layout hints
+Settings -[hidden]down-> Setting
+IntegerSetting -[hidden]right-> BooleanSetting
+BooleanSetting -[hidden]right-> StringSetting
+StringSetting -[hidden]right-> FloatSetting
+FloatSetting -[hidden]right-> DropDownSetting
+
+note bottom of Settings
+  **Key Characteristics:**
+  - All methods are static
+  - No constructor (implicit public constructor)
+  - No instance control
+  - Direct static access from everywhere
+  - Tight coupling to static methods
+  
+  **Problems:**
+  - Cannot prevent multiple instantiation (if constructor called)
+  - Global state shared across all code
+  - Difficult to test (cannot inject mock)
+  - Thread safety issues with shared mutable state
+  - No lazy initialization control
+end note
+
+note as PatternNote
+  **BEFORE: Traditional Static Utility Class**
+  
+  This is NOT a Singleton Pattern!
+  
+  Issues:
+  - No instance management
+  - No getInstance() method
+  - Public constructor (default)
+  - Static methods everywhere
+  - Hard to extend or modify
+  - Testing requires actual static state
+end note
+
+@enduml

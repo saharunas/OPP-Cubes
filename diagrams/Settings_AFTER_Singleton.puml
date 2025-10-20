@@ -1,0 +1,200 @@
+@startuml Settings_AFTER_Singleton
+
+' ===================================================================
+' AFTER: Settings with Singleton Pattern (Thread-Safe)
+' ===================================================================
+
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FFFFFF
+skinparam class {
+    BackgroundColor<<Singleton>> #CCFFCC
+    BackgroundColor #FFEECC
+    BorderColor #000000
+    ArrowColor #000000
+    FontSize 12
+}
+
+' Main Settings class (AFTER - Singleton Pattern)
+class Settings <<Singleton>> {
+    {static} **- instance : Settings** {volatile}
+    {static} **- INSTANCE_LOCK : Object**
+    - settings : Map<String, Setting>
+    {static} + GRAPHICS_VIEW_DISTANCE : String
+    {static} + USERNAME : String
+    {static} + NETWORKING_PORT : String
+    ..
+    **- Settings()** {private constructor}
+    **{static} + getInstance() : Settings**
+    ..
+    - initInstance() : void
+    - writeInstance() : void
+    - getSettingInstance(name : String) : Setting
+    - getIntegerSettingInstance(name : String) : IntegerSetting
+    - getBooleanSettingInstance(name : String) : BooleanSetting
+    - getStringSettingInstance(name : String) : StringSetting
+    ..
+    {static} + init() : void
+    {static} + write() : void
+    {static} + getSetting(name : String) : Setting
+    {static} + getIntegerSetting(name : String) : IntegerSetting
+    {static} + getBooleanSetting(name : String) : BooleanSetting
+    {static} + getStringSetting(name : String) : StringSetting
+    {static} + getIntegerSettingValue(name : String) : int
+    {static} + getBooleanSettingValue(name : String) : boolean
+    {static} + getStringSettingValue(name : String) : String
+}
+
+note right of Settings
+  **AFTER: Singleton Pattern**
+  
+  Key Features:
+  ✓ Private constructor
+  ✓ getInstance() method
+  ✓ Volatile instance variable
+  ✓ Double-checked locking
+  ✓ Thread-safe
+  ✓ Lazy initialization
+  ✓ Single instance guaranteed
+  ✓ Static facade for backward compatibility
+end note
+
+note as SingletonNote
+  **Returns unique**
+  **instance**
+end note
+
+SingletonNote .. Settings : getInstance()
+
+' Self-reference showing Singleton creates itself
+Settings "1" o-- "1" Settings : **- instance**
+
+' Abstract Setting class
+abstract class Setting {
+    {abstract} + getActor(...) : Actor
+    {abstract} + toString() : String
+    {abstract} + toJson() : JsonValue
+    {abstract} + readJson(json : JsonValue) : void
+    + onChange() : void
+    + shouldDisplay() : boolean
+}
+
+' Concrete Setting Types
+class IntegerSetting {
+    - value : int
+    - min : int
+    - max : int
+    + get() : int
+    + set(value : int) : void
+}
+
+class BooleanSetting {
+    - value : boolean
+    + get() : boolean
+    + set(value : boolean) : void
+}
+
+class StringSetting {
+    - value : String
+    + get() : String
+    + set(value : String) : void
+}
+
+class FloatSetting {
+    - value : float
+    - min : float
+    - max : float
+    + get() : float
+    + set(value : float) : void
+}
+
+class DropDownSetting {
+    - options : List<String>
+    - selected : String
+    + getSelected() : String
+    + setSelected(value : String) : void
+}
+
+' Classes that use Settings
+class Cubes {
+    + setup() : void
+    + cleanup() : void
+}
+
+class WorldClient {
+    - renderDistance : int
+}
+
+class PacketConnect {
+    + username : String
+    + renderDistance : int
+}
+
+class ClientDebug {
+    + update() : void
+}
+
+class Area {
+    {static} + isShared() : boolean
+}
+
+' Relationships
+
+' Settings contains many Setting objects (Composition)
+Settings "1" *-- "*" Setting : contains >
+
+' Inheritance hierarchy
+Setting <|-- IntegerSetting : extends
+Setting <|-- BooleanSetting : extends
+Setting <|-- StringSetting : extends
+Setting <|-- FloatSetting : extends
+Setting <|-- DropDownSetting : extends
+
+' Dependencies (SAME static facade maintained for backward compatibility!)
+Cubes ..> Settings : << uses >>\nSettings.init()\nSettings.write()
+WorldClient ..> Settings : << uses >>\nSettings.getIntegerSettingValue()
+PacketConnect ..> Settings : << uses >>\nSettings.getStringSettingValue()
+ClientDebug ..> Settings : << uses >>\nSettings.getBooleanSetting()
+Area ..> Settings : << uses >>\nSettings.getBooleanSettingValue()
+
+' Layout hints
+Settings -[hidden]down-> Setting
+IntegerSetting -[hidden]right-> BooleanSetting
+BooleanSetting -[hidden]right-> StringSetting
+StringSetting -[hidden]right-> FloatSetting
+FloatSetting -[hidden]right-> DropDownSetting
+
+note bottom of Settings
+  **Singleton Implementation Details:**
+  
+  1. **Private Constructor**: Prevents direct instantiation
+     private Settings() { ... }
+  
+  2. **Static Instance Variable**: Holds the single instance
+     private static volatile Settings instance = null;
+  
+  3. **Thread-Safe getInstance()**: Double-checked locking
+     public static Settings getInstance() {
+       if (instance == null) {
+         synchronized (INSTANCE_LOCK) {
+           if (instance == null) {
+             instance = new Settings();
+           }
+         }
+       }
+       return instance;
+     }
+  
+  4. **Static Facade**: For backward compatibility
+     public static void init() {
+       getInstance().initInstance();
+     }
+  
+  **Advantages:**
+  + Guaranteed single instance
+  + Thread-safe initialization
+  + Lazy loading (created when needed)
+  + No changes to existing code (110+ usages)
+  + Testable (can mock instance)
+end note
+
+@enduml
