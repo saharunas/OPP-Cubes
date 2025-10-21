@@ -17,6 +17,7 @@ public class PlayerCollision {
   public void preventNoclip(PlayerMovementEvent event) {
     Player player = event.getPlayer();
     Vector3 pos = event.newPosition;
+    player.setNoClip(Side.getCubes().getClient().gamemodeStrategy.hasNoClip());
     if (player.noClip()) return;
 
     if (world.getArea(CoordinateConverter.area(pos.x), CoordinateConverter.area(pos.z)) != null && !event.isCanceled()) {

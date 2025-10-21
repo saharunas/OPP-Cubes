@@ -161,7 +161,7 @@ public class CameraController extends InputAdapter {
         jumping = true;
       }
     }
-    if (jump && !wasJumpDown && Cubes.getClient().gamemode == Gamemode.creative) {
+    if (jump && !wasJumpDown && Cubes.getClient().gamemodeStrategy.canFly()) {
       long time = System.currentTimeMillis();
       long delta = time - lastJumpDown;
       if (delta <= 500) {
