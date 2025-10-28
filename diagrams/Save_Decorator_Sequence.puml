@@ -1,0 +1,262 @@
+@startuml Save_Decorator_Sequence
+
+title Decorator Pattern - Save System (3 Levels Stacked)
+
+' Style
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor Client
+participant "performance:\nPerformanceSaveDecorator" as Performance <<Level 3>>
+participant "caching:\nCachingSaveDecorator" as Caching <<Level 2>>
+participant "logging:\nLoggingSaveDecorator" as Logging <<Level 1>>
+participant "basicSave:\nBasicSave" as Basic <<Component>>
+participant "save:\nSave" as Save <<Original>>
+database "Disk" as Disk
+
+note over Client
+  Client creates decorated save:
+  
+  SaveInterface save = 
+    new PerformanceSaveDecorator(
+      new CachingSaveDecorator(
+        new LoggingSaveDecorator(
+          new BasicSave(name, fileHandle)
+        )
+      )
+    );
+end note
+
+== First readArea() Call - Cache Miss ==
+
+Client -> Performance : readArea(10, 20)
+activate Performance
+
+note right of Performance
+  Start timing
+  startTime = currentTimeMillis()
+end note
+
+Performance -> Caching : readArea(10, 20)
+activate Caching
+
+note right of Caching
+  Check cache
+  key = "10_20"
+  cached = areaCache.get(key)
+  → null (cache miss)
+end note
+
+Caching -> Logging : readArea(10, 20)
+activate Logging
+
+note right of Logging
+  Log operation
+  "Reading area at (10, 20)"
+end note
+
+Logging -> Basic : readArea(10, 20)
+activate Basic
+
+Basic -> Save : readArea(10, 20)
+activate Save
+
+Save -> Disk : Read area file
+Disk --> Save : area data
+Save --> Basic : Area(10, 20)
+deactivate Save
+
+Basic --> Logging : Area(10, 20)
+deactivate Basic
+
+note right of Logging
+  Log result
+  "Successfully read area at (10, 20)"
+end note
+
+Logging --> Caching : Area(10, 20)
+deactivate Logging
+
+note right of Caching
+  Store in cache
+  areaCache.put("10_20", area)
+end note
+
+Caching --> Performance : Area(10, 20)
+deactivate Caching
+
+note right of Performance
+  Calculate duration
+  duration = currentTimeMillis() - startTime
+  recordOperation("readArea(10,20)", duration)
+  
+  duration = 45ms
+  "readArea(10,20) took 45ms"
+end note
+
+Performance --> Client : Area(10, 20)
+deactivate Performance
+
+|||
+
+== Second readArea() Call - Cache Hit ==
+
+Client -> Performance : readArea(10, 20)
+activate Performance
+
+note right of Performance
+  Start timing
+  startTime = currentTimeMillis()
+end note
+
+Performance -> Caching : readArea(10, 20)
+activate Caching
+
+note right of Caching
+  Check cache
+  key = "10_20"
+  cached = areaCache.get(key)
+  → Area(10, 20) ✓ (cache hit!)
+  
+  **Skip disk I/O - return cached**
+end note
+
+Caching --> Performance : Area(10, 20)
+deactivate Caching
+
+note right of Performance
+  Calculate duration
+  duration = currentTimeMillis() - startTime
+  recordOperation("readArea(10,20)", duration)
+  
+  duration = 2ms (much faster!)
+  "readArea(10,20) took 2ms"
+end note
+
+Performance --> Client : Area(10, 20)
+deactivate Performance
+
+note over Client
+  **Cache improvement:**
+  1st call: 45ms (disk read)
+  2nd call: 2ms (from cache)
+  
+  22.5x faster!
+end note
+
+|||
+
+== writeArea() Call - All Decorators Add Functionality ==
+
+Client -> Performance : writeArea(area)
+activate Performance
+
+note right of Performance
+  Start timing
+end note
+
+Performance -> Caching : writeArea(area)
+activate Caching
+
+Caching -> Logging : writeArea(area)
+activate Logging
+
+note right of Logging
+  Log operation
+  "Writing area at (15, 25)"
+end note
+
+Logging -> Basic : writeArea(area)
+activate Basic
+
+Basic -> Save : writeArea(area)
+activate Save
+
+Save -> Disk : Write area file
+Disk --> Save : success
+Save --> Basic : true
+deactivate Save
+
+Basic --> Logging : true
+deactivate Basic
+
+note right of Logging
+  Log result
+  "Successfully wrote area at (15, 25)"
+end note
+
+Logging --> Caching : true
+deactivate Logging
+
+note right of Caching
+  Update cache
+  areaCache.put("15_25", area)
+  
+  Cache stays consistent
+  with disk!
+end note
+
+Caching --> Performance : true
+deactivate Caching
+
+note right of Performance
+  Record timing
+  "writeArea(15,25) took 78ms"
+end note
+
+Performance --> Client : true
+deactivate Performance
+
+|||
+
+== Client Checks Performance Stats ==
+
+Client -> Performance : logPerformanceStats()
+activate Performance
+
+note right of Performance
+  **Performance Statistics:**
+  
+  readArea(10,20): count=2, avg=23.5ms, min=2ms, max=45ms
+  writeArea(15,25): count=1, avg=78ms
+  
+  Total time saved by cache: 43ms
+end note
+
+Performance --> Client : (logs to console)
+deactivate Performance
+
+|||
+
+== Client Checks Cache Stats ==
+
+Client -> Caching : getCacheStats()
+activate Caching
+
+note right of Caching
+  Cache stats:
+  Areas: 2/50
+  Caves: 0/50
+  Players: 0/50
+end note
+
+Caching --> Client : "Cache stats - Areas: 2/50..."
+deactivate Caching
+
+note over Client
+  **Decorator Pattern Benefits Demonstrated:**
+  
+  ✓ Each decorator adds its own responsibility
+  ✓ Decorators work independently
+  ✓ Can be composed in any order
+  ✓ No modification to BasicSave needed
+  ✓ Can add/remove decorators dynamically
+  
+  **Execution Flow:**
+  Client → Performance → Caching → Logging → Basic → Save
+  
+  Each layer adds value without
+  knowing about the others!
+end note
+
+@enduml

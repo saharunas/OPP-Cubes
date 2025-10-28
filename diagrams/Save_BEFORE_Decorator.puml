@@ -1,0 +1,111 @@
+@startuml Save_BEFORE_Decorator
+
+title Save System - BEFORE Decorator Pattern
+
+' Style
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam packageStyle rectangle
+
+package "Save System (Original)" {
+    class Save {
+        + name: String
+        + fileHandle: FileHandle
+        + readOnly: boolean
+        - saveOptions: SaveOptions
+        --
+        + Save(name, fileHandle)
+        + Save(name, fileHandle, readOnly)
+        --
+        + writeArea(area: Area): boolean
+        + writeAreas(areas: AreaMap): void
+        + readArea(x: int, z: int): Area
+        + writePlayer(player: Player): void
+        + writePlayers(): void
+        + readPlayer(uuid: UUID, clientId): Player
+        + writeCave(areaRef, cave): void
+        + readCave(areaRef): Cave
+        + getSaveOptions(): SaveOptions
+        + writeSaveOptions(): SaveOptions
+        + folderArea(): FileHandle
+        + folderCave(): FileHandle
+        + folderPlayer(): FileHandle
+    }
+    
+    class SaveAreaIO <<static utility>> {
+        {static} - deflaterLocal: ThreadLocal<Deflater>
+        {static} - inflaterLocal: ThreadLocal<Inflater>
+        --
+        {static} + write(save: Save, area: Area): boolean
+        {static} + read(save: Save, x: int, z: int): Area
+        {static} + file(save: Save, x: int, z: int): FileHandle
+    }
+    
+    class SaveOptions {
+        + idManager: DataGroup
+        + seed: long
+        + worldType: String
+        + worldGenerator: String
+        --
+        + write(): DataGroup
+        + read(data: DataGroup): void
+    }
+}
+
+package "World Storage" {
+    class Area {
+        + areaX: int
+        + areaZ: int
+        + blocks: int[]
+        --
+        + write(output): void
+        + read(input): Area
+    }
+    
+    class AreaMap {
+        - areas: Map<AreaCoordinate, Area>
+        --
+        + size(): int
+        + get(x: int, z: int): Area
+    }
+    
+    class Player {
+        + username: String
+        + uuid: UUID
+        --
+        + write(): DataGroup
+        + read(data: DataGroup): void
+    }
+    
+    class Cave {
+        --
+        + write(output): void
+        {static} + read(input): Cave
+    }
+}
+
+' Relationships
+Save --> SaveAreaIO : uses
+Save --> SaveOptions : manages
+Save --> Area : reads/writes
+Save --> AreaMap : saves
+Save --> Player : reads/writes
+Save --> Cave : reads/writes
+
+note right of Save
+  **Problems:**
+  - No logging capability
+  - No caching mechanism
+  - No performance monitoring
+  - All functionality in one class
+  - Cannot add features dynamically
+  - Uses static utility (SaveAreaIO)
+end note
+
+note right of SaveAreaIO
+  Static utility class
+  Cannot be decorated
+  or extended easily
+end note
+
+@enduml
