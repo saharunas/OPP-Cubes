@@ -72,7 +72,12 @@ public class PerformanceSaveDecorator extends SaveDecorator {
     
     private void recordOperation(String operationName, long durationMs) {
         synchronized (operationStats) {
-            operationStats.computeIfAbsent(operationName, k -> new OperationStats()).record(durationMs);
+            OperationStats stats = operationStats.get(operationName);
+            if (stats == null) {
+                stats = new OperationStats();
+                operationStats.put(operationName, stats);
+            }
+            stats.record(durationMs);
         }
         
         if (logSlowOperations && durationMs > slowOperationThresholdMs) {
@@ -94,7 +99,7 @@ public class PerformanceSaveDecorator extends SaveDecorator {
         long startTime = System.currentTimeMillis();
         super.writeAreas(areas);
         long duration = System.currentTimeMillis() - startTime;
-        recordOperation("writeAreas(" + areas.size() + " areas)", duration);
+        recordOperation("writeAreas(" + areas.getSize() + " areas)", duration);
     }
     
     @Override

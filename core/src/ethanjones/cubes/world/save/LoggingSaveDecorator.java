@@ -42,7 +42,7 @@ public class LoggingSaveDecorator extends SaveDecorator {
     
     @Override
     public void writeAreas(AreaMap areas) {
-        Log.debug("Writing " + areas.size() + " areas");
+        Log.debug("Writing " + areas.getSize() + " areas");
         super.writeAreas(areas);
         Log.debug("Finished writing areas");
     }

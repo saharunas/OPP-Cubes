@@ -102,6 +102,7 @@ public class CommandManager {
     TimeCommand.init();
     RainCommand.init();
     NoClipCommand.init();
+    SkinCommand.init();
 
     StopCommand.init();
     ThreadDumpCommand.init();

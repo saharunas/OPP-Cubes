@@ -123,7 +123,14 @@ public class PlayerManager {
     packetOtherPlayerConnected.uuid = client.getPlayer().uuid;
     packetOtherPlayerConnected.position = client.getPlayer().position;
     packetOtherPlayerConnected.angle = client.getPlayer().angle;
+    packetOtherPlayerConnected.skinColor = client.getPlayer().getSkinColor();
     NetworkingManager.sendPacketToOtherClients(packetOtherPlayerConnected, client);
+    
+    // Send new player's inventory to other clients so they can render tools
+    PacketOtherPlayerInventory newPlayerInv = new PacketOtherPlayerInventory();
+    newPlayerInv.playerUUID = client.getPlayer().uuid;
+    newPlayerInv.inv = clientIdentifier.getPlayer().getInventory().write();
+    NetworkingManager.sendPacketToOtherClients(newPlayerInv, client);
     
     for (ClientIdentifier c : Cubes.getServer().getAllClients()) {
       if (c == client || c == null) continue;
@@ -132,7 +139,14 @@ public class PlayerManager {
       popc.uuid = c.getPlayer().uuid;
       popc.position = c.getPlayer().position;
       popc.angle = c.getPlayer().angle;
+      popc.skinColor = c.getPlayer().getSkinColor();
       NetworkingManager.sendPacketToClient(popc, client);
+      
+      // Send existing player's inventory to new client so they can render tools
+      PacketOtherPlayerInventory existingPlayerInv = new PacketOtherPlayerInventory();
+      existingPlayerInv.playerUUID = c.getPlayer().uuid;
+      existingPlayerInv.inv = c.getPlayer().getInventory().write();
+      NetworkingManager.sendPacketToClient(existingPlayerInv, client);
     }
     
     clientIdentifier.getPlayer().addToWorld();

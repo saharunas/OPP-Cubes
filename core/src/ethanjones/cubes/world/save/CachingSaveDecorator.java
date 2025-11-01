@@ -39,24 +39,26 @@ public class CachingSaveDecorator extends SaveDecorator {
         this.maxCacheSize = maxCacheSize;
         
         // Create LRU caches using LinkedHashMap
+        final int maxSize = maxCacheSize; // Java 7 requires final for inner class access
+        
         this.areaCache = new LinkedHashMap<String, Area>(maxCacheSize, 0.75f, true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry<String, Area> eldest) {
-                return size() > maxCacheSize;
+                return size() > maxSize;
             }
         };
         
         this.caveCache = new LinkedHashMap<String, Cave>(maxCacheSize, 0.75f, true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry<String, Cave> eldest) {
-                return size() > maxCacheSize;
+                return size() > maxSize;
             }
         };
         
         this.playerCache = new LinkedHashMap<UUID, Player>(maxCacheSize, 0.75f, true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry<UUID, Player> eldest) {
-                return size() > maxCacheSize;
+                return size() > maxSize;
             }
         };
     }
