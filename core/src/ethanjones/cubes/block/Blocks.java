@@ -1,13 +1,6 @@
 package ethanjones.cubes.block;
 
 import ethanjones.cubes.block.blocks.*;
-import ethanjones.cubes.block.factories.BlockFactoryRegistry;
-import ethanjones.cubes.block.factories.ChestBlockFactory;
-import ethanjones.cubes.block.factories.DirtBlockFactory;
-import ethanjones.cubes.block.factories.GlassBlockFactory;
-import ethanjones.cubes.block.factories.GrassBlockFactory;
-import ethanjones.cubes.block.factories.LeavesBlockFactory;
-import ethanjones.cubes.block.factories.SaplingBlockFactory;
 import ethanjones.cubes.core.id.GetInstances.GetBlock;
 import ethanjones.cubes.core.id.IDManager;
 
@@ -35,24 +28,17 @@ public class Blocks {
   public static Block sapling;
 
   public static void init() {
-    BlockFactoryRegistry.register("dirt", new DirtBlockFactory());
-    BlockFactoryRegistry.register("grass", new GrassBlockFactory());
-    BlockFactoryRegistry.register("leaves", new LeavesBlockFactory());
-    BlockFactoryRegistry.register("glass", new GlassBlockFactory());
-    BlockFactoryRegistry.register("chest", new ChestBlockFactory());
-    BlockFactoryRegistry.register("sapling", new SaplingBlockFactory());
-
-    dirt = BlockFactoryRegistry.create("dirt");
+    dirt = new BlockDirt();
     IDManager.register(dirt);
-    grass = BlockFactoryRegistry.create("grass");
+    grass = new BlockGrass();
     IDManager.register(grass);
-    leaves = BlockFactoryRegistry.create("leaves");
+    leaves = new BlockLeaves();
     IDManager.register(leaves);
-    glass = BlockFactoryRegistry.create("glass");
+    glass = new BlockGlass();
     IDManager.register(glass);
-    chest = BlockFactoryRegistry.create("chest");
+    chest = new BlockChest();
     IDManager.register(chest);
-    sapling = BlockFactoryRegistry.create("sapling");
+    sapling = new BlockSapling();
     IDManager.register(sapling);
   }
 }
