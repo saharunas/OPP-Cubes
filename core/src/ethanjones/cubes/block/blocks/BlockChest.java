@@ -25,68 +25,71 @@ import com.badlogic.gdx.math.Vector3;
 
 public class BlockChest extends Block {
 
-  private static final BlockFace[] lockFace = new BlockFace[]{BlockFace.posX, BlockFace.negX, BlockFace.posZ, BlockFace.negZ};
+    private static final BlockFace[] lockFace = new BlockFace[]{
+            BlockFace.posX, BlockFace.negX, BlockFace.posZ, BlockFace.negZ
+    };
 
-  public BlockChest() {
-    super("core:chest");
+    public BlockChest(String id) {
+        super(id);
 
-    miningTime = 3;
-    miningTool = ToolType.axe;
-    miningOther = true;
-  }
-
-  @Override
-  public void loadGraphics() {
-    textureHandlers = new BlockTextureHandler[4];
-
-    for (int i = 0; i < textureHandlers.length; i++) {
-      textureHandlers[i] = new BlockTextureHandler("core:chest_side");
-      textureHandlers[i].setSide(BlockFace.posY, "core:chest_y");
-      textureHandlers[i].setSide(BlockFace.negY, "core:chest_y");
-      textureHandlers[i].setSide(lockFace[i], "core:chest_lock");
+        miningTime = 3f;
+        miningTool = ToolType.axe;
+        miningOther = true;
     }
-  }
 
-  @Override
-  public boolean blockData() {
-    return true;
-  }
+    @Override
+    public void loadGraphics() {
+        textureHandlers = new BlockTextureHandler[4];
 
-  @Override
-  public BlockData createBlockData(Area area, int x, int y, int z, int meta, DataGroup dataGroup) {
-    return new BlockDataChest(area, x, y, z);
-  }
-
-  @Override
-  public boolean onButtonPress(ClickType type, Player player, int blockX, int blockY, int blockZ) {
-    if (Side.isServer() || type != ClickType.place) return false;
-    BlockData blockData = Side.getCubes().world.getBlockData(blockX, blockY, blockZ);
-    if (blockData instanceof BlockDataChest) {
-      InventoryActor inventoryActor = new InventoryActor(((BlockDataChest) blockData).inventory);
-      InventoryActor playerInv = Cubes.getClient().renderer.guiRenderer.playerInv;
-      InventoryManager.showInventory(new InventoryWindow(new DoubleInventory(inventoryActor, playerInv)));
+        for (int i = 0; i < textureHandlers.length; i++) {
+            BlockTextureHandler handler = new BlockTextureHandler("core:chest_side");
+            handler.setSide(BlockFace.posY, "core:chest_y");
+            handler.setSide(BlockFace.negY, "core:chest_y");
+            handler.setSide(lockFace[i], "core:chest_lock");
+            textureHandlers[i] = handler;
+        }
     }
-    return true;
-  }
 
-  @Override
-  public Integer place(World world, int x, int y, int z, int meta, Player player, BlockIntersection intersection) {
-    Vector3 pos = player.position.cpy();
-    pos.sub(x, y, z);
-    pos.nor();
-    BlockFace blockFace = VectorUtil.directionXZ(pos);
-    if (blockFace == BlockFace.negX) {
-      return 1;
-    } else if (blockFace == BlockFace.posZ) {
-      return 2;
-    } else if (blockFace == BlockFace.negZ) {
-      return 3;
+    @Override
+    public boolean blockData() {
+        return true;
     }
-    return 0;
-  }
 
-  @Override
-  public ItemStack[] drops(World world, int x, int y, int z, int meta) {
-    return super.drops(world, x, y, z, 0);
-  }
+    @Override
+    public BlockData createBlockData(Area area, int x, int y, int z, int meta, DataGroup dataGroup) {
+        return new BlockDataChest(area, x, y, z);
+    }
+
+    @Override
+    public boolean onButtonPress(ClickType type, Player player, int blockX, int blockY, int blockZ) {
+        if (Side.isServer() || type != ClickType.place) return false;
+        BlockData blockData = Side.getCubes().world.getBlockData(blockX, blockY, blockZ);
+        if (blockData instanceof BlockDataChest) {
+            InventoryActor inventoryActor = new InventoryActor(((BlockDataChest) blockData).inventory);
+            InventoryActor playerInv = Cubes.getClient().renderer.guiRenderer.playerInv;
+            InventoryManager.showInventory(new InventoryWindow(new DoubleInventory(inventoryActor, playerInv)));
+        }
+        return true;
+    }
+
+    @Override
+    public Integer place(World world, int x, int y, int z, int meta, Player player, BlockIntersection intersection) {
+        Vector3 pos = player.position.cpy();
+        pos.sub(x, y, z);
+        pos.nor();
+        BlockFace blockFace = VectorUtil.directionXZ(pos);
+        if (blockFace == BlockFace.negX) {
+            return 1;
+        } else if (blockFace == BlockFace.posZ) {
+            return 2;
+        } else if (blockFace == BlockFace.negZ) {
+            return 3;
+        }
+        return 0;
+    }
+
+    @Override
+    public ItemStack[] drops(World world, int x, int y, int z, int meta) {
+        return super.drops(world, x, y, z, 0);
+    }
 }

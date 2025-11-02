@@ -1,6 +1,9 @@
 package ethanjones.cubes.item;
 
 import ethanjones.cubes.block.Block;
+import ethanjones.cubes.core.GameContext;
+import ethanjones.cubes.core.command.BreakBlockCommand;
+import ethanjones.cubes.core.command.CommandManager;
 import ethanjones.cubes.core.event.entity.living.player.PlayerBreakBlockEvent;
 import ethanjones.cubes.entity.living.player.Player;
 import ethanjones.cubes.side.common.Cubes;
@@ -62,7 +65,9 @@ public class ItemTool extends Item {
           if (target.time >= target.totalTime) {
             player.setCurrentlyMining(null);
             if (Side.isServer()) {
-              Cubes.getServer().world.setBlock(null, blockReference.blockX, blockReference.blockY, blockReference.blockZ);
+                GameContext.commandManager.executeCommand(
+                        new BreakBlockCommand(Side.getCubes().world, blockReference.blockX, blockReference.blockY, blockReference.blockZ)
+                );
               if (block.canMine(itemStack)) {
                 PlayerBreakBlockEvent event = new PlayerBreakBlockEvent(player, block, meta, blockIntersection, blockReference);
                 if (event.post().isCanceled()) return;

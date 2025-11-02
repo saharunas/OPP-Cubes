@@ -1,6 +1,9 @@
 package ethanjones.cubes.item;
 
 import ethanjones.cubes.block.Block;
+import ethanjones.cubes.core.GameContext;
+import ethanjones.cubes.core.command.CommandManager;
+import ethanjones.cubes.core.command.PlaceBlockCommand;
 import ethanjones.cubes.core.event.entity.living.player.PlayerPlaceBlockEvent;
 import ethanjones.cubes.core.util.BlockFace;
 import ethanjones.cubes.entity.living.player.Player;
@@ -80,7 +83,16 @@ public class ItemBlock extends Item {
       PlayerPlaceBlockEvent event = new PlayerPlaceBlockEvent(player, block, meta, blockIntersection, blockReference);
       if (event.post().isCanceled()) return false;
 
-      Cubes.getServer().world.setBlock(block, blockReference.blockX, blockReference.blockY, blockReference.blockZ, event.getMeta());
+      GameContext.commandManager.executeCommand(
+            new PlaceBlockCommand(
+                    Cubes.getServer().world,
+                    block,
+                    blockReference.blockX,
+                    blockReference.blockY,
+                    blockReference.blockZ,
+                    event.getMeta()
+            )
+        );
 
       InventoryHelper.reduceCount(player.getInventory(), stack);
       return true;
