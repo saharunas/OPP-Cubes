@@ -5,12 +5,15 @@ import ethanjones.cubes.core.platform.Adapter;
 import ethanjones.cubes.core.system.CubesException;
 import ethanjones.cubes.graphics.menus.ClientErrorMenu.DisconnectedMenu;
 import ethanjones.cubes.networking.Networking;
+import ethanjones.cubes.networking.Networking.NetworkingState;
 import ethanjones.cubes.networking.packet.Packet;
 import ethanjones.cubes.networking.packet.PacketDirection;
 import ethanjones.cubes.networking.packet.PacketQueue;
 import ethanjones.cubes.networking.packets.PacketConnect;
 import ethanjones.cubes.networking.packets.PacketPingRequest;
 import ethanjones.cubes.networking.socket.SocketMonitor;
+import ethanjones.cubes.networking.transport.TransportSocket;
+import ethanjones.cubes.networking.transport.TransportSockets;
 import ethanjones.cubes.side.common.Cubes;
 import ethanjones.cubes.side.common.Side;
 
@@ -28,9 +31,9 @@ public class ClientNetworking extends Networking {
   //TODO: Send packet when disconnecting and log better
   public static PingResult ping(ClientNetworkingParameter clientNetworkingParameter) {
     Log.debug("Pinging Host:" + clientNetworkingParameter.host + " Port:" + clientNetworkingParameter.port);
-    Socket socket;
-    try {
-      socket = Gdx.net.newClientSocket(Protocol.TCP, clientNetworkingParameter.host, clientNetworkingParameter.port, socketHints);
+    try (TransportSocket socket = TransportSockets.connect(
+           clientNetworkingParameter.host,
+           clientNetworkingParameter.port)) {
       return ClientConnectionInitializer.ping(socket);
     } catch (Exception e) {
       PingResult pingResult = new PingResult();
@@ -42,7 +45,7 @@ public class ClientNetworking extends Networking {
 
   private final ClientNetworkingParameter clientNetworkingParameter;
   private SocketMonitor socketMonitor;
-  private Socket socket;
+  private TransportSocket socket;
   private Exception exception;
   
   private int tickCount;
@@ -57,20 +60,14 @@ public class ClientNetworking extends Networking {
     setNetworkingState(NetworkingState.Starting);
     Log.info("Starting Client Networking");
     Log.info("Host:" + clientNetworkingParameter.host + " Port:" + clientNetworkingParameter.port);
-    Socket socket;
+
+    TransportSocket socket = TransportSockets.connect(
+      clientNetworkingParameter.host,
+      clientNetworkingParameter.port);
     try {
-      socket = Gdx.net.newClientSocket(Protocol.TCP, clientNetworkingParameter.host, clientNetworkingParameter.port, socketHints);
-    } catch (GdxRuntimeException e) {
-      if (!(e.getCause() instanceof Exception)) throw e;
-      throw (Exception) e.getCause();
-    }
-    try {
-      ClientConnectionInitializer.connect(socket);
+      ClientConnectionInitializer.connect(socket); // add this overload
     } catch (Exception e) {
-      try {
-        socket.dispose();
-      } catch (Exception ignored) {
-      }
+      try { socket.close(); } catch (Exception ignored) {}
       throw e;
     }
     this.socket = socket;

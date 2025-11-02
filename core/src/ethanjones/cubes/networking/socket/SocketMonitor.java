@@ -2,6 +2,8 @@ package ethanjones.cubes.networking.socket;
 
 import ethanjones.cubes.networking.Networking;
 import ethanjones.cubes.networking.packet.PacketIDDatabase;
+import ethanjones.cubes.networking.transport.TransportSocket;
+import ethanjones.cubes.networking.transport.TransportSockets;
 import ethanjones.cubes.side.common.Side;
 
 import com.badlogic.gdx.net.Socket;
@@ -15,12 +17,12 @@ public class SocketMonitor implements Disposable {
   protected final AtomicBoolean running;
   private final Networking networking;
   private final Side side;
-  private final Socket socket;
+  private final TransportSocket socket;
   private final SocketInput socketInput;
   private final SocketOutput socketOutput;
   private final PacketIDDatabase packetIDDatabase;
 
-  public SocketMonitor(Socket socket, Networking networking, Side side) {
+  public SocketMonitor(TransportSocket socket, Networking networking, Side side) {
     this.socket = socket;
     this.networking = networking;
     this.side = side;
@@ -38,7 +40,7 @@ public class SocketMonitor implements Disposable {
     running.set(false);
     socketInput.dispose();
     socketOutput.dispose();
-    socket.dispose();
+    socket.close();
   }
 
   public Networking getNetworking() {
@@ -49,7 +51,7 @@ public class SocketMonitor implements Disposable {
     return side;
   }
 
-  public Socket getSocket() {
+  public TransportSocket getSocket() {
     return socket;
   }
 

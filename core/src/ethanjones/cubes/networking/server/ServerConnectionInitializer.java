@@ -3,6 +3,7 @@ package ethanjones.cubes.networking.server;
 import ethanjones.cubes.core.logging.Log;
 import ethanjones.cubes.core.system.Branding;
 import ethanjones.cubes.core.system.Executor;
+import ethanjones.cubes.networking.transport.TransportSocket;
 import ethanjones.cubes.side.common.Cubes;
 import ethanjones.cubes.side.common.Side;
 
@@ -24,69 +25,85 @@ public class ServerConnectionInitializer {
 
   private static class Checker implements Callable<Object> {
 
-    private final Socket javaSocket;
-    private final NetJavaSocketImpl gdxSocket;
+    private final TransportSocket socket;
 
-    private Checker(Socket javaSocket, NetJavaSocketImpl gdxSocket) {
-      this.javaSocket = javaSocket;
-      this.gdxSocket = gdxSocket;
+    private Checker(TransportSocket socket) {
+      this.socket = socket;
     }
 
     @Override
-    public Object call() throws Exception {
+    public Object call() {
       try {
-        initialConnect(javaSocket, gdxSocket);
+        initialConnect(socket);
       } catch (SocketTimeoutException e) {
         Log.debug(new IOException("Client did not respond in time", e));
+        try { socket.close(); } catch (Exception ignored) {}
       } catch (IOException e) {
         Log.debug(e);
+        try { socket.close(); } catch (Exception ignored) {}
+      } catch (Exception e) {
+        Log.debug(e);
+        try { socket.close(); } catch (Exception ignored) {}
       }
       return null;
     }
   }
 
-  public static void check(com.badlogic.gdx.net.Socket gdxSocket) throws Exception {
-    Socket javaSocket = extractJavaSocket(gdxSocket);
-    NetJavaSocketImpl netJavaSocketImpl = (NetJavaSocketImpl) gdxSocket;
-    Executor.execute(new Checker(javaSocket, netJavaSocketImpl));
+  public static void check(TransportSocket socket) {
+    Executor.execute(new Checker(socket));
   }
 
-  private static void initialConnect(Socket javaSocket, NetJavaSocketImpl gdxSocket) throws Exception {
-    javaSocket.setSoTimeout(TIMEOUT);
-    DataInputStream dataInputStream = new DataInputStream(javaSocket.getInputStream());
-    byte b = dataInputStream.readByte();
-    DataOutputStream dataOutputStream = new DataOutputStream(javaSocket.getOutputStream());
-    dataOutputStream.writeInt(Branding.VERSION_MAJOR);
-    dataOutputStream.writeInt(Branding.VERSION_MINOR);
-    dataOutputStream.writeInt(Branding.VERSION_POINT);
-    dataOutputStream.writeInt(Branding.VERSION_BUILD);
-    dataOutputStream.writeUTF(Branding.VERSION_HASH);
-    switch (b) {
+  private static void initialConnect(TransportSocket socket) throws Exception {
+    // require first byte within TIMEOUT
+    socket.setSoTimeout(TIMEOUT);
+
+    DataInputStream in  = new DataInputStream(socket.getInputStream());
+    DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+    byte code = in.readByte(); // may throw SocketTimeoutException
+
+    // send server version
+    out.writeInt(Branding.VERSION_MAJOR);
+    out.writeInt(Branding.VERSION_MINOR);
+    out.writeInt(Branding.VERSION_POINT);
+    out.writeInt(Branding.VERSION_BUILD);
+    out.writeUTF(Branding.VERSION_HASH);
+
+    switch (code) {
       case 0:
-        connect(javaSocket, gdxSocket, dataOutputStream, dataInputStream);
+        connect(socket, out, in);
         return;
       case 1:
-        ping(javaSocket, gdxSocket, dataOutputStream, dataInputStream);
+        ping(socket, out, in);
         return;
       default:
-        throw new IOException("Unrecognised connection code " + b);
+        throw new IOException("Unrecognised connection code " + code);
     }
   }
 
-  private static void connect(Socket javaSocket, NetJavaSocketImpl gdxSocket, DataOutputStream dataOutputStream, DataInputStream dataInputStream) throws Exception {
-    javaSocket.setSoTimeout(0);
-    ((ServerNetworking) Side.getNetworking()).accepted(gdxSocket);
+  private static void connect(TransportSocket socket,
+                              DataOutputStream out,
+                              DataInputStream in) throws Exception {
+    // normal operation: no read timeout
+    socket.setSoTimeout(0);
+    // hand off to networking
+    ((ServerNetworking) Side.getNetworking()).accepted(socket);
   }
 
-  private static void ping(Socket javaSocket, NetJavaSocketImpl gdxSocket, DataOutputStream dataOutputStream, DataInputStream dataInputStream) throws Exception {
-    Log.debug(gdxSocket.getRemoteAddress() + " pinged the server");
+  private static void ping(TransportSocket socket,
+                           DataOutputStream out,
+                           DataInputStream in) throws Exception {
+    Log.debug(socket.getRemoteAddress() + " pinged the server");
+
     List<ClientIdentifier> clients = Cubes.getServer().getAllClients();
-    dataOutputStream.writeInt(clients.size());
+    out.writeInt(clients.size());
     for (ClientIdentifier client : clients) {
-      dataOutputStream.writeUTF(client.getPlayer().username);
+      out.writeUTF(client.getPlayer().username);
     }
-    dataOutputStream.flush();
-    gdxSocket.dispose();
+    out.flush();
+
+    // Close after responding to ping (matches your previous behavior)
+    socket.close();
   }
   
 }

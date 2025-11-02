@@ -2,6 +2,7 @@ package ethanjones.cubes.networking.client;
 
 import ethanjones.cubes.core.logging.Log;
 import ethanjones.cubes.core.system.Branding;
+import ethanjones.cubes.networking.transport.TransportSocket;
 
 import com.badlogic.gdx.net.NetJavaSocketImpl;
 
@@ -16,18 +17,16 @@ public class ClientConnectionInitializer {
 
   public static final int TIMEOUT = 5000;
 
-  public static void connect(com.badlogic.gdx.net.Socket gdxSocket) throws Exception {
-    Socket javaSocket = extractJavaSocket(gdxSocket);
-    DataOutputStream dataOutputStream = new DataOutputStream(javaSocket.getOutputStream());
+  public static void connect(TransportSocket socket) throws Exception {
+    DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
     dataOutputStream.writeByte(0); //0 is connect
-    javaSocket.setSoTimeout(TIMEOUT);
     int serverMajor;
     int serverMinor;
     int serverPoint;
     int serverBuild;
     String serverHash;
     try {
-      DataInputStream dataInputStream = new DataInputStream(javaSocket.getInputStream());
+      DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
       serverMajor = dataInputStream.readInt();
       serverMinor = dataInputStream.readInt();
       serverPoint = dataInputStream.readInt();
@@ -54,7 +53,6 @@ public class ClientConnectionInitializer {
       String str = serverMajor + "." + serverMinor + "." + serverPoint;
       throw new IOException("Server is running version " + str + " not " + Branding.VERSION_MAJOR_MINOR_POINT);
     }
-    javaSocket.setSoTimeout(0);
   }
 
   public static Socket extractJavaSocket(com.badlogic.gdx.net.Socket gdxSocket) throws IOException {
@@ -76,14 +74,12 @@ public class ClientConnectionInitializer {
     }
   }
 
-  public static PingResult ping(com.badlogic.gdx.net.Socket gdxSocket) throws Exception {
-    Socket javaSocket = extractJavaSocket(gdxSocket);
-    DataOutputStream dataOutputStream = new DataOutputStream(javaSocket.getOutputStream());
+  public static PingResult ping(TransportSocket socket) throws Exception {
+    DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
     Long firstTime = System.currentTimeMillis();
     dataOutputStream.writeByte(1); //1 is ping
-    javaSocket.setSoTimeout(TIMEOUT);
     try {
-      DataInputStream dataInputStream = new DataInputStream(javaSocket.getInputStream());
+      DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
       PingResult pingResult = new PingResult();
       pingResult.serverMajor = dataInputStream.readInt();
       Long secondTime = System.currentTimeMillis();
@@ -97,7 +93,7 @@ public class ClientConnectionInitializer {
         pingResult.players[i] = dataInputStream.readUTF();
       }
       pingResult.ping = (int) (secondTime - firstTime);
-      gdxSocket.dispose();
+      socket.close();
       return pingResult;
     } catch (IOException e) {
       if (e instanceof SocketTimeoutException) {
