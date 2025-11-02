@@ -20,6 +20,17 @@ public class Adapter {
   private static final int JOIN_TIMEOUT = 60000;
   private static AdapterInterface adapter;
 
+  private static PlatformFactory factory;
+
+  public static void setFactory(PlatformFactory f) {
+    if (factory == null && f != null) factory = f;
+  }
+
+  public static PlatformFactory getFactory() {
+    if (factory == null) throw new IllegalStateException("PlatformFactory not set");
+    return factory;
+  }
+
   public static void setClient(CubesClient cubesClient) throws UnsupportedOperationException {
     adapter.setClient(cubesClient);
     new InstanceChangedEvent.ClientChangedEvent().post();

@@ -1,7 +1,9 @@
 package ethanjones.cubes.core.platform.android;
+import ethanjones.cubes.core.platform.android.AndroidPlatformFactory;
 
 import ethanjones.cubes.core.platform.Compatibility;
 import ethanjones.cubes.core.platform.Launcher;
+import ethanjones.cubes.core.platform.Adapter;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -9,10 +11,14 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 
 public class AndroidLauncher extends AndroidApplication implements Launcher {
 
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    new AndroidCompatibility(this).startCubes();
+  super.onCreate(savedInstanceState);
+
+  Adapter.setFactory(new AndroidPlatformFactory(this));
+  Log.initFromFactory();
+  Adapter.getFactory().createCompatibility().startCubes();
   }
 
   @Override
