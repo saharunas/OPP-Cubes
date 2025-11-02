@@ -1,7 +1,8 @@
 package ethanjones.cubes.core.platform.desktop;
 
 import ethanjones.cubes.core.platform.Adapter;
-import ethanjones.cubes.core.platform.desktop.DesktopPlatformFactory;
+import ethanjones.cubes.core.facade.BootFacade;
+
 
 public class ClientLauncher implements DesktopLauncher {
 
@@ -13,7 +14,7 @@ public class ClientLauncher implements DesktopLauncher {
     DesktopCompatibility.setup();
 
     Adapter.setFactory(new DesktopPlatformFactory(this, arg));
-    Adapter.getFactory().createCompatibility().startCubes();
+    BootFacade.launch();
   }
 
   private final String[] arg;

@@ -4,6 +4,7 @@ import ethanjones.cubes.core.platform.android.AndroidPlatformFactory;
 import ethanjones.cubes.core.platform.Compatibility;
 import ethanjones.cubes.core.platform.Launcher;
 import ethanjones.cubes.core.platform.Adapter;
+import ethanjones.cubes.core.facade.BootFacade;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -17,8 +18,7 @@ public class AndroidLauncher extends AndroidApplication implements Launcher {
   super.onCreate(savedInstanceState);
 
   Adapter.setFactory(new AndroidPlatformFactory(this));
-  Log.initFromFactory();
-  Adapter.getFactory().createCompatibility().startCubes();
+  BootFacade.launch();
   }
 
   @Override
