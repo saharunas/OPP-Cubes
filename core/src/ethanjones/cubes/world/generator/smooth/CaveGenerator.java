@@ -11,10 +11,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CaveGenerator implements Cloneable {
+public class CaveGenerator {
 
     public static final int roomNodesMin = 25;
     public static final int roomNodesMax = 100;
+    private static final boolean DEBUG_COPIES = true;
 
     private final int caveStartX;
     private final int caveStartY;
@@ -67,9 +68,16 @@ public class CaveGenerator implements Cloneable {
         return new Cave(caveStartX, caveStartY, caveStartZ, caveBlocks);
     }
 
-    // === Node generation (Prototype logic) ===
+    private static void debug(String msg) {
+        if (DEBUG_COPIES) {
+            System.out.println("[CaveDebug] " + msg);
+        }
+    }
+
     private void generateNodes() {
-        // Randomized spherical rooms using deep-copied prototypes
+        debug("=== Generating Rooms and Tunnels ===");
+
+        // --- Rooms (deep copies) ---
         for (int i = 0; i < 5; i++) {
             RoomNode room = roomPrototype.deepCopy();
             int offsetX = (numbers.nextInt(40) - 20);
@@ -78,26 +86,46 @@ public class CaveGenerator implements Cloneable {
             room.location.offset(offsetX, offsetY, offsetZ);
             room.size = 3 + numbers.nextInt(3);
             rooms.add(room);
+
+            debug(String.format("Room[%d]: loc=%s hash=%d",
+                    i, room.location, System.identityHashCode(room.location)));
         }
 
-        // Connect rooms with tunnels using deep copies
+        // --- Connect rooms with tunnels ---
         for (int i = 0; i < rooms.size() - 1; i++) {
             RoomNode a = rooms.get(i);
             RoomNode b = rooms.get(i + 1);
 
-            // Main tunnel (deep copy ensures independent geometry)
+            // Deep copy (main tunnel)
             TunnelNode mainTunnel = tunnelPrototype.deepCopy()
                     .withEnds(a.location.copy(), b.location.copy());
             mainTunnel.startRadius = 1.5f + numbers.nextFloat();
             mainTunnel.endRadius = 1.5f + numbers.nextFloat();
             tunnels.add(mainTunnel);
 
-            // Occasionally create a smaller parallel tunnel (shallow copy)
+            debug(String.format(
+                    "MainTunnel[%d]: start=%s (%d) end=%s (%d) | distinct=%s",
+                    i,
+                    mainTunnel.start, System.identityHashCode(mainTunnel.start),
+                    mainTunnel.end, System.identityHashCode(mainTunnel.end),
+                    (mainTunnel.start != mainTunnel.end)
+            ));
+
+            // Shallow copy (side tunnel)
             if (numbers.nextFloat() < 0.3f) {
                 TunnelNode sideTunnel = mainTunnel.shallowCopy();
                 sideTunnel.startRadius *= 0.6f;
                 sideTunnel.endRadius *= 0.6f;
                 tunnels.add(sideTunnel);
+
+                debug(String.format(
+                        " ↳ SideTunnel[%d]: shares start=%s (%d) end=%s (%d) | sharedStart=%s sharedEnd=%s",
+                        i,
+                        sideTunnel.start, System.identityHashCode(sideTunnel.start),
+                        sideTunnel.end, System.identityHashCode(sideTunnel.end),
+                        (sideTunnel.start == mainTunnel.start),
+                        (sideTunnel.end == mainTunnel.end)
+                ));
             }
         }
     }
@@ -217,20 +245,31 @@ public class CaveGenerator implements Cloneable {
             this.end = end;
         }
 
-        /** 🔹 Deep copy — duplicates coordinates */
         public TunnelNode deepCopy() {
-            TunnelNode copy = new TunnelNode(start.copy(), end.copy());
+            TunnelNode copy = new TunnelNode(
+                    start != null ? start.copy() : null,
+                    end != null ? end.copy() : null
+            );
             copy.startRadius = this.startRadius;
             copy.endRadius = this.endRadius;
             return copy;
         }
 
-        /** 🔹 Shallow copy — shares same start/end references but copies radii */
         public TunnelNode shallowCopy() {
+            // Shared start/end references (same geometry line)
             TunnelNode copy = new TunnelNode(this.start, this.end);
             copy.startRadius = this.startRadius;
             copy.endRadius = this.endRadius;
             return copy;
+        }
+
+        @Override
+        public TunnelNode clone() {
+            try {
+                return (TunnelNode) super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new AssertionError("TunnelNode cloning failed unexpectedly", e);
+            }
         }
 
         public TunnelNode withEnds(BlockReference newStart, BlockReference newEnd) {
