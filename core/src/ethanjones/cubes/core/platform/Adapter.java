@@ -20,6 +20,12 @@ public class Adapter {
   private static final int JOIN_TIMEOUT = 60000;
   private static AdapterInterface adapter;
 
+  private static final GameFlowMediator gameFlowMediator = new DefaultGameFlowMediator();
+
+  public static GameFlowMediator getGameFlowMediator() {
+    return gameFlowMediator;
+  }
+
   public static void setClient(CubesClient cubesClient) throws UnsupportedOperationException {
     adapter.setClient(cubesClient);
     new InstanceChangedEvent.ClientChangedEvent().post();
@@ -92,7 +98,8 @@ public class Adapter {
   }
 
   public static void setInterface(AdapterInterface adapterInterface) {
-    if (adapter == null && adapterInterface != null) adapter = adapterInterface;
+    if (adapter == null && adapterInterface != null)
+      adapter = adapterInterface;
   }
 
   private static void stopFromClientThread(final CubesClient cubesClient, final CubesServer cubesServer) {
@@ -125,15 +132,15 @@ public class Adapter {
       if (cubesServer != null) {
         cubesServer.dispose();
       }
-//      if (cubesClient != null) {
-//        try {
-//          cubesClient.getThread().join(JOIN_TIMEOUT);
-//        } catch (InterruptedException e) {
-//        }
-//        if (cubesClient.getThread().isAlive()) {
-//          failedToStopThread(cubesClient.getThread());
-//        }
-//      }
+      // if (cubesClient != null) {
+      // try {
+      // cubesClient.getThread().join(JOIN_TIMEOUT);
+      // } catch (InterruptedException e) {
+      // }
+      // if (cubesClient.getThread().isAlive()) {
+      // failedToStopThread(cubesClient.getThread());
+      // }
+      // }
     } catch (Exception e) {
       Debug.crash(e);
     }
@@ -147,29 +154,29 @@ public class Adapter {
       if (cubesServer != null) {
         cubesServer.dispose();
       }
-//      if (cubesClient != null) {
-//        try {
-//          cubesClient.getThread().join(JOIN_TIMEOUT);
-//        } catch (InterruptedException e) {
-//        }
-//        if (cubesClient.getThread().isAlive()) {
-//          failedToStopThread(cubesClient.getThread());
-//        }
-//      }
-//      if (cubesServer != null) {
-//        try {
-//          cubesServer.getThread().join(JOIN_TIMEOUT);
-//        } catch (InterruptedException e) {
-//        }
-//        if (cubesServer.getThread().isAlive()) {
-//          failedToStopThread(cubesServer.getThread());
-//        }
-//      }
+      // if (cubesClient != null) {
+      // try {
+      // cubesClient.getThread().join(JOIN_TIMEOUT);
+      // } catch (InterruptedException e) {
+      // }
+      // if (cubesClient.getThread().isAlive()) {
+      // failedToStopThread(cubesClient.getThread());
+      // }
+      // }
+      // if (cubesServer != null) {
+      // try {
+      // cubesServer.getThread().join(JOIN_TIMEOUT);
+      // } catch (InterruptedException e) {
+      // }
+      // if (cubesServer.getThread().isAlive()) {
+      // failedToStopThread(cubesServer.getThread());
+      // }
+      // }
     } catch (Exception e) {
       Debug.crash(e);
     }
   }
-  
+
   private static void stopBackground() {
     try {
       Executor.stop();
@@ -189,15 +196,16 @@ public class Adapter {
   public static void gotoMainMenu() {
     gotoMenu(new MainMenu());
   }
-  
-  
+
   /**
    * Will exit if server
    */
   public static void gotoMenu(final Menu menu) {
-    if (isDedicatedServer()) quit();
-    if (menu == null || adapter.getMenu() instanceof RunnableMenu || menu.getClass().isInstance(adapter.getMenu())) return;
-  
+    if (isDedicatedServer())
+      quit();
+    if (menu == null || adapter.getMenu() instanceof RunnableMenu || menu.getClass().isInstance(adapter.getMenu()))
+      return;
+
     adapter.setMenu(new RunnableMenu(new Runnable() {
       @Override
       public void run() {
@@ -211,6 +219,6 @@ public class Adapter {
 
   public static void quit() {
     System.exit(0); // Force android to exit vm
-    //Gdx.app.exit();
+    // Gdx.app.exit();
   }
 }
