@@ -1,0 +1,236 @@
+@startuml CommandParsing_AFTER_Interpreter
+
+title Command Parsing System - AFTER Interpreter Pattern
+
+note as N1
+<b>SOLUTION: Interpreter Pattern for Command Parsing</b>
+
+Benefits of Interpreter Pattern:
+✓ Grammar definition: Clear token types and parsing rules
+✓ Quote support: Handles "quoted strings" correctly
+✓ Escape sequences: \n, \t, \", \\, etc.
+✓ Extensible: Add new token types without modifying existing code
+✓ Testable: Each expression independently tested
+✓ Open-Closed Principle: Add features by extension
+✓ Context awareness: Track parsing state
+
+<b>Pattern Structure:</b>
+• AbstractExpression: TokenExpression
+• TerminalExpressions: WordToken, QuotedStringToken, NumberToken
+• NonTerminalExpression: CommandExpression (composite)
+• Context: ParseContext (input string + position)
+• Client: CommandManager
+end note
+
+package "ethanjones.cubes.side.server.command.parsing" <<Interpreter Pattern>> {
+  
+  abstract class TokenExpression <<AbstractExpression>> {
+    + {abstract} interpret(context: ParseContext) : String
+    + {abstract} matches(context: ParseContext) : boolean
+  }
+  
+  note right of TokenExpression
+    <b>AbstractExpression</b>
+    Declares interpret operation
+    
+    Each concrete expression knows
+    how to parse its token type
+    from the context
+  end note
+  
+  class ParseContext <<Context>> {
+    - input : String
+    - position : int
+    --
+    + getInput() : String
+    + getPosition() : int
+    + setPosition(pos: int)
+    + hasMore() : boolean
+    + peek() : char
+    + peek(offset: int) : char
+    + consume() : char
+    + skipWhitespace()
+    + getRemaining() : String
+    + startsWith(prefix: String) : boolean
+  }
+  
+  note right of ParseContext
+    <b>Context</b>
+    Maintains parsing state:
+    • Original input string
+    • Current position
+    • Utility methods
+    
+    Shared by all expressions
+    during interpretation
+  end note
+  
+  class WordToken <<TerminalExpression>> {
+    + interpret(context: ParseContext) : String
+    + matches(context: ParseContext) : boolean
+  }
+  
+  note bottom of WordToken
+    <b>Terminal Expression</b>
+    Grammar: word ::= [^\\s"']+
+    
+    Parses simple words:
+    • "hello" → "hello"
+    • "@player" → "@player"
+    • "stone_sword" → "stone_sword"
+    
+    Stops at whitespace or quotes
+  end note
+  
+  class QuotedStringToken <<TerminalExpression>> {
+    + interpret(context: ParseContext) : String
+    + matches(context: ParseContext) : boolean
+  }
+  
+  note bottom of QuotedStringToken
+    <b>Terminal Expression</b>
+    Grammar: quoted ::= '"' (char | escape)* '"'
+                      | "'" (char | escape)* "'"
+    
+    Parses quoted strings with escapes:
+    • "hello world" → hello world
+    • "say \\"hi\\"" → say "hi"
+    • "line1\\nline2" → line1[newline]line2
+    
+    Supports: \\n, \\t, \\r, \\\\, \\", \\'
+  end note
+  
+  class NumberToken <<TerminalExpression>> {
+    + interpret(context: ParseContext) : String
+    + matches(context: ParseContext) : boolean
+  }
+  
+  note bottom of NumberToken
+    <b>Terminal Expression</b>
+    Grammar: number ::= '-'? digit+ ('.' digit+)?
+    
+    Parses numbers:
+    • "123" → "123"
+    • "-45" → "-45"
+    • "3.14" → "3.14"
+    • "-0.5" → "-0.5"
+    
+    Handles integers and floats
+  end note
+  
+  class CommandExpression <<NonTerminalExpression>> {
+    - terminalExpressions : List<TokenExpression>
+    --
+    + interpret(context: ParseContext) : String
+    + matches(context: ParseContext) : boolean
+    + parseTokens(input: String) : List<String>
+    + parse(input: String) : String[]
+  }
+  
+  note bottom of CommandExpression
+    <b>NonTerminalExpression (Composite)</b>
+    Grammar: command ::= token (' '+ token)*
+             token   ::= quoted | number | word
+    
+    Composes terminal expressions:
+    1. Skip whitespace
+    2. Try each terminal expression
+    3. Add matched token to list
+    4. Repeat until end of input
+    
+    Parses complete commands into token lists
+  end note
+  
+  TokenExpression <|-- WordToken
+  TokenExpression <|-- QuotedStringToken
+  TokenExpression <|-- NumberToken
+  TokenExpression <|-- CommandExpression
+  
+  CommandExpression o--> TokenExpression : contains >
+  TokenExpression ..> ParseContext : uses
+}
+
+package "ethanjones.cubes.side.server.command" {
+  
+  class CommandManager <<Client>> {
+    + {static} commands : HashMap<String, CommandBuilder>
+    + {static} commandParser : CommandExpression
+    --
+    + {static} run(command: String, sender: CommandSender)
+    - {static} check(...) : boolean
+    + {static} register(builder: CommandBuilder)
+  }
+  
+  note right of CommandManager::run
+    <b>AFTER Interpreter Pattern:</b>
+    ArrayList<String> arg = new ArrayList<>();
+    List<String> tokens = 
+        <b>commandParser.parseTokens(command);</b>
+    arg.addAll(tokens);
+    
+    <b>Benefits:</b>
+    ✓ Handles quotes: "hello world"
+    ✓ Escape sequences: \\n, \\t, \\"
+    ✓ Numbers: 123, -45, 3.14
+    ✓ Special tokens: @player, ~10
+    ✓ Extensible: add new token types
+    ✓ Testable: unit test each expression
+  end note
+  
+  class CommandBuilder {
+    - commandValue : CommandValue
+    - commandString : String
+    - children : List<CommandBuilder>
+  }
+  
+  interface CommandSender {
+    + getLocation() : Vector3
+    + print(message: String)
+  }
+  
+  CommandManager ..> CommandExpression : uses interpreter
+  CommandManager ..> CommandBuilder : builds commands
+  CommandManager ..> CommandSender : receives
+}
+
+note bottom
+<b>Interpreter Pattern Benefits in Command Parsing:</b>
+
+<b>1. Grammar Definition:</b>
+   • Clear token types: word, quoted, number
+   • Easy to understand parsing rules
+   • Well-defined syntax
+
+<b>2. Quote Support:</b>
+   Input: say "hello world"
+   Output: ["say", "hello world"]  ✓
+   
+<b>3. Escape Sequences:</b>
+   Input: say "line1\\nline2"
+   Output: ["say", "line1[newline]line2"]  ✓
+
+<b>4. Extensibility:</b>
+   • Add ColorCodeToken for &cRed text
+   • Add SelectorToken for @a, @p, @r
+   • Add RelativeCoordToken for ~10, ~-5
+   • No changes to existing code!
+
+<b>5. Testability:</b>
+   • Each expression tested independently
+   • Context can be mocked
+   • Clear input/output contracts
+
+<b>6. Maintainability:</b>
+   • Single Responsibility per expression
+   • Easy to debug individual token types
+   • Clear separation of concerns
+
+<b>Example Use Cases:</b>
+say "hello world"           → ["say", "hello world"]
+tp 10 20 30                 → ["tp", "10", "20", "30"]
+give @player stone 64       → ["give", "@player", "stone", "64"]
+say "test \\"quote\\""        → ["say", "test "quote""]
+setblock 5 -10 3.5 stone    → ["setblock", "5", "-10", "3.5", "stone"]
+end note
+
+@enduml

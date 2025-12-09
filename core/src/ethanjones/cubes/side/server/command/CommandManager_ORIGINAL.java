@@ -2,20 +2,28 @@ package ethanjones.cubes.side.server.command;
 
 import ethanjones.cubes.core.localization.Localization;
 import ethanjones.cubes.core.logging.Log;
-import ethanjones.cubes.side.server.command.parsing.CommandExpression;
 import ethanjones.cubes.side.server.commands.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
-public class CommandManager {
+/**
+ * ORIGINAL VERSION (BEFORE Interpreter Pattern)
+ * 
+ * This is the original implementation before applying the Interpreter Pattern.
+ * Kept for documentation and comparison purposes.
+ * 
+ * PROBLEMS with this approach:
+ * 1. Cannot parse quoted strings: say "hello world" → splits into 3 tokens
+ * 2. No escape character support: say \"test\" → broken parsing
+ * 3. Hard-coded regex "  *" (two or more spaces) - inflexible
+ * 4. Cannot handle special syntax like @player, ~relative coordinates
+ * 5. Violates Open-Closed Principle - need to modify for new parsing rules
+ */
+public class CommandManager_ORIGINAL {
 
   public static HashMap<String, CommandBuilder> commands = new HashMap<String, CommandBuilder>();
-  
-  // Interpreter Pattern: NonTerminalExpression for parsing commands
-  private static final CommandExpression commandParser = new CommandExpression();
 
   protected static void register(CommandBuilder commandBuilder) {
     if (!commands.containsKey(commandBuilder.getCommandString())) {
@@ -25,11 +33,10 @@ public class CommandManager {
 
   public static void run(String command, CommandSender commandSender) {
     if (command == null || commandSender == null) return;
-    
-    // AFTER Interpreter Pattern: Use proper parsing with quote and escape support
     ArrayList<String> arg = new ArrayList<String>();
-    List<String> tokens = commandParser.parseTokens(command);
-    arg.addAll(tokens);
+    
+    // PROBLEM: Primitive string split - no quote handling, no escape support
+    arg.addAll(Arrays.asList(command.split("  *")));
     
     if (arg.size() == 0 || !commands.containsKey(arg.get(0))) {
       unknownCommand(commandSender);

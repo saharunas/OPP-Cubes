@@ -6,9 +6,9 @@ import ethanjones.cubes.world.reference.BlockReference;
 import ethanjones.cubes.world.server.WorldServer;
 import ethanjones.cubes.world.storage.Area;
 
-public class VoidTerrainGenerator extends TerrainGenerator {
+public final class VoidTerrainGenerator extends TerrainGenerator {
   @Override
-  public void generate(Area area) {
+  protected void generateTerrain(Area area) {
     if (area.areaX != 0 || area.areaZ != 0) return;
   
     for (int x = 0; x < 5; x++) {
@@ -22,8 +22,11 @@ public class VoidTerrainGenerator extends TerrainGenerator {
   }
   
   @Override
-  public void features(Area area, WorldServer world) {
-    if (area.areaX == 0 && area.areaZ == 0) new TreeGenerator().generateTree(2, 101, 2, 3, area);
+  protected void generateVegetation(Area area, WorldServer world) {
+    // Generate single tree at spawn point
+    if (area.areaX == 0 && area.areaZ == 0) {
+      new TreeGenerator().generateTree(2, 101, 2, 3, area);
+    }
   }
   
   @Override

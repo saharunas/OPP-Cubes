@@ -1,0 +1,113 @@
+@startuml CommandParsing_BEFORE_Interpreter
+
+title Command Parsing System - BEFORE Interpreter Pattern
+
+note as N1
+<b>PROBLEM: Primitive String Parsing</b>
+
+Issues with current approach:
+• Cannot parse quoted strings: say "hello world" → 3 tokens instead of 2
+• No escape character support: \"test\" → broken
+• Hard-coded regex "  *" (two or more spaces)
+• Cannot handle special syntax gracefully
+• Violates Open-Closed Principle
+• Inflexible and error-prone
+
+<b>Example Problems:</b>
+Input: say "hello world"
+Expected: ["say", "hello world"]
+Actual: ["say", "\"hello", "world\""]  ❌
+
+Input: give @player "diamond sword" 1
+Expected: ["give", "@player", "diamond sword", "1"]
+Actual: ["give", "@player", "\"diamond", "sword\"", "1"]  ❌
+end note
+
+package "ethanjones.cubes.side.server.command" {
+  
+  class CommandManager {
+    + {static} commands : HashMap<String, CommandBuilder>
+    + {static} commandParser : CommandExpression
+    --
+    + {static} run(command: String, sender: CommandSender)
+    - {static} check(...) : boolean
+    + {static} register(builder: CommandBuilder)
+    + {static} unknownCommand(sender: CommandSender)
+    + {static} init()
+  }
+  
+  note right of CommandManager::run
+    <b>BEFORE Pattern:</b>
+    ArrayList<String> arg = new ArrayList<>();
+    arg.addAll(Arrays.asList(
+        <b>command.split("  *")</b>  ← PROBLEM!
+    ));
+    
+    <b>Issues:</b>
+    • Splits on ANY whitespace
+    • Ignores quotes completely
+    • No escape handling
+    • Cannot extend behavior
+  end note
+  
+  class CommandBuilder {
+    - commandValue : CommandValue
+    - commandString : String
+    - children : List<CommandBuilder>
+    - listener : CommandListener
+    --
+    + add(string: String) : CommandBuilder
+    + add(value: CommandValue) : CommandBuilder
+    + getCommandString() : String
+  }
+  
+  interface CommandSender {
+    + getLocation() : Vector3
+    + print(message: String)
+    + getPermissionLevel() : int
+  }
+  
+  CommandManager ..> CommandBuilder : uses
+  CommandManager ..> CommandSender : receives
+}
+
+package "java.lang" {
+  class String {
+    + split(regex: String) : String[]
+  }
+  
+  note bottom of String::split
+    <b>Problem with String.split():</b>
+    • Only regex-based splitting
+    • Cannot handle nested structures
+    • No state/context awareness
+    • Cannot customize per-token
+  end note
+}
+
+CommandManager ..> String : uses split()
+
+note bottom
+<b>Why This Approach Fails:</b>
+
+<b>1. No Quote Support:</b>
+   say "hello world" → Splits into 3 tokens
+
+<b>2. No Escape Support:</b>
+   say "test \"quote\"" → Broken parsing
+
+<b>3. Inflexible:</b>
+   • Cannot add new token types
+   • Cannot customize parsing rules
+   • Hard to test individual parsing logic
+
+<b>4. Error Prone:</b>
+   • Edge cases not handled
+   • No clear parsing grammar
+   • Difficult to debug
+
+<b>Need:</b> Proper parser with grammar definition,
+quote handling, escape sequences, and extensibility
+end note
+
+@enduml
