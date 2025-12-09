@@ -9,6 +9,8 @@ import ethanjones.cubes.item.ItemTool.ToolType;
 import ethanjones.cubes.world.World;
 import ethanjones.cubes.world.storage.Area;
 
+import ethanjones.cubes.block.BlockVisitor;
+
 public class BlockGrass extends Block {
 
   public static final int MIN_LIGHT = 10;
@@ -26,12 +28,12 @@ public class BlockGrass extends Block {
     BlockTextureHandler handler = new BlockTextureHandler("core:grass_side");
     handler.setSide(BlockFace.posY, "core:grass_top");
     handler.setSide(BlockFace.negY, "core:dirt");
-    textureHandlers = new BlockTextureHandler[]{handler};
+    textureHandlers = new BlockTextureHandler[] { handler };
   }
 
   @Override
   public ItemStack[] drops(World world, int x, int y, int z, int meta) {
-    return new ItemStack[]{new ItemStack(Blocks.dirt.getItemBlock(), 1, 0)};
+    return new ItemStack[] { new ItemStack(Blocks.dirt.getItemBlock(), 1, 0) };
   }
 
   @Override
@@ -40,4 +42,10 @@ public class BlockGrass extends Block {
       area.setBlock(Blocks.dirt, x, y, z, 0);
     }
   }
+
+  @Override
+  public <R> R accept(BlockVisitor<R> visitor) {
+    return visitor.visitGrass(this);
+  }
+
 }

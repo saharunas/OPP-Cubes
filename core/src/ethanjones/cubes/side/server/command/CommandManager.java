@@ -107,6 +107,7 @@ public class CommandManager {
     NoClipCommand.init();
     GamemodeCommand.init();
     InventoryCommand.init();
+    BlockInfoCommand.init();
 
     StopCommand.init();
     ThreadDumpCommand.init();

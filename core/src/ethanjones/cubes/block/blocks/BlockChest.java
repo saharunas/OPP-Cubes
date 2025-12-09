@@ -23,9 +23,12 @@ import ethanjones.data.DataGroup;
 
 import com.badlogic.gdx.math.Vector3;
 
+import ethanjones.cubes.block.BlockVisitor;
+
 public class BlockChest extends Block {
 
-  private static final BlockFace[] lockFace = new BlockFace[]{BlockFace.posX, BlockFace.negX, BlockFace.posZ, BlockFace.negZ};
+  private static final BlockFace[] lockFace = new BlockFace[] { BlockFace.posX, BlockFace.negX, BlockFace.posZ,
+      BlockFace.negZ };
 
   public BlockChest() {
     super("core:chest");
@@ -59,7 +62,8 @@ public class BlockChest extends Block {
 
   @Override
   public boolean onButtonPress(ClickType type, Player player, int blockX, int blockY, int blockZ) {
-    if (Side.isServer() || type != ClickType.place) return false;
+    if (Side.isServer() || type != ClickType.place)
+      return false;
     BlockData blockData = Side.getCubes().world.getBlockData(blockX, blockY, blockZ);
     if (blockData instanceof BlockDataChest) {
       InventoryActor inventoryActor = new InventoryActor(((BlockDataChest) blockData).inventory);
@@ -89,4 +93,10 @@ public class BlockChest extends Block {
   public ItemStack[] drops(World world, int x, int y, int z, int meta) {
     return super.drops(world, x, y, z, 0);
   }
+
+  @Override
+  public <R> R accept(BlockVisitor<R> visitor) {
+    return visitor.visitChest(this);
+  }
+
 }
