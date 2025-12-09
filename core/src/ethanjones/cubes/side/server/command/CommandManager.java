@@ -19,7 +19,8 @@ public class CommandManager {
   }
 
   public static void run(String command, CommandSender commandSender) {
-    if (command == null || commandSender == null) return;
+    if (command == null || commandSender == null)
+      return;
     ArrayList<String> arg = new ArrayList<String>();
     arg.addAll(Arrays.asList(command.split("  *")));
     if (arg.size() == 0 || !commands.containsKey(arg.get(0))) {
@@ -34,11 +35,13 @@ public class CommandManager {
     }
   }
 
-  private static boolean check(CommandSender sender, CommandBuilder commandBuilder, ArrayList<String> arg, ArrayList<CommandArgument> arguments, int i, String str) {
+  private static boolean check(CommandSender sender, CommandBuilder commandBuilder, ArrayList<String> arg,
+      ArrayList<CommandArgument> arguments, int i, String str) {
     boolean success = false;
     if (i < arg.size()) {
       for (CommandBuilder builder : commandBuilder.getChildren()) {
-        if (success) break;
+        if (success)
+          break;
         String a = arg.get(i);
         try {
           if (builder.getCommandString() != null) {
@@ -103,6 +106,7 @@ public class CommandManager {
     RainCommand.init();
     NoClipCommand.init();
     GamemodeCommand.init();
+    InventoryCommand.init();
 
     StopCommand.init();
     ThreadDumpCommand.init();

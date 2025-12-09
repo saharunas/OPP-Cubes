@@ -5,6 +5,7 @@ import ethanjones.cubes.core.localization.Localization;
 import ethanjones.cubes.core.settings.Settings;
 import ethanjones.cubes.core.util.locks.Locked;
 import ethanjones.cubes.entity.living.LivingEntity;
+import ethanjones.cubes.entity.living.player.Player.InventoryMemento;
 import ethanjones.cubes.graphics.entity.PlayerRenderer;
 import ethanjones.cubes.item.ItemTool;
 import ethanjones.cubes.networking.NetworkingManager;
@@ -33,6 +34,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
 import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class Player extends LivingEntity implements CommandSender, RenderableProvider, LoadedAreaFilter {
 
@@ -43,6 +47,18 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
   public final ClientIdentifier clientIdentifier;
 
   private final PlayerInventory inventory;
+
+  public static final class InventoryMemento {
+    private final DataGroup snapshot;
+
+    private InventoryMemento(DataGroup snapshot) {
+      this.snapshot = snapshot;
+    }
+  }
+
+  // Caretaker storage: named inventory snapshots for this player
+  private final Map<String, InventoryMemento> inventorySnapshots = new HashMap<String, InventoryMemento>();
+
   private Vector3 previousPosition = new Vector3();
   private ItemTool.MiningTarget currentlyMining;
 
@@ -79,6 +95,42 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
     return inventory;
   }
 
+  // --- Inventory memento API ---
+
+  /** Originator: capture current inventory state into a memento */
+  public InventoryMemento createInventoryMemento() {
+    return new InventoryMemento(inventory.write());
+  }
+
+  /** Originator: restore inventory state from a memento */
+  public void restoreInventoryMemento(InventoryMemento memento) {
+    if (memento == null)
+      return;
+    inventory.read(memento.snapshot);
+    inventory.sync(); // updates client/server via PacketPlayerInventory
+  }
+
+  /** Caretaker: save snapshot under a user-chosen name */
+  public void saveInventorySnapshot(String name) {
+    if (name == null || name.isEmpty())
+      return;
+    inventorySnapshots.put(name, createInventoryMemento());
+  }
+
+  /** Caretaker: load snapshot by name; returns false if not found */
+  public boolean loadInventorySnapshot(String name) {
+    InventoryMemento m = inventorySnapshots.get(name);
+    if (m == null)
+      return false;
+    restoreInventoryMemento(m);
+    return true;
+  }
+
+  /** Caretaker: expose snapshot names for listing in commands */
+  public Set<String> getInventorySnapshotNames() {
+    return inventorySnapshots.keySet();
+  }
+
   @Override
   public void print(String string) {
     if (clientIdentifier != null) {
@@ -102,7 +154,8 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
     World world = Side.getCubes().world;
     try (Locked<WorldLockable> locked = world.entities.acquireWriteLock()) {
       world.entities.map.put(uuid, this);
-      if (world instanceof WorldServer) ((WorldServer) world).addLoadedAreaFilter(this);
+      if (world instanceof WorldServer)
+        ((WorldServer) world).addLoadedAreaFilter(this);
     }
   }
 
@@ -110,7 +163,8 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
   public void updatePosition(float time) {
     if (!noClip) {
       if (Side.isClient() && !Cubes.getClient().inputChain.cameraController.flying()) {
-        if (!inLoadedArea()) return;
+        if (!inLoadedArea())
+          return;
         Side side = Side.getSide();
         World world = Side.getCubes().world;
         tmpVector.set(position);
@@ -126,13 +180,15 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
 
           if (!new PlayerMovementEvent(this, tmpVector).post().isCanceled()) {
             position.set(tmpVector);
-            if (side == Side.Server) world.syncEntity(uuid);
+            if (side == Side.Server)
+              world.syncEntity(uuid);
           }
         }
       }
       World world = Side.getCubes().world;
       if (world.getArea(CoordinateConverter.area(position.x), CoordinateConverter.area(position.z)) != null) {
-        if (world.getBlock(CoordinateConverter.block(position.x), CoordinateConverter.block(position.y - height), CoordinateConverter.block(position.z)) != null) {
+        if (world.getBlock(CoordinateConverter.block(position.x), CoordinateConverter.block(position.y - height),
+            CoordinateConverter.block(position.z)) != null) {
           position.set(previousPosition);
           world.syncEntity(uuid);
         }
@@ -143,10 +199,10 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
 
   @Override
   public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
-    if (Side.isServer() || this == Cubes.getClient().player) return;
+    if (Side.isServer() || this == Cubes.getClient().player)
+      return;
     PlayerRenderer.getRenderables(renderables, pool, this);
   }
-
 
   public ItemTool.MiningTarget getCurrentlyMining() {
     return currentlyMining;
@@ -163,7 +219,6 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
     dataGroup.put("noClip", noClip);
     return dataGroup;
   }
-
 
   public void read(DataGroup dataGroup) {
     super.read(dataGroup);
@@ -184,10 +239,13 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
   }
 
   public boolean isNoClipInBlock() {
-    if (!noClip) return false;
+    if (!noClip)
+      return false;
     World world = Side.getCubes().world;
-    return world.getBlock(CoordinateConverter.block(position.x), CoordinateConverter.block(position.y), CoordinateConverter.block(position.z)) != null ||
-        world.getBlock(CoordinateConverter.block(position.x), CoordinateConverter.block(position.y - 1), CoordinateConverter.block(position.z)) != null;
+    return world.getBlock(CoordinateConverter.block(position.x), CoordinateConverter.block(position.y),
+        CoordinateConverter.block(position.z)) != null ||
+        world.getBlock(CoordinateConverter.block(position.x), CoordinateConverter.block(position.y - 1),
+            CoordinateConverter.block(position.z)) != null;
   }
 
   public void setNoClip(boolean enabled) {
