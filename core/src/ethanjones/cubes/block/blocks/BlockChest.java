@@ -20,6 +20,8 @@ import ethanjones.cubes.world.World;
 import ethanjones.cubes.world.collision.BlockIntersection;
 import ethanjones.cubes.world.storage.Area;
 import ethanjones.data.DataGroup;
+import ethanjones.cubes.graphics.world.block.BlockTextureHandlers;
+
 
 import com.badlogic.gdx.math.Vector3;
 
@@ -43,10 +45,11 @@ public class BlockChest extends Block {
     textureHandlers = new BlockTextureHandler[4];
 
     for (int i = 0; i < textureHandlers.length; i++) {
-      textureHandlers[i] = new BlockTextureHandler("core:chest_side");
-      textureHandlers[i].setSide(BlockFace.posY, "core:chest_y");
-      textureHandlers[i].setSide(BlockFace.negY, "core:chest_y");
-      textureHandlers[i].setSide(lockFace[i], "core:chest_lock");
+      BlockTextureHandler handler = BlockTextureHandlers.uniform("core:chest_side")
+      .withSide(BlockFace.posY, "core:chest_y")
+      .withSide(BlockFace.negY, "core:chest_y")
+      .withSide(lockFace[i], "core:chest_lock");
+      textureHandlers[i] = handler;
     }
   }
 
