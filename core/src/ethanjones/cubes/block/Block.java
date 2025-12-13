@@ -17,6 +17,8 @@ import ethanjones.cubes.world.World;
 import ethanjones.cubes.world.collision.BlockIntersection;
 import ethanjones.cubes.world.storage.Area;
 import ethanjones.data.DataGroup;
+import ethanjones.cubes.graphics.world.block.BlockTextureHandlers;
+
 
 import ethanjones.cubes.block.BlockVisitor;
 
@@ -42,7 +44,7 @@ public class Block {
   }
 
   public void loadGraphics() {
-    textureHandlers = new BlockTextureHandler[] { new BlockTextureHandler(id) };
+    textureHandlers = new BlockTextureHandler[] { BlockTextureHandlers.uniform(id) };
   }
 
   public BlockTextureHandler getTextureHandler(int meta) {

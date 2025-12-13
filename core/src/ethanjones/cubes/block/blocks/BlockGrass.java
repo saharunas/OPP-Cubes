@@ -10,6 +10,8 @@ import ethanjones.cubes.world.World;
 import ethanjones.cubes.world.storage.Area;
 
 import ethanjones.cubes.block.BlockVisitor;
+import ethanjones.cubes.graphics.world.block.BlockTextureHandlers;
+
 
 public class BlockGrass extends Block {
 
@@ -25,9 +27,9 @@ public class BlockGrass extends Block {
 
   @Override
   public void loadGraphics() {
-    BlockTextureHandler handler = new BlockTextureHandler("core:grass_side");
-    handler.setSide(BlockFace.posY, "core:grass_top");
-    handler.setSide(BlockFace.negY, "core:dirt");
+    BlockTextureHandler handler = BlockTextureHandlers.uniform("core:grass_side")
+    .withSide(BlockFace.posY, "core:grass_top")
+    .withSide(BlockFace.negY, "core:dirt");
     textureHandlers = new BlockTextureHandler[] { handler };
   }
 

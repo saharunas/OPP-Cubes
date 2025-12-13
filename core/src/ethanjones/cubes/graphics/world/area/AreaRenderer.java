@@ -81,20 +81,12 @@ public class AreaRenderer implements RenderableProvider, Disposable, Pool.Poolab
     if (maxZ.isBlank()) maxZ = null;
     if (minZ.isBlank()) minZ = null;
 
-    int i = ySection * SIZE_BLOCKS_CUBED;
     int vertexOffset = 0;
 
     try (Locked<Area> locked = LockManager.lockMany(false, minX, minZ, area, maxZ, maxX)) {
       if (!area.isBlank()) {
-        for (int y = ySection * SIZE_BLOCKS; y < (ySection + 1) * SIZE_BLOCKS; y++) {
-          for (int z = 0; z < SIZE_BLOCKS; z++) {
-            for (int x = 0; x < SIZE_BLOCKS; x++, i++) {
-              int blockInt = area.blocks[i];
-              if ((blockInt & BLOCK_VISIBLE) == BLOCK_VISIBLE) {
-                vertexOffset = render(vertexOffset, blockInt, x, y, z, i, ao, maxX, minX, maxZ, minZ);
-              }
-            }
-          }
+        for (Area.BlockCursor c : area.iterateVisibleSection(ySection)) {
+          vertexOffset = render(vertexOffset, c.blockInt, c.x, c.y, c.z, c.ref, ao, maxX, minX, maxZ, minZ);
         }
         if (vertexOffset > 0) {
           save(vertexOffset);
@@ -107,6 +99,7 @@ public class AreaRenderer implements RenderableProvider, Disposable, Pool.Poolab
 
     return true;
   }
+
 
   private int render(int vertexOffset, int blockInt, int x, int y, int z, int i, boolean ao, Area maxX, Area minX, Area maxZ, Area minZ) {
     Block block = IDManager.toBlock(blockInt & 0xFFFFF);

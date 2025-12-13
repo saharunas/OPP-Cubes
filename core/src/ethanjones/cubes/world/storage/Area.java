@@ -21,6 +21,7 @@ import ethanjones.cubes.side.common.Side;
 import ethanjones.cubes.world.CoordinateConverter;
 import ethanjones.cubes.world.light.SunLight;
 import ethanjones.cubes.world.reference.BlockReference;
+import ethanjones.cubes.world.storage.Area.BlockCursor;
 import ethanjones.cubes.world.thread.WorldLockable;
 import ethanjones.data.Data;
 import ethanjones.data.DataGroup;
@@ -551,13 +552,8 @@ public class Area extends Lockable<Area> {
   public void updateAll() {
     try (Locked<Area> locked = acquireWriteLock()) {
       if (!isBlank()) {
-        int i = 0;
-        for (int y = 0; y < maxY; y++) {
-          for (int z = 0; z < SIZE_BLOCKS; z++) {
-            for (int x = 0; x < SIZE_BLOCKS; x++, i++) {
-              update(x, y, z, i);
-            }
-          }
+          for (BlockCursor c : iterateAllBlocks()) {
+          update(c.x, c.y, c.z, c.ref);
         }
       }
     }
@@ -994,6 +990,159 @@ public class Area extends Lockable<Area> {
     area.read(dataInputStream);
     return area;
   }
+
+    // ---------------------------------------------------------------------------
+  // Iterator pattern for block traversal (does NOT make Area itself Iterable)
+  // ---------------------------------------------------------------------------
+
+  /** Mutable cursor. The iterator reuses the same instance each step (do not store it). */
+  public static final class BlockCursor {
+    public int x, y, z;
+    public int ref;
+    public int blockInt;
+  }
+
+  /** Iterate all blocks using the SAME traversal order as updateAll() (y < maxY). */
+  public Iterable<BlockCursor> iterateAllBlocks() {
+    return new AllBlocksIterator(this);
+  }
+
+  /** Iterate blocks in a specific y-section (32 blocks tall). */
+  public Iterable<BlockCursor> iterateSection(int ySection) {
+    return new SectionBlocksIterator(this, ySection, false);
+  }
+
+  /** Iterate ONLY visible blocks in a specific y-section (used by meshing). */
+  public Iterable<BlockCursor> iterateVisibleSection(int ySection) {
+    return new SectionBlocksIterator(this, ySection, true);
+  }
+
+  private static final class AllBlocksIterator implements Iterable<BlockCursor>, Iterator<BlockCursor> {
+    private final Area area;
+    private final BlockCursor c = new BlockCursor();
+    private int x = 0, y = 0, z = 0;
+    private int ref = 0;
+    private boolean prepared = false;
+
+    private AllBlocksIterator(Area area) {
+      this.area = area;
+    }
+
+    @Override
+    public Iterator<BlockCursor> iterator() {
+      return this;
+    }
+
+    @Override
+    public boolean hasNext() {
+      // match existing updateAll(): y < maxY
+      return !area.isBlank() && y < area.maxY;
+    }
+
+    @Override
+    public BlockCursor next() {
+      // prepare current cursor
+      c.x = x;
+      c.y = y;
+      c.z = z;
+      c.ref = ref;
+      c.blockInt = area.blocks[ref];
+
+      // advance
+      ref++;
+      x++;
+      if (x == SIZE_BLOCKS) {
+        x = 0;
+        z++;
+        if (z == SIZE_BLOCKS) {
+          z = 0;
+          y++;
+        }
+      }
+      return c;
+    }
+  }
+
+  private static final class SectionBlocksIterator implements Iterable<BlockCursor>, Iterator<BlockCursor> {
+    private final Area area;
+    private final boolean visibleOnly;
+    private final BlockCursor c = new BlockCursor();
+
+    private final int refEndExclusive;
+
+    private int x = 0, z = 0;
+    private int y;          // absolute y
+    private int ref;        // absolute ref
+
+    private boolean hasBuffered = false;
+    private boolean bufferedHasNext = false;
+
+    private SectionBlocksIterator(Area area, int ySection, boolean visibleOnly) {
+      this.area = area;
+      this.visibleOnly = visibleOnly;
+
+      int yStart = ySection * SIZE_BLOCKS;
+      this.y = yStart;
+      this.ref = ySection * SIZE_BLOCKS_CUBED;
+      this.refEndExclusive = this.ref + SIZE_BLOCKS_CUBED;
+    }
+
+    @Override
+    public Iterator<BlockCursor> iterator() {
+      return this;
+    }
+
+    @Override
+    public boolean hasNext() {
+      if (hasBuffered) return bufferedHasNext;
+      bufferedHasNext = advanceToNextMatch();
+      hasBuffered = true;
+      return bufferedHasNext;
+    }
+
+    @Override
+    public BlockCursor next() {
+      if (!hasBuffered) advanceToNextMatch();
+      hasBuffered = false;
+
+      c.x = x;
+      c.y = y;
+      c.z = z;
+      c.ref = ref;
+      c.blockInt = area.blocks[ref];
+
+      // advance one step AFTER yielding
+      stepForward();
+      return c;
+    }
+
+    private boolean advanceToNextMatch() {
+      if (area.isBlank()) return false;
+
+      while (ref < refEndExclusive) {
+        int b = area.blocks[ref];
+        if (!visibleOnly || (b & BLOCK_VISIBLE) == BLOCK_VISIBLE) {
+          return true;
+        }
+        stepForward();
+      }
+      return false;
+    }
+
+    private void stepForward() {
+      ref++;
+      x++;
+      if (x == SIZE_BLOCKS) {
+        x = 0;
+        z++;
+        if (z == SIZE_BLOCKS) {
+          z = 0;
+          y++;
+        }
+      }
+    }
+  }
+
 
   public static int getRef(int x, int y, int z) {
     return x + z * SIZE_BLOCKS + y * SIZE_BLOCKS_SQUARED;
