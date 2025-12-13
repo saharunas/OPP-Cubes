@@ -12,7 +12,7 @@ import ethanjones.cubes.world.storage.Area;
 
 import java.util.Random;
 
-public class SmoothWorld extends TerrainGenerator {
+public final class SmoothWorld extends TerrainGenerator {
   public static final int minSurfaceHeight = 48;
   private static Random randomSeed = new Random();
 
@@ -40,7 +40,7 @@ public class SmoothWorld extends TerrainGenerator {
   }
 
   @Override
-  public void generate(Area area) {
+  protected void generateTerrain(Area area) {
     for (int x = 0; x < Area.SIZE_BLOCKS; x++) {
       for (int z = 0; z < Area.SIZE_BLOCKS; z++) {
         int g = getSurfaceHeight(x + area.minBlockX, z + area.minBlockZ);
@@ -62,14 +62,23 @@ public class SmoothWorld extends TerrainGenerator {
   }
 
   @Override
-  public void features(Area area, WorldServer world) {
-    if (area.areaX == 0 && area.areaZ == 0) return; // no trees on spawnpoint
+  protected void generateCaves(Area area, WorldServer world) {
+    // Note: Caves are already applied during generateTerrain via caves.apply(area)
+    // This hook is intentionally empty to show the pattern
+  }
+
+  @Override
+  protected void generateVegetation(Area area, WorldServer world) {
+    // Skip spawn point area to avoid trees at spawn
+    if (area.areaX == 0 && area.areaZ == 0) return;
+    
+    // Generate trees based on noise distribution
     for (int x = 0; x < Area.SIZE_BLOCKS; x++) {
       for (int z = 0; z < Area.SIZE_BLOCKS; z++) {
         double t = trees.eval(area.areaX + x, area.areaZ + z);
         if (t > 0.5d) {
-          int trees = 100 - ((int) ((t - 0.4d) / 0.05d));
-          if (pseudorandomInt(x + area.minBlockX, z + area.minBlockZ, trees) == 0) {
+          int treeChance = 100 - ((int) ((t - 0.4d) / 0.05d));
+          if (pseudorandomInt(x + area.minBlockX, z + area.minBlockZ, treeChance) == 0) {
             genTree(area, x, z);
           }
         }

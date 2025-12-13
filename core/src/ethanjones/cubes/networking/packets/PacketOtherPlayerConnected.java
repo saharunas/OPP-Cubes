@@ -20,6 +20,7 @@ public class PacketOtherPlayerConnected extends Packet {
   public UUID uuid;
   public Vector3 angle;
   public Vector3 position;
+  public String skinColor; // Skin color for visual customization
 
   @Override
   public void write(DataOutputStream dataOutputStream) throws IOException {
@@ -28,6 +29,7 @@ public class PacketOtherPlayerConnected extends Packet {
     dataOutputStream.writeLong(uuid.getLeastSignificantBits());
     VectorUtil.stream(angle, dataOutputStream);
     VectorUtil.stream(position, dataOutputStream);
+    dataOutputStream.writeUTF(skinColor != null ? skinColor : "default");
   }
 
   @Override
@@ -36,6 +38,7 @@ public class PacketOtherPlayerConnected extends Packet {
     uuid = new UUID(dataInputStream.readLong(), dataInputStream.readLong());
     angle = VectorUtil.stream(dataInputStream);
     position = VectorUtil.stream(dataInputStream);
+    skinColor = dataInputStream.readUTF();
   }
 
   @Override
@@ -43,6 +46,7 @@ public class PacketOtherPlayerConnected extends Packet {
     Player player = new Player(username, uuid);
     player.position.set(position);
     player.angle.set(angle);
+    player.setSkinColor(skinColor != null ? skinColor : "default");
     player.addToWorld();
   }
 

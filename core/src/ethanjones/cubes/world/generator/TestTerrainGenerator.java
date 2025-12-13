@@ -5,9 +5,9 @@ import ethanjones.cubes.world.reference.BlockReference;
 import ethanjones.cubes.world.server.WorldServer;
 import ethanjones.cubes.world.storage.Area;
 
-public class TestTerrainGenerator extends TerrainGenerator {
+public final class TestTerrainGenerator extends TerrainGenerator {
   @Override
-  public void generate(Area area) {
+  protected void generateTerrain(Area area) {
     if (area.areaX != 0 || area.areaZ != 0) return;
 
     for (int x = 0; x < Area.SIZE_BLOCKS; x++) {
@@ -31,10 +31,7 @@ public class TestTerrainGenerator extends TerrainGenerator {
     }
   }
 
-  @Override
-  public void features(Area area, WorldServer world) {
-
-  }
+  // No features overridden - uses default empty implementations
 
   @Override
   public BlockReference spawnPoint(WorldServer world) {

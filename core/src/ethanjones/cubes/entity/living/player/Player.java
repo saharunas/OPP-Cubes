@@ -7,6 +7,11 @@ import ethanjones.cubes.core.util.locks.Locked;
 import ethanjones.cubes.entity.living.LivingEntity;
 import ethanjones.cubes.entity.living.player.Player.InventoryMemento;
 import ethanjones.cubes.graphics.entity.PlayerRenderer;
+import ethanjones.cubes.graphics.entity.PlayerRendererInterface;
+import ethanjones.cubes.graphics.entity.BasicPlayerRenderer;
+import ethanjones.cubes.graphics.entity.NameTagRendererDecorator;
+import ethanjones.cubes.graphics.entity.SkinRendererDecorator;
+import ethanjones.cubes.graphics.entity.ToolRendererDecorator;
 import ethanjones.cubes.item.ItemTool;
 import ethanjones.cubes.networking.NetworkingManager;
 import ethanjones.cubes.networking.packets.PacketChat;
@@ -63,6 +68,10 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
   private ItemTool.MiningTarget currentlyMining;
 
   private boolean noClip = false;
+  private String skinColor = "default"; // For SkinRendererDecorator: red, green, blue, or default
+  
+  // Decorator Pattern: Player renderer with decorators
+  private PlayerRendererInterface playerRenderer;
 
   public Player(String username, UUID uuid) {
     super("core:player", 20);
@@ -71,6 +80,7 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
     this.clientIdentifier = null;
     this.inventory = new PlayerInventory(this);
     this.height = PLAYER_HEIGHT;
+    this.playerRenderer = createPlayerRenderer();
   }
 
   public Player(String username, UUID uuid, ClientIdentifier clientIdentifier) {
@@ -80,6 +90,7 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
     this.clientIdentifier = clientIdentifier;
     this.inventory = new PlayerInventory(this);
     this.height = PLAYER_HEIGHT;
+    this.playerRenderer = createPlayerRenderer();
   }
 
   public Player(Camera camera) {
@@ -89,6 +100,28 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
     this.clientIdentifier = null;
     this.inventory = new PlayerInventory(this);
     this.height = PLAYER_HEIGHT;
+    this.playerRenderer = createPlayerRenderer();
+  }
+  
+  /**
+   * Pattern: Decorator + Factory Method
+   * Creates player renderer with decorators stacked:
+   * Tool -> Skin -> NameTag -> Basic
+   * 
+   * Note: Only creates decorators on client side, server doesn't need rendering
+   */
+  private PlayerRendererInterface createPlayerRenderer() {
+    // Server doesn't need rendering - decorators use graphics resources
+    if (Side.isServer()) {
+      return new BasicPlayerRenderer(); // Minimal renderer for server
+    }
+    
+    // Client side: full decorator stack with 3 levels
+    PlayerRendererInterface renderer = new BasicPlayerRenderer();
+    renderer = new NameTagRendererDecorator(renderer);
+    renderer = new SkinRendererDecorator(renderer, this);
+    renderer = new ToolRendererDecorator(renderer, this);
+    return renderer;
   }
 
   public PlayerInventory getInventory() {
@@ -199,9 +232,9 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
 
   @Override
   public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
-    if (Side.isServer() || this == Cubes.getClient().player)
-      return;
-    PlayerRenderer.getRenderables(renderables, pool, this);
+    if (Side.isServer() || this == Cubes.getClient().player) return;
+    // Use decorator pattern instead of direct call
+    playerRenderer.getRenderables(renderables, pool, this);
   }
 
   public ItemTool.MiningTarget getCurrentlyMining() {
@@ -260,5 +293,14 @@ public class Player extends LivingEntity implements CommandSender, RenderablePro
       NetworkingManager.sendPacketToClient(p, clientIdentifier);
     }
     this.noClip = enabled;
+  }
+  
+  public String getSkinColor() {
+    return skinColor;
+  }
+  
+  public void setSkinColor(String color) {
+    this.skinColor = color;
+    // Don't recreate renderer - decorator will check color dynamically each frame
   }
 }
