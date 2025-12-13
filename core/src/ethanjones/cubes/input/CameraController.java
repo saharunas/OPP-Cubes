@@ -194,10 +194,7 @@ public class CameraController extends InputAdapter {
         }
       }
     }
-    
-    // State Pattern: Double-jump to toggle flying (works in air or on ground)
-    // Check canTransitionToFlying() AFTER state updates from jumping
-    if (jump && !wasJumpDown && Cubes.getClient().gamemode == Gamemode.creative) {
+    if (jump && !wasJumpDown && Cubes.getClient().gamemodeStrategy.canFly()) {
       long time = System.currentTimeMillis();
       long delta = time - lastJumpDown;
       if (delta <= 500 && movementContext.canTransitionToFlying()) {

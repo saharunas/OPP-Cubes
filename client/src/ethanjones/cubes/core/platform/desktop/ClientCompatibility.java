@@ -6,6 +6,7 @@ import ethanjones.cubes.core.event.settings.AddSettingsEvent;
 import ethanjones.cubes.core.logging.Log;
 import ethanjones.cubes.core.logging.loggers.FileLogWriter;
 import ethanjones.cubes.core.settings.Keybinds;
+import ethanjones.cubes.core.settings.SettingGroup;
 import ethanjones.cubes.core.settings.Settings;
 import ethanjones.cubes.core.settings.type.BooleanSetting;
 import ethanjones.cubes.core.settings.type.DropDownSetting;
@@ -139,8 +140,11 @@ public class ClientCompatibility extends DesktopCompatibility {
         instanceChanged(null);
       }
     });
-    Settings.getBaseSettingGroup().getChildGroups().get("graphics").add("client.graphics.vsync");
-
+    SettingGroup graphics = Settings.getBaseSettingGroup().getChildGroup("graphics");
+    if (graphics != null) {
+      graphics.add("client.graphics.vsync");
+    }
+    
     Settings.addSetting("client.graphics.fullscreen", new DropDownSetting("windowedBorderless", "fullscreen") {
       @Override
       public void onChange() {
@@ -151,8 +155,13 @@ public class ClientCompatibility extends DesktopCompatibility {
         }
       }
     });
-    Settings.getBaseSettingGroup().getChildGroups().get("graphics").add("client.graphics.fullscreen");
+    
+    // DO NOT redeclare graphics here — reuse it
+    if (graphics != null) {
+      graphics.add("client.graphics.fullscreen");
+    }
   }
+    
 
   @EventHandler
   public void instanceChanged(InstanceChangedEvent e) {

@@ -1,7 +1,9 @@
 package ethanjones.cubes.networking.socket;
 
 import ethanjones.cubes.core.logging.Log;
+import ethanjones.cubes.networking.packet.DefaultPacketFactory;
 import ethanjones.cubes.networking.packet.Packet;
+import ethanjones.cubes.networking.packet.PacketFactory;
 import ethanjones.cubes.networking.packet.PacketQueue;
 import ethanjones.cubes.networking.stream.PairedStreams;
 import ethanjones.cubes.side.common.Side;
@@ -21,11 +23,13 @@ public class SocketInput extends SocketIO {
   private final PacketQueue packetQueue;
   private final Inflater inflater;
   private final PairedStreams pairedStreams;
+  private final PacketFactory packetFactory;
   private final byte[] compressedBuffer = new byte[16384];
   private final byte[] inflateBuffer = new byte[16384];
 
   public SocketInput(SocketMonitor socketMonitor) {
     super(socketMonitor);
+    this.packetFactory = new DefaultPacketFactory(socketMonitor);
     this.packetQueue = new PacketQueue();
     this.socketInputStream = socketMonitor.getSocket().getInputStream();
     this.dataInputStream = new DataInputStream(socketInputStream) {
@@ -49,20 +53,16 @@ public class SocketInput extends SocketIO {
     Side.setSide(socketMonitor.getSide());
     while (socketMonitor.running.get()) {
       try {
-        Class<? extends Packet> packetClass;
-
+        Packet packet;
         int b = dataInputStream.readByte();
         if (b == 0 || b == 2) {
-          packetClass = socketMonitor.getPacketIDDatabase().get(dataInputStream.readInt());
+          int id = dataInputStream.readInt();
+          packet = packetFactory.createFromId(id);
         } else {
-          packetClass = Class.forName(dataInputStream.readUTF()).asSubclass(Packet.class);
-          if (socketMonitor.getSide() == Side.Server) {
-            socketMonitor.getPacketIDDatabase().sendID(packetClass, socketMonitor);
-          }
+          String className = dataInputStream.readUTF();
+          packet = packetFactory.createFromClassName(className);
         }
-
-        Packet packet = packetClass.newInstance();
-        packet.setSocketMonitor(socketMonitor);
+        
         if (b == 2 || b == 3) {
           //Reset
           pairedStreams.reset();

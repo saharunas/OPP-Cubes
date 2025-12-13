@@ -32,12 +32,13 @@ public class SingleplayerSavesMenu extends Menu {
   public SingleplayerSavesMenu() {
     title = new Label(Localization.get("menu.singleplayer.title"), skin.get("title", Label.LabelStyle.class));
     noSaves = new Label(Localization.get("menu.singleplayer.nosave"), skin);
-    
+
     listLabel = new List<Save>(skin);
     listLabel.addListener(new ActorGestureListener() {
       @Override
       public void tap(InputEvent event, float x, float y, int count, int button) {
-        if (count == 2) play.toggle();
+        if (count == 2)
+          play.toggle();
       }
     });
 
@@ -53,7 +54,8 @@ public class SingleplayerSavesMenu extends Menu {
       @Override
       public void changed(ChangeEvent event, Actor actor) {
         Save save = listLabel.getSelected();
-        if (save == null) return;
+        if (save == null)
+          return;
         Adapter.setMenu(new SingleplayerSaveDeleteMenu(save));
       }
     });
@@ -62,7 +64,7 @@ public class SingleplayerSavesMenu extends Menu {
     create.addListener(new ChangeListener() {
       @Override
       public void changed(ChangeEvent event, Actor actor) {
-        Adapter.setMenu(new SingleplayerSaveCreateMenu());
+        Adapter.getGameFlowMediator().openSingleplayerSaveCreateMenu();
       }
     });
 
@@ -71,22 +73,21 @@ public class SingleplayerSavesMenu extends Menu {
       @Override
       public void changed(ChangeEvent event, Actor actor) {
         Save save = listLabel.getSelected();
-        if (save == null) return;
+        if (save == null)
+          return;
         Adapter.setMenu(new ServerSetupMenu(save));
       }
     });
 
     play = new TextButton(Localization.get("menu.singleplayer.play"), skin);
+    play = new TextButton(Localization.get("menu.singleplayer.play"), skin);
     play.addListener(new ChangeListener() {
       @Override
       public void changed(ChangeEvent event, Actor actor) {
         Save save = listLabel.getSelected();
-        if (save == null) return;
-        if (GeneratorManager.terrainGeneratorExists(save.getSaveOptions().worldType)) {
-          Adapter.setMenu(new SingleplayerLoadingMenu(save));
-        } else {
-          Adapter.setMenu(new InfoMenu("Terrain generator '" + save.getSaveOptions().worldType + "' does not exist", true));
-        }
+        if (save == null)
+          return;
+        Adapter.getGameFlowMediator().startSingleplayerFromSave(save);
       }
     });
 

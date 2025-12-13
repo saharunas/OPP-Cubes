@@ -17,10 +17,14 @@ import ethanjones.cubes.world.World;
 import ethanjones.cubes.world.collision.BlockIntersection;
 import ethanjones.cubes.world.storage.Area;
 import ethanjones.data.DataGroup;
+import ethanjones.cubes.graphics.world.block.BlockTextureHandlers;
+
+
+import ethanjones.cubes.block.BlockVisitor;
 
 public class Block {
 
-  private static final int[] ONE_ZERO = new int[]{0};
+  private static final int[] ONE_ZERO = new int[] { 0 };
 
   public String id;
   public int intID;
@@ -33,17 +37,19 @@ public class Block {
   protected boolean miningOther = true;
 
   public Block(String id) {
-    if (!id.contains(":")) throw new IllegalArgumentException(id + " is not in the correct format");
+    if (!id.contains(":"))
+      throw new IllegalArgumentException(id + " is not in the correct format");
     this.id = id.toLowerCase();
     this.itemBlock = new ItemBlock(this);
   }
 
   public void loadGraphics() {
-    textureHandlers = new BlockTextureHandler[]{new BlockTextureHandler(id)};
+    textureHandlers = new BlockTextureHandler[] { BlockTextureHandlers.uniform(id) };
   }
 
   public BlockTextureHandler getTextureHandler(int meta) {
-    if (meta < 0 || meta >= textureHandlers.length) meta = 0;
+    if (meta < 0 || meta >= textureHandlers.length)
+      meta = 0;
     return textureHandlers[meta];
   }
 
@@ -83,9 +89,11 @@ public class Block {
 
   // block mining
   public boolean canMine(ItemStack itemStack) {
-    if (itemStack == null || !(itemStack.item instanceof ItemTool)) return miningOther;
+    if (itemStack == null || !(itemStack.item instanceof ItemTool))
+      return miningOther;
     ItemTool itemTool = ((ItemTool) itemStack.item);
-    if (itemTool.getToolType() != miningTool) return miningOther;
+    if (itemTool.getToolType() != miningTool)
+      return miningOther;
     return miningOther || miningToolLevel >= itemTool.getToolLevel();
   }
 
@@ -94,9 +102,11 @@ public class Block {
   }
 
   public float getMiningSpeed(ItemStack itemStack) {
-    if (itemStack == null || !(itemStack.item instanceof ItemTool)) return 1f;
+    if (itemStack == null || !(itemStack.item instanceof ItemTool))
+      return 1f;
     ItemTool itemTool = ((ItemTool) itemStack.item);
-    if (itemTool.getToolType() != miningTool) return 1f;
+    if (itemTool.getToolType() != miningTool)
+      return 1f;
     return itemTool.getToolLevel() * 2;
   }
 
@@ -114,10 +124,12 @@ public class Block {
   }
 
   // coordinates inside area
-  public void randomTick(World world, Area area, int x, int y, int z, int meta) { }
+  public void randomTick(World world, Area area, int x, int y, int z, int meta) {
+  }
 
   public void dropItems(World world, int x, int y, int z, int meta) {
-    if (Side.isClient()) return;
+    if (Side.isClient())
+      return;
     ItemStack[] drops = drops(world, x, y, z, meta);
     for (ItemStack drop : drops) {
       ItemEntity itemEntity = new ItemEntity();
@@ -132,7 +144,7 @@ public class Block {
   }
 
   public ItemStack[] drops(World world, int x, int y, int z, int meta) {
-    return new ItemStack[]{new ItemStack(getItemBlock(), 1, meta)};
+    return new ItemStack[] { new ItemStack(getItemBlock(), 1, meta) };
   }
 
   public BlockRenderType renderType(int meta) {
@@ -141,5 +153,9 @@ public class Block {
 
   public boolean renderFace(BlockFace blockFace, int neighbourIDAndMeta) {
     return TransparencyManager.isTransparent(neighbourIDAndMeta);
+  }
+
+  public <R> R accept(BlockVisitor<R> visitor) {
+    return visitor.visitBlock(this);
   }
 }

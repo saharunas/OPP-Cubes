@@ -20,12 +20,17 @@ import ethanjones.cubes.world.World;
 import ethanjones.cubes.world.collision.BlockIntersection;
 import ethanjones.cubes.world.storage.Area;
 import ethanjones.data.DataGroup;
+import ethanjones.cubes.graphics.world.block.BlockTextureHandlers;
+
 
 import com.badlogic.gdx.math.Vector3;
 
+import ethanjones.cubes.block.BlockVisitor;
+
 public class BlockChest extends Block {
 
-  private static final BlockFace[] lockFace = new BlockFace[]{BlockFace.posX, BlockFace.negX, BlockFace.posZ, BlockFace.negZ};
+  private static final BlockFace[] lockFace = new BlockFace[] { BlockFace.posX, BlockFace.negX, BlockFace.posZ,
+      BlockFace.negZ };
 
   public BlockChest() {
     super("core:chest");
@@ -40,10 +45,11 @@ public class BlockChest extends Block {
     textureHandlers = new BlockTextureHandler[4];
 
     for (int i = 0; i < textureHandlers.length; i++) {
-      textureHandlers[i] = new BlockTextureHandler("core:chest_side");
-      textureHandlers[i].setSide(BlockFace.posY, "core:chest_y");
-      textureHandlers[i].setSide(BlockFace.negY, "core:chest_y");
-      textureHandlers[i].setSide(lockFace[i], "core:chest_lock");
+      BlockTextureHandler handler = BlockTextureHandlers.uniform("core:chest_side")
+      .withSide(BlockFace.posY, "core:chest_y")
+      .withSide(BlockFace.negY, "core:chest_y")
+      .withSide(lockFace[i], "core:chest_lock");
+      textureHandlers[i] = handler;
     }
   }
 
@@ -59,7 +65,8 @@ public class BlockChest extends Block {
 
   @Override
   public boolean onButtonPress(ClickType type, Player player, int blockX, int blockY, int blockZ) {
-    if (Side.isServer() || type != ClickType.place) return false;
+    if (Side.isServer() || type != ClickType.place)
+      return false;
     BlockData blockData = Side.getCubes().world.getBlockData(blockX, blockY, blockZ);
     if (blockData instanceof BlockDataChest) {
       InventoryActor inventoryActor = new InventoryActor(((BlockDataChest) blockData).inventory);
@@ -89,4 +96,10 @@ public class BlockChest extends Block {
   public ItemStack[] drops(World world, int x, int y, int z, int meta) {
     return super.drops(world, x, y, z, 0);
   }
+
+  @Override
+  public <R> R accept(BlockVisitor<R> visitor) {
+    return visitor.visitChest(this);
+  }
+
 }

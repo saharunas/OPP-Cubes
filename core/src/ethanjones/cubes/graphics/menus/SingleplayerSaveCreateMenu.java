@@ -4,7 +4,7 @@ import ethanjones.cubes.core.localization.Localization;
 import ethanjones.cubes.core.platform.Adapter;
 import ethanjones.cubes.graphics.menu.Menu;
 import ethanjones.cubes.graphics.menu.MenuTools;
-import ethanjones.cubes.world.client.ClientSaveManager;
+import ethanjones.cubes.graphics.menus.SingleplayerSaveCreateMenu.SaveTypeDisplay;
 import ethanjones.cubes.world.generator.GeneratorManager;
 import ethanjones.cubes.world.save.Gamemode;
 
@@ -24,7 +24,7 @@ public class SingleplayerSaveCreateMenu extends Menu {
   TextField seed;
   TextButton start;
   TextButton back;
-  
+
   ChangeListener startListener;
 
   public SingleplayerSaveCreateMenu() {
@@ -59,7 +59,11 @@ public class SingleplayerSaveCreateMenu extends Menu {
     start.addListener(startListener = new ChangeListener() {
       @Override
       public void changed(ChangeEvent event, Actor actor) {
-        Adapter.setMenu(new SingleplayerLoadingMenu(ClientSaveManager.createSave(name.getText(), generator.getSelected().id, mode.getSelected(), seed.getText())));
+        Adapter.getGameFlowMediator().createAndStartSingleplayerSave(
+            name.getText(),
+            generator.getSelected().id,
+            mode.getSelected(),
+            seed.getText());
       }
     });
 
@@ -76,7 +80,8 @@ public class SingleplayerSaveCreateMenu extends Menu {
   public void resize(float width, float height) {
     super.resize(width, height);
     MenuTools.setTitle(title);
-    MenuTools.arrange(width / 4, height / 4, width / 2, height / 2, MenuTools.Direction.Above, start, seed, mode, generator, name);
+    MenuTools.arrange(width / 4, height / 4, width / 2, height / 2, MenuTools.Direction.Above, start, seed, mode,
+        generator, name);
     MenuTools.copyPosAndSize(start, back);
     back.setY(0);
   }

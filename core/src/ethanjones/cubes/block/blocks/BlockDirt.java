@@ -6,6 +6,8 @@ import ethanjones.cubes.item.ItemTool.ToolType;
 import ethanjones.cubes.world.World;
 import ethanjones.cubes.world.storage.Area;
 
+import ethanjones.cubes.block.BlockVisitor;
+
 public class BlockDirt extends Block {
 
   public BlockDirt() {
@@ -18,11 +20,14 @@ public class BlockDirt extends Block {
 
   @Override
   public void randomTick(World world, Area area, int x, int y, int z, int meta) {
-    if (area.getLight(x, y+1, z) > BlockGrass.MIN_LIGHT || (area.getSunlight(x, y+1, z) > BlockGrass.MIN_LIGHT && world.isDay())) {
+    if (area.getLight(x, y + 1, z) > BlockGrass.MIN_LIGHT
+        || (area.getSunlight(x, y + 1, z) > BlockGrass.MIN_LIGHT && world.isDay())) {
       for (int i = y - 1; i <= y + 1; i++) {
-        if (checkForGrass(world, area, x + 1, i, z + 1) || checkForGrass(world, area, x + 1, i, z) ||  checkForGrass(world, area, x + 1, i, z - 1) ||
+        if (checkForGrass(world, area, x + 1, i, z + 1) || checkForGrass(world, area, x + 1, i, z)
+            || checkForGrass(world, area, x + 1, i, z - 1) ||
             checkForGrass(world, area, x, i, z + 1) || checkForGrass(world, area, x, i, z - 1) ||
-            checkForGrass(world, area, x - 1, i, z + 1) || checkForGrass(world, area, x - 1, i, z) || checkForGrass(world, area, x - 1, i, z - 1)) {
+            checkForGrass(world, area, x - 1, i, z + 1) || checkForGrass(world, area, x - 1, i, z)
+            || checkForGrass(world, area, x - 1, i, z - 1)) {
           area.setBlock(Blocks.grass, x, y, z, 0);
         }
       }
@@ -42,4 +47,10 @@ public class BlockDirt extends Block {
       return area.getBlock(x, y, z) == Blocks.grass;
     }
   }
+
+  @Override
+  public <R> R accept(BlockVisitor<R> visitor) {
+    return visitor.visitDirt(this);
+  }
+
 }

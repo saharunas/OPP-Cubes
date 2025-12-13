@@ -9,6 +9,11 @@ import ethanjones.cubes.core.performance.PerformanceTags;
 import ethanjones.cubes.core.platform.Adapter;
 import ethanjones.cubes.core.system.CubesException;
 import ethanjones.cubes.entity.living.player.Player;
+import ethanjones.cubes.entity.living.player.strategies.AdventureStrategy;
+import ethanjones.cubes.entity.living.player.strategies.CreativeStrategy;
+import ethanjones.cubes.entity.living.player.strategies.GamemodeStrategy;
+import ethanjones.cubes.entity.living.player.strategies.SpectatorStrategy;
+import ethanjones.cubes.entity.living.player.strategies.SurvivalStrategy;
 import ethanjones.cubes.graphics.hud.inv.InventoryManager;
 import ethanjones.cubes.graphics.menus.PauseMenu;
 import ethanjones.cubes.graphics.menus.WorldLoadingMenu;
@@ -36,6 +41,7 @@ public class CubesClient extends Cubes implements ApplicationListener {
   public InputChain inputChain;
   public Renderer renderer;
   public Gamemode gamemode;
+  public GamemodeStrategy gamemodeStrategy = new SurvivalStrategy();
   public long frameStart;
   public float worldProgress = 0f;
   public boolean worldReady = false;
@@ -45,6 +51,25 @@ public class CubesClient extends Cubes implements ApplicationListener {
   public CubesClient() {
     super(Side.Client);
     if (Adapter.isDedicatedServer()) throw new CubesException("Cannot run client on server");
+  }
+
+  public void setGamemode(Gamemode _gamemode){
+    this.gamemode = _gamemode;
+
+    switch (_gamemode){
+        case survival:
+          this.gamemodeStrategy = new SurvivalStrategy();
+          break;
+        case creative:
+          this.gamemodeStrategy = new CreativeStrategy();
+          break;
+        case spectator:
+          this.gamemodeStrategy = new SpectatorStrategy();
+          break;
+        case adventure:
+          this.gamemodeStrategy = new AdventureStrategy();
+          break;
+    }
   }
 
   @Override
