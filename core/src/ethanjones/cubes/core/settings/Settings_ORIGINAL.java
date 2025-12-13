@@ -133,7 +133,7 @@ public class Settings_ORIGINAL {
   }
 
   public static boolean isSetup() {
-    return base.getChildGroups().size() > 0 || base.getChildren().size() > 0;
+    return base.getChildren().size() > 0;
   }
 
   public static void addSetting(String notLocalised, Setting setting) {
