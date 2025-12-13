@@ -19,6 +19,10 @@ public class Keybinds {
   public static final String KEYBIND_JUMP = KEYBIND_BASE + "jump";
   public static final String KEYBIND_DESCEND = KEYBIND_BASE + "descend";
   
+  // State Pattern: Movement state keybinds
+  public static final String KEYBIND_SPRINT = KEYBIND_BASE + "sprint";
+  public static final String KEYBIND_CROUCH = KEYBIND_BASE + "crouch";
+  
   public static final String KEYBIND_THROW = KEYBIND_BASE + "throw";
   public static final String KEYBIND_INVENTORY = KEYBIND_BASE + "inventory";
   public static final String KEYBIND_CHAT = KEYBIND_BASE + "chat";
@@ -40,6 +44,10 @@ public class Keybinds {
       Settings.addSetting(KEYBIND_JUMP, new KeybindSetting(Keys.SPACE));
       Settings.addSetting(KEYBIND_DESCEND, new KeybindSetting(Keys.SHIFT_LEFT));
       
+      // State Pattern: Movement state keybinds
+      Settings.addSetting(KEYBIND_SPRINT, new KeybindSetting(Keys.SHIFT_LEFT));
+      Settings.addSetting(KEYBIND_CROUCH, new KeybindSetting(Keys.CONTROL_LEFT));
+      
       Settings.addSetting(KEYBIND_THROW, new KeybindSetting(Keys.Q));
       Settings.addSetting(KEYBIND_INVENTORY, new KeybindSetting(Keys.E));
       Settings.addSetting(KEYBIND_CHAT, new KeybindSetting(Keys.F4));
@@ -57,6 +65,7 @@ public class Keybinds {
         }
       };
       settingGroup.add(KEYBIND_FORWARD).add(KEYBIND_BACK).add(KEYBIND_LEFT).add(KEYBIND_RIGHT).add(KEYBIND_JUMP).add(KEYBIND_DESCEND);
+      settingGroup.add(KEYBIND_SPRINT).add(KEYBIND_CROUCH);
       settingGroup.add(KEYBIND_INVENTORY).add(KEYBIND_CHAT);
       settingGroup.add(KEYBIND_FULLSCREEN).add(KEYBIND_HIDEGUI).add(KEYBIND_SCREENSHOT).add(KEYBIND_DEBUG).add(KEYBIND_AREABOUNDARIES);
     }
