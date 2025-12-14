@@ -11,6 +11,7 @@ public class FileLogWriter extends TextLogWriter {
   PrintStream printStream;
 
   public FileLogWriter(File file) {
+    System.out.println("FileLogWriter CREATED");
     FileLogWriter.file = file;
     try {
       file.createNewFile();
