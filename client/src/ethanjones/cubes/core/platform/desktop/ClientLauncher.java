@@ -1,7 +1,5 @@
 package ethanjones.cubes.core.platform.desktop;
 
-import ethanjones.cubes.core.logging.Log;
-
 public class ClientLauncher implements DesktopLauncher {
 
   public static void main(String[] arg) {
@@ -10,13 +8,6 @@ public class ClientLauncher implements DesktopLauncher {
 
   private void start() {
     DesktopCompatibility.setup();
-    Log.performanceTest(10_000);
-    Log.performanceTest(100_000);
-    Log.performanceTest(500_000);
-    Log.performanceTest(1_000_000);
-    Log.performanceTest(5_000_000);
-    Log.printPerformanceSummary();
-
     new ClientCompatibility(this, arg).startCubes();
   }
 

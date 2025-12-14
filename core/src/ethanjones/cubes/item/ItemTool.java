@@ -44,7 +44,14 @@ public class ItemTool extends Item {
   }
 
   public static void mine(Player player, boolean mine) {
-    if (mine) {
+    boolean canBreakBlocks = true;
+    boolean instantBreak = false;
+    if (Side.isClient())
+    {
+      canBreakBlocks = Side.getCubes().getClient().gamemodeStrategy.canBreakBlocks();
+      instantBreak = Side.getCubes().getClient().gamemodeStrategy.instantBreak();
+    }
+    if (mine && canBreakBlocks) {
       ItemStack itemStack = player.getInventory().selectedItemStack(); // may be null
       BlockIntersection blockIntersection = BlockIntersection.getBlockIntersection(player.position, player.angle, Side.getCubes().world);
       if (blockIntersection != null) {
@@ -58,6 +65,7 @@ public class ItemTool extends Item {
             target = new MiningTarget();
             target.target = blockReference;
             target.totalTime = block.getMiningTime();
+            if (instantBreak) { target.totalTime = 0f; }
             target.itemStack = itemStack;
             player.setCurrentlyMining(target);
           }

@@ -20,14 +20,17 @@ import ethanjones.cubes.world.World;
 import ethanjones.cubes.world.collision.BlockIntersection;
 import ethanjones.cubes.world.storage.Area;
 import ethanjones.data.DataGroup;
+import ethanjones.cubes.graphics.world.block.BlockTextureHandlers;
+
 
 import com.badlogic.gdx.math.Vector3;
 
+import ethanjones.cubes.block.BlockVisitor;
+
 public class BlockChest extends Block {
 
-    private static final BlockFace[] lockFace = new BlockFace[]{
-            BlockFace.posX, BlockFace.negX, BlockFace.posZ, BlockFace.negZ
-    };
+  private static final BlockFace[] lockFace = new BlockFace[] { BlockFace.posX, BlockFace.negX, BlockFace.posZ,
+      BlockFace.negZ };
 
     public BlockChest(String id) {
         super(id);
@@ -41,14 +44,14 @@ public class BlockChest extends Block {
     public void loadGraphics() {
         textureHandlers = new BlockTextureHandler[4];
 
-        for (int i = 0; i < textureHandlers.length; i++) {
-            BlockTextureHandler handler = new BlockTextureHandler("core:chest_side");
-            handler.setSide(BlockFace.posY, "core:chest_y");
-            handler.setSide(BlockFace.negY, "core:chest_y");
-            handler.setSide(lockFace[i], "core:chest_lock");
-            textureHandlers[i] = handler;
-        }
+    for (int i = 0; i < textureHandlers.length; i++) {
+      BlockTextureHandler handler = BlockTextureHandlers.uniform("core:chest_side")
+      .withSide(BlockFace.posY, "core:chest_y")
+      .withSide(BlockFace.negY, "core:chest_y")
+      .withSide(lockFace[i], "core:chest_lock");
+      textureHandlers[i] = handler;
     }
+  }
 
     @Override
     public boolean blockData() {
@@ -60,17 +63,18 @@ public class BlockChest extends Block {
         return new BlockDataChest(area, x, y, z);
     }
 
-    @Override
-    public boolean onButtonPress(ClickType type, Player player, int blockX, int blockY, int blockZ) {
-        if (Side.isServer() || type != ClickType.place) return false;
-        BlockData blockData = Side.getCubes().world.getBlockData(blockX, blockY, blockZ);
-        if (blockData instanceof BlockDataChest) {
-            InventoryActor inventoryActor = new InventoryActor(((BlockDataChest) blockData).inventory);
-            InventoryActor playerInv = Cubes.getClient().renderer.guiRenderer.playerInv;
-            InventoryManager.showInventory(new InventoryWindow(new DoubleInventory(inventoryActor, playerInv)));
-        }
-        return true;
+  @Override
+  public boolean onButtonPress(ClickType type, Player player, int blockX, int blockY, int blockZ) {
+    if (Side.isServer() || type != ClickType.place)
+      return false;
+    BlockData blockData = Side.getCubes().world.getBlockData(blockX, blockY, blockZ);
+    if (blockData instanceof BlockDataChest) {
+      InventoryActor inventoryActor = new InventoryActor(((BlockDataChest) blockData).inventory);
+      InventoryActor playerInv = Cubes.getClient().renderer.guiRenderer.playerInv;
+      InventoryManager.showInventory(new InventoryWindow(new DoubleInventory(inventoryActor, playerInv)));
     }
+    return true;
+  }
 
     @Override
     public Integer place(World world, int x, int y, int z, int meta, Player player, BlockIntersection intersection) {
@@ -88,8 +92,14 @@ public class BlockChest extends Block {
         return 0;
     }
 
-    @Override
-    public ItemStack[] drops(World world, int x, int y, int z, int meta) {
-        return super.drops(world, x, y, z, 0);
-    }
+  @Override
+  public ItemStack[] drops(World world, int x, int y, int z, int meta) {
+    return super.drops(world, x, y, z, 0);
+  }
+
+  @Override
+  public <R> R accept(BlockVisitor<R> visitor) {
+    return visitor.visitChest(this);
+  }
+
 }

@@ -9,6 +9,10 @@ import ethanjones.cubes.item.ItemTool.ToolType;
 import ethanjones.cubes.world.World;
 import ethanjones.cubes.world.storage.Area;
 
+import ethanjones.cubes.block.BlockVisitor;
+import ethanjones.cubes.graphics.world.block.BlockTextureHandlers;
+
+
 public class BlockGrass extends Block {
 
     public static final int MIN_LIGHT = 10;
@@ -20,28 +24,29 @@ public class BlockGrass extends Block {
         miningOther = true;
     }
 
-    @Override
-    public void loadGraphics() {
-        // Start with the side texture
-        BlockTextureHandler handler = new BlockTextureHandler("core:grass_side");
+  @Override
+  public void loadGraphics() {
+    BlockTextureHandler handler = BlockTextureHandlers.uniform("core:grass_side")
+    .withSide(BlockFace.posY, "core:grass_top")
+    .withSide(BlockFace.negY, "core:dirt");
+    textureHandlers = new BlockTextureHandler[] { handler };
+  }
 
-        // Assign top and bottom textures explicitly
-        handler.setSide(BlockFace.posY, "core:grass_top");
-        handler.setSide(BlockFace.negY, "core:dirt");
+  @Override
+  public ItemStack[] drops(World world, int x, int y, int z, int meta) {
+    return new ItemStack[] { new ItemStack(Blocks.dirt.getItemBlock(), 1, 0) };
+  }
 
-        // Apply the handler
-        textureHandlers = new BlockTextureHandler[]{handler};
+  @Override
+  public void randomTick(World world, Area area, int x, int y, int z, int meta) {
+    if (y < area.maxY && area.getMaxLight(x, y + 1, z) < MIN_LIGHT) {
+      area.setBlock(Blocks.dirt, x, y, z, 0);
     }
+  }
 
-    @Override
-    public ItemStack[] drops(World world, int x, int y, int z, int meta) {
-        return new ItemStack[]{new ItemStack(Blocks.dirt.getItemBlock(), 1, 0)};
-    }
+  @Override
+  public <R> R accept(BlockVisitor<R> visitor) {
+    return visitor.visitGrass(this);
+  }
 
-    @Override
-    public void randomTick(World world, Area area, int x, int y, int z, int meta) {
-        if (y < area.maxY && area.getMaxLight(x, y + 1, z) < MIN_LIGHT) {
-            area.setBlock(Blocks.dirt, x, y, z, 0);
-        }
-    }
 }

@@ -6,6 +6,7 @@ import ethanjones.cubes.networking.packet.Packet;
 import ethanjones.cubes.networking.packet.PacketDirection;
 import ethanjones.cubes.networking.packet.PacketQueue;
 import ethanjones.cubes.networking.socket.SocketMonitor;
+import ethanjones.cubes.networking.transport.TransportSocket;
 import ethanjones.cubes.side.common.Cubes;
 import ethanjones.cubes.side.common.Side;
 
@@ -81,7 +82,7 @@ public class ServerNetworking extends Networking {
     }
   }
 
-  protected synchronized void accepted(Socket socket) {
+  protected synchronized void accepted(TransportSocket socket) {
     sockets.add(new SocketMonitor(socket, this, Side.Server));
     Log.info("Successfully connected to " + socket.getRemoteAddress());
   }

@@ -24,9 +24,43 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Settings {
 
+  private static volatile Settings instance = null;
+  private static final Object INSTANCE_LOCK = new Object();
+  
+  public static Settings getInstance() {
+    // First check (no locking) - performance optimization
+    if (instance == null) {
+      // Synchronize on lock object for thread safety
+      synchronized (INSTANCE_LOCK) {
+        // Second check (with locking) - prevent duplicate instances
+        if (instance == null) {
+          Log.info("Initializing Settings Singleton instance");
+          instance = new Settings();
+        }
+      }
+    }
+    return instance;
+  }
+  
+  /**
+   * Private constructor prevents direct instantiation.
+   * Only getInstance() can create the Settings instance.
+   */
+  private Settings() {
+    // Initialize instance variables
+    this.base = new SettingGroup();
+    this.settings = new ConcurrentHashMap<>();
+    Log.debug("Settings instance created (Thread: " + Thread.currentThread().getName() + ")");
+  }
+  
+  private final SettingGroup base;
+  
+  private final Map<String, Setting> settings;
+  
   public static final String USERNAME = "username";
   public static final String UUID = "uuid";
   public static final String GRAPHICS_VIEW_DISTANCE = "graphics.viewDistance";
@@ -50,18 +84,19 @@ public class Settings {
   public static final String GROUP_NETWORKING = "networking";
   public static final String GROUP_DEBUG = "debug";
 
-  protected static SettingGroup base = new SettingGroup();
-  protected static LinkedHashMap<String, Setting> settings = new LinkedHashMap<String, Setting>();
-
   public static void init() {
-    addSetting(USERNAME, new StringSetting("User"));
-    addSetting(UUID, new PlayerUUIDSetting());
-    addSetting(GRAPHICS_VIEW_DISTANCE, new IntegerSetting(5, 2, 256, IntegerSetting.Type.Slider));
-    addSetting(GRAPHICS_FOV, new IntegerSetting(70, 10, 120, IntegerSetting.Type.Slider));
-    addSetting(GRAPHICS_FOG, new BooleanSetting(true));
-    addSetting(GRAPHICS_SCALE, new FloatSetting(0f, -2f, 2f, FloatSetting.Type.Slider) {
+    getInstance().initInstance();
+  }
+  
+  private void initInstance() {
+    addSettingInstance(USERNAME, new StringSetting("User"));
+    addSettingInstance(UUID, new PlayerUUIDSetting());
+    addSettingInstance(GRAPHICS_VIEW_DISTANCE, new IntegerSetting(5, 2, 256, IntegerSetting.Type.Slider));
+    addSettingInstance(GRAPHICS_FOV, new IntegerSetting(70, 10, 120, IntegerSetting.Type.Slider));
+    addSettingInstance(GRAPHICS_FOG, new BooleanSetting(true));
+    addSettingInstance(GRAPHICS_SCALE, new FloatSetting(0f, -2f, 2f, FloatSetting.Type.Slider) {
       {
-        if (!isSetup()) {
+        if (!isSetupInstance()) {
           if (!Adapter.isDedicatedServer()) this.rangeStart = -(Graphics.scaleFactor() - 0.25f);
         } else {
           Log.warning("GRAPHICS_SCALE setting initialized after settings setup");
@@ -75,12 +110,12 @@ public class Settings {
         Gdx.app.getApplicationListener().resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
       }
     });
-    addSetting(GRAPHICS_AO, AmbientOcclusion.getSetting());
-    addSetting(GRAPHICS_SIMPLE_SHADER, CubesShaderProvider.getSetting());
-    addSetting(GRAPHICS_SCREENSHOT_SIZE, Screenshot.screenshotResolutionSetting());
+    addSettingInstance(GRAPHICS_AO, AmbientOcclusion.getSetting());
+    addSettingInstance(GRAPHICS_SIMPLE_SHADER, CubesShaderProvider.getSetting());
+    addSettingInstance(GRAPHICS_SCREENSHOT_SIZE, Screenshot.screenshotResolutionSetting());
 
-    addSetting(INPUT_MOUSE_SENSITIVITY, new FloatSetting(0.5f, 0.05f, 1f, FloatSetting.Type.Slider));
-    addSetting(INPUT_TOUCHPAD_SIZE, new FloatSetting(0.45f, 0.30f, 0.60f, FloatSetting.Type.Slider) {
+    addSettingInstance(INPUT_MOUSE_SENSITIVITY, new FloatSetting(0.5f, 0.05f, 1f, FloatSetting.Type.Slider));
+    addSettingInstance(INPUT_TOUCHPAD_SIZE, new FloatSetting(0.45f, 0.30f, 0.60f, FloatSetting.Type.Slider) {
       {
         this.sliderSteps = 0.005f;
       }
@@ -90,18 +125,18 @@ public class Settings {
         return Compatibility.get().isTouchScreen();
       }
     });
-    addSetting(INPUT_TOUCHPAD_LEFT, new BooleanSetting(false) {
+    addSettingInstance(INPUT_TOUCHPAD_LEFT, new BooleanSetting(false) {
       @Override
       public boolean shouldDisplay() {
         return Compatibility.get().isTouchScreen();
       }
     });
 
-    addSetting(NETWORKING_PORT, new IntegerSetting(24842));
+    addSettingInstance(NETWORKING_PORT, new IntegerSetting(24842));
 
-    addSetting(DEBUG_FRAMETIME_GRAPH, new BooleanSetting(false));
-    addSetting(DEBUG_GL_PROFILER, new BooleanSetting(false));
-    addSetting(DEBUG_UNLIMITED_VIEW_DISTANCE, new BooleanSetting(false) {
+    addSettingInstance(DEBUG_FRAMETIME_GRAPH, new BooleanSetting(false));
+    addSettingInstance(DEBUG_GL_PROFILER, new BooleanSetting(false));
+    addSettingInstance(DEBUG_UNLIMITED_VIEW_DISTANCE, new BooleanSetting(false) {
       @Override
       public void onChange() {
         IntegerSetting viewDistance = Settings.getIntegerSetting(Settings.GRAPHICS_VIEW_DISTANCE);
@@ -113,7 +148,7 @@ public class Settings {
         viewDistance.clamp();
       }
     });
-    addSetting(DEBUG_AREA_SHARING, new BooleanSetting(true));
+    addSettingInstance(DEBUG_AREA_SHARING, new BooleanSetting(true));
 
     String keybindsGroup = Keybinds.KEYBIND_GROUP;
     SettingGroup keybinds = Keybinds.init();
@@ -126,21 +161,33 @@ public class Settings {
 
     new AddSettingsEvent().post();
 
-    if (!read()) {
+    if (!readInstance()) {
       Log.info("Creating new settings file");
-      write();
+      writeInstance();
     }
   }
 
   public static boolean isSetup() {
-    return base.getChildGroups().size() > 0 || base.getChildren().size() > 0;
+    return getInstance().isSetupInstance();
+  }
+  
+  private boolean isSetupInstance() {
+    return base.getChildren().size() > 0;
   }
 
   public static void addSetting(String notLocalised, Setting setting) {
+    getInstance().addSettingInstance(notLocalised, setting);
+  }
+  
+  private void addSettingInstance(String notLocalised, Setting setting) {
     settings.put(notLocalised, setting);
   }
 
   public static boolean read() {
+    return getInstance().readInstance();
+  }
+  
+  private boolean readInstance() {
     FileHandle fileHandle = Compatibility.get().getBaseFolder().child("settings.json");
 
     boolean failed = false;
@@ -173,6 +220,10 @@ public class Settings {
   }
 
   public static boolean write() {
+    return getInstance().writeInstance();
+  }
+  
+  private boolean writeInstance() {
     FileHandle fileHandle = Compatibility.get().getBaseFolder().child("settings.json");
     JsonObject json = new JsonObject();
     for (Map.Entry<String, Setting> entry : settings.entrySet()) {
@@ -191,6 +242,10 @@ public class Settings {
   }
 
   public static void print() {
+    getInstance().printInstance();
+  }
+  
+  private void printInstance() {
     for (Map.Entry<String, Setting> entry : settings.entrySet()) {
       Log.debug("Setting \"" + getLocalisedSettingName(entry.getKey()) + "\" = \"" + entry.getValue() + "\"");
     }
@@ -202,40 +257,60 @@ public class Settings {
 
   //Get casted values
   public static boolean getBooleanSettingValue(String notLocalised) {
-    return getBooleanSetting(notLocalised).get();
+    return getInstance().getBooleanSetting(notLocalised).get();
   }
 
   //Get casted
   public static BooleanSetting getBooleanSetting(String notLocalised) {
-    return (BooleanSetting) getSetting(notLocalised);
+    return getInstance().getBooleanSettingInstance(notLocalised);
+  }
+  
+  private BooleanSetting getBooleanSettingInstance(String notLocalised) {
+    return (BooleanSetting) getSettingInstance(notLocalised);
   }
 
   public static Setting getSetting(String notLocalised) {
+    return getInstance().getSettingInstance(notLocalised);
+  }
+  
+  private Setting getSettingInstance(String notLocalised) {
     return settings.get(notLocalised);
   }
 
   public static int getIntegerSettingValue(String notLocalised) {
-    return getIntegerSetting(notLocalised).get();
+    return getInstance().getIntegerSetting(notLocalised).get();
   }
 
   public static IntegerSetting getIntegerSetting(String notLocalised) {
-    return (IntegerSetting) getSetting(notLocalised);
+    return getInstance().getIntegerSettingInstance(notLocalised);
+  }
+  
+  private IntegerSetting getIntegerSettingInstance(String notLocalised) {
+    return (IntegerSetting) getSettingInstance(notLocalised);
   }
 
   public static float getFloatSettingValue(String notLocalised) {
-    return getFloatSetting(notLocalised).get();
+    return getInstance().getFloatSetting(notLocalised).get();
   }
 
   public static FloatSetting getFloatSetting(String notLocalised) {
-    return (FloatSetting) getSetting(notLocalised);
+    return getInstance().getFloatSettingInstance(notLocalised);
+  }
+  
+  private FloatSetting getFloatSettingInstance(String notLocalised) {
+    return (FloatSetting) getSettingInstance(notLocalised);
   }
 
   public static String getStringSettingValue(String notLocalised) {
-    return getStringSetting(notLocalised).get();
+    return getInstance().getStringSetting(notLocalised).get();
   }
 
   public static StringSetting getStringSetting(String notLocalised) {
-    return (StringSetting) getSetting(notLocalised);
+    return getInstance().getStringSettingInstance(notLocalised);
+  }
+  
+  private StringSetting getStringSettingInstance(String notLocalised) {
+    return (StringSetting) getSettingInstance(notLocalised);
   }
 
   public static String getLocalisedSettingGroupName(String notLocalised) {
@@ -243,6 +318,10 @@ public class Settings {
   }
 
   public static SettingGroup getBaseSettingGroup() {
+    return getInstance().getBaseSettingGroupInstance();
+  }
+  
+  private SettingGroup getBaseSettingGroupInstance() {
     return base;
   }
 }

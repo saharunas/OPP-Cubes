@@ -11,7 +11,7 @@ public class BlockDirtBuilder extends BlockBuilder<BlockDirt, BlockDirtBuilder> 
 
     @Override
     public BlockDirt build() {
-        BlockDirt dirt = new BlockDirt(id);
+        BlockDirt dirt = new BlockDirt();
         dirt.miningTime = this.miningTime;
         dirt.miningTool = this.miningTool;
         dirt.miningToolLevel = this.miningToolLevel;

@@ -11,16 +11,6 @@ public class Log {
 
   private static LogWriter output;
   private static LogWriter file;
-  // === PERFORMANCE STATISTICS (TEMPORARY) ===
-  private static int testRuns = 0;
-  private static long totalLogCalls = 0;
-  private static long totalTimeNs = 0;
-
-  // store individual runs
-  private static long[] runLogCounts = new long[10];
-  private static long[] runTimesNs = new long[10];
-
-
 
   static {
     try {
@@ -203,66 +193,5 @@ public class Log {
       file.dispose();
     } catch (Exception e) {
     }
-  }
-
-  // TEMPORARY PERFORMANCE TEST WITH ACCUMULATION
-  public static void performanceTest(int count) {
-    long start = System.nanoTime();
-
-    for (int i = 0; i < count; i++) {
-      Log.info("test");
-    }
-
-    long end = System.nanoTime();
-    long duration = end - start;
-
-    // store run
-    runLogCounts[testRuns] = count;
-    runTimesNs[testRuns] = duration;
-
-    testRuns++;
-    totalLogCalls += count;
-    totalTimeNs += duration;
-  }
-
-  public static void printPerformanceSummary() {
-    System.out.println();
-    System.out.println("===== LOGGING PERFORMANCE SUMMARY =====");
-    System.out.println("Run | Log count | Time (ns) | Avg / log (ns)");
-    System.out.println("--------------------------------------");
-
-    for (int i = 0; i < testRuns; i++) {
-      long avg = runTimesNs[i] / runLogCounts[i];
-      System.out.println(
-              (i + 1) + "   | " +
-                      runLogCounts[i] + "     | " +
-                      runTimesNs[i] + " | " +
-                      avg
-      );
-    }
-
-    System.out.println("--------------------------------------");
-    System.out.println("Total runs: " + testRuns);
-    System.out.println("Total log calls: " + totalLogCalls);
-    System.out.println("Total time (ns): " + totalTimeNs);
-    System.out.println(
-            "Overall avg / log (ns): " +
-                    (totalTimeNs / totalLogCalls)
-    );
-    System.out.println("======================================");
-  }
-
-  public static void memoryTest() {
-    Runtime rt = Runtime.getRuntime();
-
-    long before = rt.totalMemory() - rt.freeMemory();
-    System.out.println("Memory before logging: " + before);
-
-    Log.info("first log");
-
-    long after = rt.totalMemory() - rt.freeMemory();
-    System.out.println("Memory after logging: " + after);
-
-    System.out.println("Difference: " + (after - before));
   }
 }

@@ -54,18 +54,14 @@ public class MainMenu extends Menu {
     singleplayer.addListener(new ChangeListener() {
       @Override
       public void changed(ChangeEvent event, Actor actor) {
-        if (Compatibility.get().functionModifier()) {
-          Adapter.setMenu(new SingleplayerTemporarySaveMenu());
-        } else {
-          Adapter.setMenu(new SingleplayerSavesMenu());
-        }
+        Adapter.getGameFlowMediator().openSingleplayerRootMenu();
       }
     });
     buttons.add(multiplayer = new TextButton(Localization.get("menu.main.multiplayer"), skin)).row();
     multiplayer.addListener(new ChangeListener() {
       @Override
       public void changed(ChangeEvent event, Actor actor) {
-        Adapter.setMenu(new MultiplayerConnectMenu());
+        Adapter.getGameFlowMediator().openMultiplayerMenu();
       }
     });
     buttons.add(settings = new TextButton(Localization.get("menu.main.settings"), skin)).row();
@@ -88,7 +84,7 @@ public class MainMenu extends Menu {
     stage.addActor(version);
     stage.addActor(author);
     stage.addActor(buttons);
-    
+
     logo.addListener(new ActorGestureListener() {
       @Override
       public boolean longPress(Actor actor, float x, float y) {

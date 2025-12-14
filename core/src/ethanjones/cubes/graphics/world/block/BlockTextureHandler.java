@@ -8,18 +8,33 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.Arrays;
 
-public class BlockTextureHandler {
+/**
+ * Flyweight-friendly texture handler.
+ *
+ * IMPORTANT: This class is now immutable.
+ * Use {@link BlockTextureHandlers} (the Flyweight factory) to obtain shared instances.
+ */
+public final class BlockTextureHandler {
 
-  TextureRegion[] textureRegions;
+  final TextureRegion[] textureRegions;
 
-  public BlockTextureHandler(String id) {
-    this(Assets.getBlockItemTextureRegion(id, "block"));
+  /** Package-private: use BlockTextureHandlers. */
+  BlockTextureHandler(TextureRegion[] regions) {
+    if (regions == null || regions.length != 6) throw new CubesException("Texture region array must be length 6");
+    for (TextureRegion r : regions) {
+      if (r == null) throw new CubesException("Texture region cannot be null");
+    }
+    this.textureRegions = regions;
   }
 
-  public BlockTextureHandler(TextureRegion textureRegion) {
-    if (textureRegion == null) throw new CubesException("Texture region cannot be null");
-    textureRegions = new TextureRegion[6];
-    Arrays.fill(textureRegions, textureRegion);
+  /** Convenience: all faces use the same texture id. Prefer BlockTextureHandlers.uniform(id). */
+  public static BlockTextureHandler uniform(String id) {
+    return BlockTextureHandlers.uniform(id);
+  }
+
+  /** Convenience: create from a single region (all sides). Prefer BlockTextureHandlers.uniform(region). */
+  public static BlockTextureHandler uniform(TextureRegion textureRegion) {
+    return BlockTextureHandlers.uniform(textureRegion);
   }
 
   public TextureRegion getSide(BlockFace blockFace) {
@@ -30,13 +45,36 @@ public class BlockTextureHandler {
     return textureRegions[direction];
   }
 
-  public BlockTextureHandler setSide(BlockFace blockFace, String id) {
-    textureRegions[blockFace.index] = Assets.getBlockItemTextureRegion(id, "block");
-    return this;
+  /**
+   * Returns a NEW handler with one face changed (does not mutate this instance).
+   * Prefer using {@link BlockTextureHandlers#withSide(BlockTextureHandler, BlockFace, String)}.
+   */
+  public BlockTextureHandler withSide(BlockFace blockFace, String id) {
+    return BlockTextureHandlers.withSide(this, blockFace, id);
   }
 
+  /** Legacy API kept for compatibility; now returns a NEW handler (does not mutate). */
+  @Deprecated
+  public BlockTextureHandler setSide(BlockFace blockFace, String id) {
+    return withSide(blockFace, id);
+  }
+
+  /** Legacy API kept for compatibility; now returns a NEW handler (does not mutate). */
+  @Deprecated
   public BlockTextureHandler setSide(int blockFace, String id) {
-    textureRegions[blockFace] = Assets.getBlockItemTextureRegion(id, "block");
-    return this;
+    return withSide(BlockFace.values()[blockFace], id);
+  }
+
+  /** Helper for factory: create a uniform region array. */
+  static TextureRegion[] uniformRegions(TextureRegion textureRegion) {
+    if (textureRegion == null) throw new CubesException("Texture region cannot be null");
+    TextureRegion[] regions = new TextureRegion[6];
+    Arrays.fill(regions, textureRegion);
+    return regions;
+  }
+
+  /** Helper for factory: resolve id -> region. */
+  static TextureRegion resolve(String id) {
+    return Assets.getBlockItemTextureRegion(id, "block");
   }
 }

@@ -17,10 +17,14 @@ import ethanjones.cubes.world.World;
 import ethanjones.cubes.world.collision.BlockIntersection;
 import ethanjones.cubes.world.storage.Area;
 import ethanjones.data.DataGroup;
+import ethanjones.cubes.graphics.world.block.BlockTextureHandlers;
+
+
+import ethanjones.cubes.block.BlockVisitor;
 
 public class Block {
 
-    private static final int[] ONE_ZERO = new int[]{0};
+  private static final int[] ONE_ZERO = new int[] { 0 };
 
     public String id;
     public int intID;
@@ -47,14 +51,15 @@ public class Block {
         this.itemBlock = new ItemBlock(this);
     }
 
-    public void loadGraphics() {
-        textureHandlers = new BlockTextureHandler[]{new BlockTextureHandler(id)};
-    }
+  public void loadGraphics() {
+    textureHandlers = new BlockTextureHandler[] { BlockTextureHandlers.uniform(id) };
+  }
 
-    public BlockTextureHandler getTextureHandler(int meta) {
-        if (meta < 0 || meta >= textureHandlers.length) meta = 0;
-        return textureHandlers[meta];
-    }
+  public BlockTextureHandler getTextureHandler(int meta) {
+    if (meta < 0 || meta >= textureHandlers.length)
+      meta = 0;
+    return textureHandlers[meta];
+  }
 
     public ItemBlock getItemBlock() {
         return itemBlock;
@@ -90,24 +95,28 @@ public class Block {
         return id;
     }
 
-    // ===== Mining logic =====
-    public boolean canMine(ItemStack itemStack) {
-        if (itemStack == null || !(itemStack.item instanceof ItemTool)) return miningOther;
-        ItemTool itemTool = ((ItemTool) itemStack.item);
-        if (itemTool.getToolType() != miningTool) return miningOther;
-        return miningOther || miningToolLevel >= itemTool.getToolLevel();
-    }
+  // block mining
+  public boolean canMine(ItemStack itemStack) {
+    if (itemStack == null || !(itemStack.item instanceof ItemTool))
+      return miningOther;
+    ItemTool itemTool = ((ItemTool) itemStack.item);
+    if (itemTool.getToolType() != miningTool)
+      return miningOther;
+    return miningOther || miningToolLevel >= itemTool.getToolLevel();
+  }
 
     public float getMiningTime() {
         return miningTime;
     }
 
-    public float getMiningSpeed(ItemStack itemStack) {
-        if (itemStack == null || !(itemStack.item instanceof ItemTool)) return 1f;
-        ItemTool itemTool = ((ItemTool) itemStack.item);
-        if (itemTool.getToolType() != miningTool) return 1f;
-        return itemTool.getToolLevel() * 2;
-    }
+  public float getMiningSpeed(ItemStack itemStack) {
+    if (itemStack == null || !(itemStack.item instanceof ItemTool))
+      return 1f;
+    ItemTool itemTool = ((ItemTool) itemStack.item);
+    if (itemTool.getToolType() != miningTool)
+      return 1f;
+    return itemTool.getToolLevel() * 2;
+  }
 
     // ===== Interaction / world behavior =====
     public boolean onButtonPress(ClickType type, Player player, int blockX, int blockY, int blockZ) {
@@ -122,32 +131,39 @@ public class Block {
         return false;
     }
 
-    public void randomTick(World world, Area area, int x, int y, int z, int meta) { }
+  // coordinates inside area
+  public void randomTick(World world, Area area, int x, int y, int z, int meta) {
+  }
 
-    public void dropItems(World world, int x, int y, int z, int meta) {
-        if (Side.isClient()) return;
-        ItemStack[] drops = drops(world, x, y, z, meta);
-        for (ItemStack drop : drops) {
-            ItemEntity itemEntity = new ItemEntity();
-            itemEntity.itemStack = drop;
-            itemEntity.position.set(x + 0.5f, y, z + 0.5f);
-            world.addEntity(itemEntity);
-        }
+  public void dropItems(World world, int x, int y, int z, int meta) {
+    if (Side.isClient())
+      return;
+    ItemStack[] drops = drops(world, x, y, z, meta);
+    for (ItemStack drop : drops) {
+      ItemEntity itemEntity = new ItemEntity();
+      itemEntity.itemStack = drop;
+      itemEntity.position.set(x + 0.5f, y, z + 0.5f);
+      world.addEntity(itemEntity);
     }
+  }
 
     public Integer place(World world, int x, int y, int z, int meta, Player player, BlockIntersection intersection) {
         return meta;
     }
 
-    public ItemStack[] drops(World world, int x, int y, int z, int meta) {
-        return new ItemStack[]{new ItemStack(getItemBlock(), 1, meta)};
-    }
+  public ItemStack[] drops(World world, int x, int y, int z, int meta) {
+    return new ItemStack[] { new ItemStack(getItemBlock(), 1, meta) };
+  }
 
     public BlockRenderType renderType(int meta) {
         return BlockRenderType.DEFAULT;
     }
 
-    public boolean renderFace(BlockFace blockFace, int neighbourIDAndMeta) {
-        return TransparencyManager.isTransparent(neighbourIDAndMeta);
-    }
+  public boolean renderFace(BlockFace blockFace, int neighbourIDAndMeta) {
+    return TransparencyManager.isTransparent(neighbourIDAndMeta);
+  }
+
+  public <R> R accept(BlockVisitor<R> visitor) {
+    return visitor.visitBlock(this);
+  }
 }

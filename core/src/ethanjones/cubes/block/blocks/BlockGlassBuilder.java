@@ -11,7 +11,7 @@ public class BlockGlassBuilder extends BlockBuilder<BlockGlass, BlockGlassBuilde
 
     @Override
     public BlockGlass build() {
-        BlockGlass glass = new BlockGlass(id);
+        BlockGlass glass = new BlockGlass();
         glass.miningTime = this.miningTime;
         glass.miningTool = this.miningTool;
         glass.miningToolLevel = this.miningToolLevel;

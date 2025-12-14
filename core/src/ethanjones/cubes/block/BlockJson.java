@@ -1,5 +1,6 @@
 package ethanjones.cubes.block;
 
+import ethanjones.cubes.block.BlockJson.MetaElementParser;
 import ethanjones.cubes.core.id.IDManager;
 import ethanjones.cubes.core.json.JsonException;
 import ethanjones.cubes.core.system.CubesException;
@@ -15,6 +16,8 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonObject.Member;
 import com.eclipsesource.json.JsonValue;
+import ethanjones.cubes.graphics.world.block.BlockTextureHandlers;
+
 
 import java.util.Arrays;
 
@@ -168,24 +171,30 @@ public class BlockJson {
     }
 
     @Override
-    public void loadGraphics() {
-      if (textures == null) {
-        super.loadGraphics();
-        return;
+public void loadGraphics() {
+  super.loadGraphics();
+
+  if (textures == null) return;
+
+  textureHandlers = new BlockTextureHandler[textures.length];
+
+  for (int m = 0; m < textures.length; m++) {
+    if (textures[m] == null || textures[m].length == 0) continue;
+
+    // First texture is the default for all sides
+    BlockTextureHandler handler = BlockTextureHandlers.uniform(textures[m][0]);
+
+    // If 6 textures provided, override faces 1..5 (matches your original logic)
+    if (textures[m].length == 6) {
+      for (int s = 1; s < 6; s++) {
+        handler = BlockTextureHandlers.withSide(handler, BlockFace.values()[s], textures[m][s]);
       }
-      textureHandlers = new BlockTextureHandler[meta];
-      for (int m = 0; m < textureHandlers.length; m++) {
-        textureHandlers[m] = new BlockTextureHandler(textures[m][0]);
-        if (textures[m].length == 6) {
-          for (int s = 1; s < textures[m].length; s++) {
-            textureHandlers[m].setSide(s, textures[m][s]);
-          }
-        } else {
-          throw new CubesException("Invalid JBlock.textures length for id \"" + id + "\"");
-        }
-      }
-      textures = null;
     }
+
+    textureHandlers[m] = handler;
+  }
+}
+
 
     @Override
     public int getLightLevel(int meta) {

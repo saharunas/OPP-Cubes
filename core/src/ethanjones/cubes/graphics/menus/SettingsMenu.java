@@ -2,8 +2,8 @@ package ethanjones.cubes.graphics.menus;
 
 import ethanjones.cubes.core.localization.Localization;
 import ethanjones.cubes.core.platform.Adapter;
-import ethanjones.cubes.core.settings.Setting;
 import ethanjones.cubes.core.settings.SettingGroup;
+import ethanjones.cubes.core.settings.SettingNode;
 import ethanjones.cubes.core.settings.Settings;
 import ethanjones.cubes.core.settings.VisualSettingManager;
 import ethanjones.cubes.core.system.CubesException;
@@ -17,7 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.utils.Align;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import static ethanjones.cubes.graphics.Graphics.GUI_WIDTH;
 
@@ -69,24 +68,15 @@ public class SettingsMenu extends Menu implements VisualSettingManager {
 
     table = new Table(skin);
 
-    for (Map.Entry<String, SettingGroup> entry : settingGroup.getChildGroups().entrySet()) {
-      if (!entry.getValue().shouldDisplay()) continue;
-      Label name = new Label(Settings.getLocalisedSettingGroupName(entry.getKey()), skin);
+        for (SettingNode node : settingGroup.getChildren()) {
+      if (!node.shouldDisplay()) continue;
+
+      String key = node.getKey();
+
+      Label name = new Label(Settings.getLocalisedSettingGroupName(key), skin);
       name.setAlignment(Align.left, Align.left);
 
-      Actor actor = entry.getValue().getActor(this);
-
-      listObjects.add(new ListObject(name, actor));
-    }
-
-    for (String str : settingGroup.getChildren()) {
-      Setting setting = Settings.getSetting(str);
-      if (!setting.shouldDisplay()) continue;
-
-      Label name = new Label(Settings.getLocalisedSettingGroupName(str), skin);
-      name.setAlignment(Align.left, Align.left);
-
-      Actor actor = setting.getActor(str, this);
+      Actor actor = node.getActor(this);
 
       listObjects.add(new ListObject(name, actor));
     }

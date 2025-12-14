@@ -31,9 +31,19 @@ import ethanjones.cubes.world.storage.Area;
 import ethanjones.cubes.world.thread.GenerationTask;
 import ethanjones.cubes.world.thread.WorldLockable;
 import ethanjones.cubes.world.thread.WorldRequestParameter;
+import ethanjones.cubes.side.server.observers.PlayerStateObserver;
 
 import com.badlogic.gdx.math.Vector3;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Pattern: Observer (Subject)
+ * Observers can register to receive notifications about:
+ * - Position changes
+ * - Area changes
+ * - Player disconnection
+ */
 public class PlayerManager {
   
   public final ClientIdentifier client;
@@ -46,6 +56,39 @@ public class PlayerManager {
   private int loadDistance;
   public ClickType clickType;
   private RainStatus lastSentRainStatus = RainStatus.NOT_RAINING;
+  
+  private final List<PlayerStateObserver> observers = new ArrayList<>();
+  
+  public void registerObserver(PlayerStateObserver observer) {
+    if (!observers.contains(observer)) {
+      observers.add(observer);
+    }
+  }
+  
+  public void unregisterObserver(PlayerStateObserver observer) {
+    observers.remove(observer);
+  }
+  
+  private void notifyPositionChanged(Vector3 oldPosition, Vector3 newPosition) {
+    String playerId = client.getPlayer().uuid.toString();
+    for (PlayerStateObserver observer : observers) {
+      observer.onPositionChanged(playerId, oldPosition, newPosition);
+    }
+  }
+  
+  private void notifyAreaChanged(AreaReference oldArea, AreaReference newArea) {
+    String playerId = client.getPlayer().uuid.toString();
+    for (PlayerStateObserver observer : observers) {
+      observer.onAreaChanged(playerId, oldArea, newArea);
+    }
+  }
+  
+  private void notifyPlayerDisconnected() {
+    String playerId = client.getPlayer().uuid.toString();
+    for (PlayerStateObserver observer : observers) {
+      observer.onPlayerDisconnected(playerId);
+    }
+  }
   
   public PlayerManager(ClientIdentifier clientIdentifier, PacketConnect packetConnect) {
     this.server = Cubes.getServer();
@@ -80,7 +123,14 @@ public class PlayerManager {
     packetOtherPlayerConnected.uuid = client.getPlayer().uuid;
     packetOtherPlayerConnected.position = client.getPlayer().position;
     packetOtherPlayerConnected.angle = client.getPlayer().angle;
+    packetOtherPlayerConnected.skinColor = client.getPlayer().getSkinColor();
     NetworkingManager.sendPacketToOtherClients(packetOtherPlayerConnected, client);
+    
+    // Send new player's inventory to other clients so they can render tools
+    PacketOtherPlayerInventory newPlayerInv = new PacketOtherPlayerInventory();
+    newPlayerInv.playerUUID = client.getPlayer().uuid;
+    newPlayerInv.inv = clientIdentifier.getPlayer().getInventory().write();
+    NetworkingManager.sendPacketToOtherClients(newPlayerInv, client);
     
     for (ClientIdentifier c : Cubes.getServer().getAllClients()) {
       if (c == client || c == null) continue;
@@ -89,7 +139,14 @@ public class PlayerManager {
       popc.uuid = c.getPlayer().uuid;
       popc.position = c.getPlayer().position;
       popc.angle = c.getPlayer().angle;
+      popc.skinColor = c.getPlayer().getSkinColor();
       NetworkingManager.sendPacketToClient(popc, client);
+      
+      // Send existing player's inventory to new client so they can render tools
+      PacketOtherPlayerInventory existingPlayerInv = new PacketOtherPlayerInventory();
+      existingPlayerInv.playerUUID = c.getPlayer().uuid;
+      existingPlayerInv.inv = c.getPlayer().getInventory().write();
+      NetworkingManager.sendPacketToClient(existingPlayerInv, client);
     }
     
     clientIdentifier.getPlayer().addToWorld();
@@ -143,6 +200,8 @@ public class PlayerManager {
   
   public void setPosition(Vector3 newPosition, Vector3 newAngle, boolean clientKnows) {
     synchronized (this) {
+      Vector3 oldPosition = client.getPlayer().position.cpy();
+      
       if (newPosition != null) {
         float x = newPosition.x, y = newPosition.y, z = newPosition.z;
         if (new PlayerMovementEvent(client.getPlayer(), newPosition).post().isCanceled()) {
@@ -189,10 +248,13 @@ public class PlayerManager {
         }
         
         playerArea.setFromAreaReference(newRef);
+        notifyAreaChanged(oldRef, newRef);
       }
       
       client.getPlayer().position.set(newPosition);
       client.getPlayer().angle.set(newAngle);
+      
+      notifyPositionChanged(oldPosition, newPosition);
       
       if (client.getPlayer().position.y < -10f) teleportToSpawn();
       
@@ -298,6 +360,8 @@ public class PlayerManager {
   }
   
   public void disconnected() {
+    notifyPlayerDisconnected();
+    
     Cubes.getServer().world.save.writePlayer(client.getPlayer());
     Cubes.getServer().world.removeEntity(client.getPlayer().uuid);
     ((WorldServer) Cubes.getServer().world).removeLoadedAreaFilter(client.getPlayer());

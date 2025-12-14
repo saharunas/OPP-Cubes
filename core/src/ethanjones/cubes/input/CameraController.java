@@ -6,10 +6,12 @@ import ethanjones.cubes.core.event.entity.living.player.PlayerMovementEvent;
 import ethanjones.cubes.core.settings.Keybinds;
 import ethanjones.cubes.core.settings.Settings;
 import ethanjones.cubes.entity.living.player.Player;
+import ethanjones.cubes.input.movement.PlayerMovementContext;
 import ethanjones.cubes.networking.NetworkingManager;
 import ethanjones.cubes.networking.packets.PacketPlayerMovement;
 import ethanjones.cubes.networking.packets.PacketThrowItem;
 import ethanjones.cubes.side.common.Cubes;
+import ethanjones.cubes.world.World;
 import ethanjones.cubes.world.gravity.WorldGravity;
 import ethanjones.cubes.world.save.Gamemode;
 
@@ -20,12 +22,22 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 
+/**
+ * Camera controller with State Pattern for movement
+ * 
+ * AFTER State Pattern:
+ * - Uses PlayerMovementContext to manage movement states
+ * - 4 states: Walking (4.5), Sprinting (7.0), Crouching (2.0), Flying (10.0)
+ * - Easy to add new states without modifying this class
+ * - State transitions handled by state objects themselves
+ */
 public class CameraController extends InputAdapter {
 
   public static final float JUMP_START_VELOCITY = 5f;
   public static final float JUMP_RELEASE_VELOCITY = 2f;
-  public static final float walkSpeed = 4.5f;
-  public static final float flySpeed = 10f;
+  
+  // State Pattern: Movement context manages all states and speed
+  private final PlayerMovementContext movementContext = new PlayerMovementContext();
   
   private float degreesPerPixel = Settings.getFloatSettingValue(Settings.INPUT_MOUSE_SENSITIVITY) / 3;
   
@@ -40,7 +52,6 @@ public class CameraController extends InputAdapter {
   
   private final Camera camera;
   private boolean jumping = false;
-  private boolean flying = false;
   private long lastJumpDown = 0;
   private boolean wasJumpDown = false;
 
@@ -91,7 +102,7 @@ public class CameraController extends InputAdapter {
   }
   
   private boolean handled(int keycode) {
-    return keycode == Keybinds.getCode(Keybinds.KEYBIND_FORWARD) || keycode == Keybinds.getCode(Keybinds.KEYBIND_BACK) || keycode == Keybinds.getCode(Keybinds.KEYBIND_LEFT) || keycode == Keybinds.getCode(Keybinds.KEYBIND_RIGHT) || keycode == Keybinds.getCode(Keybinds.KEYBIND_JUMP) || keycode == Keybinds.getCode(Keybinds.KEYBIND_DESCEND);
+    return keycode == Keybinds.getCode(Keybinds.KEYBIND_FORWARD) || keycode == Keybinds.getCode(Keybinds.KEYBIND_BACK) || keycode == Keybinds.getCode(Keybinds.KEYBIND_LEFT) || keycode == Keybinds.getCode(Keybinds.KEYBIND_RIGHT) || keycode == Keybinds.getCode(Keybinds.KEYBIND_JUMP) || keycode == Keybinds.getCode(Keybinds.KEYBIND_DESCEND) || keycode == Keybinds.getCode(Keybinds.KEYBIND_SPRINT) || keycode == Keybinds.getCode(Keybinds.KEYBIND_CROUCH);
   }
   
   public void update() {
@@ -121,7 +132,16 @@ public class CameraController extends InputAdapter {
   private void update(float forward, float backward, float left, float right, boolean jump, boolean descend) {
     float deltaTime = Gdx.graphics.getRawDeltaTime();
     if (deltaTime == 0f) return;
-    float speed = flying() ? flySpeed : walkSpeed;
+    
+    // State Pattern: Update movement state based on input
+    boolean onBlock = (!Cubes.getClient().player.noClip()) && WorldGravity.onBlock(Cubes.getClient().world, Cubes.getClient().player.position, Player.PLAYER_HEIGHT, Player.PLAYER_RADIUS);
+    boolean isSprintPressed = Keybinds.isPressed(Keybinds.KEYBIND_SPRINT);
+    boolean isCrouchPressed = Keybinds.isPressed(Keybinds.KEYBIND_CROUCH);
+    movementContext.updateState(isSprintPressed, isCrouchPressed, onBlock);
+    
+    // State Pattern: Get speed from current state
+    float speed = movementContext.getCurrentSpeed();
+    
     tmpMovement.setZero();
     if (forward > 0) {
       tmp.set(camera.direction.x, 0, camera.direction.z).nor().nor().scl(deltaTime * speed * forward);
@@ -139,17 +159,23 @@ public class CameraController extends InputAdapter {
       tmp.set(camera.direction.x, 0, camera.direction.z).crs(camera.up).nor().scl(deltaTime * speed * right);
       tmpMovement.add(tmp);
     }
-    tryMove();
-    boolean onBlock = (!Cubes.getClient().player.noClip()) && WorldGravity.onBlock(Cubes.getClient().world, Cubes.getClient().player.position, Player.PLAYER_HEIGHT, Player.PLAYER_RADIUS);
+    
+    // State Pattern: Edge protection for crouching (Minecraft-style)
+    if (movementContext.preventsEdgeFall() && onBlock && !tmpMovement.isZero()) {
+      tryMoveWithEdgeProtection();
+    } else {
+      tryMove();
+    }
 
-    if (flying()) {
+    // State Pattern: Vertical movement for flying state
+    if (movementContext.hasVerticalMovement()) {
       if (jump) {
-        tmpMovement.set(0, flySpeed * deltaTime, 0);
+        tmpMovement.set(0, speed * deltaTime, 0); // Use same speed for vertical
         tryMove();
-      } else if (onBlock) {
-        flying = false;
+      } else if (onBlock && !movementContext.isFlyingEnabled()) {
+        movementContext.setFlyingEnabled(false); // Auto-exit flying on landing
       } else if (descend) {
-        tmpMovement.set(0, -flySpeed * deltaTime, 0);
+        tmpMovement.set(0, -speed * deltaTime, 0);
         tryMove();
       }
     } else if (jumping) {
@@ -158,16 +184,24 @@ public class CameraController extends InputAdapter {
         jumping = false;
       }
     } else {
-      if (jump && onBlock) {
+      // Regular jump on ground
+      if (jump && onBlock && movementContext.canJump()) {
         Cubes.getClient().player.motion.y = JUMP_START_VELOCITY;
         jumping = true;
+        
+        // State Pattern: Jumping from sprint/crouch → back to walking
+        // This MUST happen BEFORE double-jump check to block flying from sprint
+        if (!movementContext.getCurrentStateName().equals("Walking") && !movementContext.isFlying()) {
+          movementContext.setState(movementContext.getWalkingState());
+        }
       }
     }
-    if (jump && !wasJumpDown && Cubes.getClient().gamemode == Gamemode.creative) {
+    if (jump && !wasJumpDown && Cubes.getClient().gamemodeStrategy.canFly()) {
       long time = System.currentTimeMillis();
       long delta = time - lastJumpDown;
-      if (delta <= 500) {
-        flying = !flying;
+      if (delta <= 500 && movementContext.canTransitionToFlying()) {
+        // This is a double-jump AND current state allows flying
+        movementContext.toggleFlying();
         lastJumpDown = 0;
       } else {
         lastJumpDown = time;
@@ -199,6 +233,48 @@ public class CameraController extends InputAdapter {
     }
     tmpMovement.setZero();
   }
+  
+  /**
+   * Minecraft-style edge protection for crouching
+   * Prevents player from walking off block edges while crouching
+   */
+  private void tryMoveWithEdgeProtection() {
+    if (tmpMovement.isZero()) return;
+    
+    Vector3 originalPos = new Vector3(camera.position);
+    Vector3 targetPos = new Vector3(camera.position).add(tmpMovement);
+    
+    World world = Cubes.getClient().world;
+    Player player = Cubes.getClient().player;
+    
+    // Check if there's ground under target position
+    boolean hasGroundAtTarget = WorldGravity.onBlock(world, targetPos, Player.PLAYER_HEIGHT, Player.PLAYER_RADIUS);
+    
+    // If moving would cause falling, prevent horizontal movement
+    if (!hasGroundAtTarget) {
+      // Try X-axis movement only
+      Vector3 xOnly = new Vector3(originalPos).add(tmpMovement.x, 0, 0);
+      boolean hasGroundX = WorldGravity.onBlock(world, xOnly, Player.PLAYER_HEIGHT, Player.PLAYER_RADIUS);
+      
+      // Try Z-axis movement only
+      Vector3 zOnly = new Vector3(originalPos).add(0, 0, tmpMovement.z);
+      boolean hasGroundZ = WorldGravity.onBlock(world, zOnly, Player.PLAYER_HEIGHT, Player.PLAYER_RADIUS);
+      
+      // Allow movement on axes that don't cause falling
+      if (hasGroundX) {
+        tmpMovement.set(tmpMovement.x, tmpMovement.y, 0);
+      } else if (hasGroundZ) {
+        tmpMovement.set(0, tmpMovement.y, tmpMovement.z);
+      } else {
+        // Both axes would cause falling - no movement
+        tmpMovement.setZero();
+        return;
+      }
+    }
+    
+    // Proceed with movement if safe
+    tryMove();
+  }
 
   public void tick() {
     Player player = Cubes.getClient().player;
@@ -210,7 +286,21 @@ public class CameraController extends InputAdapter {
   }
 
   public boolean flying() {
-    return flying || Cubes.getClient().player.noClip();
+    return movementContext.isFlying() || Cubes.getClient().player.noClip();
+  }
+  
+  /**
+   * Gets the current movement state name (for debugging/display)
+   */
+  public String getMovementStateName() {
+    return movementContext.getCurrentStateName();
+  }
+  
+  /**
+   * Gets the movement context (for testing/debugging)
+   */
+  public PlayerMovementContext getMovementContext() {
+    return movementContext;
   }
 }
 

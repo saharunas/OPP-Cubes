@@ -2,15 +2,20 @@ package ethanjones.cubes.side.server.command;
 
 import ethanjones.cubes.core.localization.Localization;
 import ethanjones.cubes.core.logging.Log;
+import ethanjones.cubes.side.server.command.parsing.CommandExpression;
 import ethanjones.cubes.side.server.commands.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class CommandManager {
 
   public static HashMap<String, CommandBuilder> commands = new HashMap<String, CommandBuilder>();
+  
+  // Interpreter Pattern: NonTerminalExpression for parsing commands
+  private static final CommandExpression commandParser = new CommandExpression();
 
   protected static void register(CommandBuilder commandBuilder) {
     if (!commands.containsKey(commandBuilder.getCommandString())) {
@@ -19,9 +24,15 @@ public class CommandManager {
   }
 
   public static void run(String command, CommandSender commandSender) {
-    if (command == null || commandSender == null) return;
+
+    
+    // AFTER Interpreter Pattern: Use proper parsing with quote and escape support
+    if (command == null || commandSender == null)
+      return;
     ArrayList<String> arg = new ArrayList<String>();
-    arg.addAll(Arrays.asList(command.split("  *")));
+    List<String> tokens = commandParser.parseTokens(command);
+    arg.addAll(tokens);
+    
     if (arg.size() == 0 || !commands.containsKey(arg.get(0))) {
       unknownCommand(commandSender);
       return;
@@ -34,11 +45,13 @@ public class CommandManager {
     }
   }
 
-  private static boolean check(CommandSender sender, CommandBuilder commandBuilder, ArrayList<String> arg, ArrayList<CommandArgument> arguments, int i, String str) {
+  private static boolean check(CommandSender sender, CommandBuilder commandBuilder, ArrayList<String> arg,
+      ArrayList<CommandArgument> arguments, int i, String str) {
     boolean success = false;
     if (i < arg.size()) {
       for (CommandBuilder builder : commandBuilder.getChildren()) {
-        if (success) break;
+        if (success)
+          break;
         String a = arg.get(i);
         try {
           if (builder.getCommandString() != null) {
@@ -102,6 +115,10 @@ public class CommandManager {
     TimeCommand.init();
     RainCommand.init();
     NoClipCommand.init();
+    SkinCommand.init();
+    GamemodeCommand.init();
+    InventoryCommand.init();
+    BlockInfoCommand.init();
 
     StopCommand.init();
     ThreadDumpCommand.init();
