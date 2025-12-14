@@ -1,5 +1,7 @@
 package ethanjones.cubes.input;
 
+import ethanjones.cubes.core.GameContext;
+import ethanjones.cubes.core.command.CommandManager;
 import ethanjones.cubes.core.event.entity.living.player.PlayerMovementEvent;
 import ethanjones.cubes.core.settings.Keybinds;
 import ethanjones.cubes.core.settings.Settings;
@@ -211,6 +213,14 @@ public class CameraController extends InputAdapter {
     Cubes.getClient().player.updatePosition(deltaTime);
     
     if (Keybinds.isJustPressed(Keybinds.KEYBIND_THROW)) NetworkingManager.sendPacketToServer(new PacketThrowItem());
+
+      if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.Z)) {
+          GameContext.commandManager.undo();
+      }
+
+      if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.Y)) {
+          GameContext.commandManager.redo();
+      }
 
     camera.update(true);
   }

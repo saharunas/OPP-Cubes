@@ -32,17 +32,17 @@ public class BlockChest extends Block {
   private static final BlockFace[] lockFace = new BlockFace[] { BlockFace.posX, BlockFace.negX, BlockFace.posZ,
       BlockFace.negZ };
 
-  public BlockChest() {
-    super("core:chest");
+    public BlockChest(String id) {
+        super(id);
 
-    miningTime = 3;
-    miningTool = ToolType.axe;
-    miningOther = true;
-  }
+        miningTime = 3f;
+        miningTool = ToolType.axe;
+        miningOther = true;
+    }
 
-  @Override
-  public void loadGraphics() {
-    textureHandlers = new BlockTextureHandler[4];
+    @Override
+    public void loadGraphics() {
+        textureHandlers = new BlockTextureHandler[4];
 
     for (int i = 0; i < textureHandlers.length; i++) {
       BlockTextureHandler handler = BlockTextureHandlers.uniform("core:chest_side")
@@ -53,15 +53,15 @@ public class BlockChest extends Block {
     }
   }
 
-  @Override
-  public boolean blockData() {
-    return true;
-  }
+    @Override
+    public boolean blockData() {
+        return true;
+    }
 
-  @Override
-  public BlockData createBlockData(Area area, int x, int y, int z, int meta, DataGroup dataGroup) {
-    return new BlockDataChest(area, x, y, z);
-  }
+    @Override
+    public BlockData createBlockData(Area area, int x, int y, int z, int meta, DataGroup dataGroup) {
+        return new BlockDataChest(area, x, y, z);
+    }
 
   @Override
   public boolean onButtonPress(ClickType type, Player player, int blockX, int blockY, int blockZ) {
@@ -76,21 +76,21 @@ public class BlockChest extends Block {
     return true;
   }
 
-  @Override
-  public Integer place(World world, int x, int y, int z, int meta, Player player, BlockIntersection intersection) {
-    Vector3 pos = player.position.cpy();
-    pos.sub(x, y, z);
-    pos.nor();
-    BlockFace blockFace = VectorUtil.directionXZ(pos);
-    if (blockFace == BlockFace.negX) {
-      return 1;
-    } else if (blockFace == BlockFace.posZ) {
-      return 2;
-    } else if (blockFace == BlockFace.negZ) {
-      return 3;
+    @Override
+    public Integer place(World world, int x, int y, int z, int meta, Player player, BlockIntersection intersection) {
+        Vector3 pos = player.position.cpy();
+        pos.sub(x, y, z);
+        pos.nor();
+        BlockFace blockFace = VectorUtil.directionXZ(pos);
+        if (blockFace == BlockFace.negX) {
+            return 1;
+        } else if (blockFace == BlockFace.posZ) {
+            return 2;
+        } else if (blockFace == BlockFace.negZ) {
+            return 3;
+        }
+        return 0;
     }
-    return 0;
-  }
 
   @Override
   public ItemStack[] drops(World world, int x, int y, int z, int meta) {

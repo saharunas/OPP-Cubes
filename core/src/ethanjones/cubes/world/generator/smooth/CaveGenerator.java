@@ -1,318 +1,281 @@
 package ethanjones.cubes.world.generator.smooth;
 
-import ethanjones.cubes.side.common.Cubes;
 import ethanjones.cubes.world.reference.AreaReference;
 import ethanjones.cubes.world.reference.BlockReference;
-import ethanjones.cubes.world.server.WorldServer;
 import ethanjones.cubes.world.storage.Area;
-
-import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.math.RandomXS128;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static ethanjones.cubes.world.generator.smooth.SmoothWorld.minSurfaceHeight;
-import static ethanjones.cubes.world.generator.smooth.SmoothWorld.murmurHash3;
-
 public class CaveGenerator {
-  public static final int roomNodesMin = 25;
-  public static final int roomNodesMax = 100;
-  public static final int roomChangeXZConstant = 10;
-  public static final int roomChangeXZRandom = 20;
-  public static final int roomChangeY = 15;
-  public static final int roomConnectDistance2Min = 20 * 20;
-  public static final int roomConnectDistance2Max = 40 * 40;
 
-  public final int caveStartX;
-  public final int caveStartY;
-  public final int caveStartZ;
+    public static final int roomNodesMin = 25;
+    public static final int roomNodesMax = 100;
+    private static final boolean DEBUG_COPIES = true;
 
-  private final SmoothWorld smoothWorld;
-  private final RandomXS128 numbers;
-  private final IntSet intSet;
+    private final int caveStartX;
+    private final int caveStartY;
+    private final int caveStartZ;
 
-  private final HashMap<AreaReference, IntArray> blocks = new HashMap<AreaReference, IntArray>();
-  private final ArrayList<RoomNode> rooms = new ArrayList<RoomNode>();
-  private final ArrayList<TunnelNode> tunnels = new ArrayList<TunnelNode>();
+    private final SmoothWorld smoothWorld;
+    private final RandomXS128 numbers;
+    private final IntSet intSet;
 
-  public CaveGenerator(int x, int z, SmoothWorld smoothWorld) {
-    this.caveStartX = x;
-    this.caveStartY = smoothWorld.getSurfaceHeight(x, z);
-    this.caveStartZ = z;
+    // === Prototypes ===
+    private final RoomNode roomPrototype;
+    private final TunnelNode tunnelPrototype;
 
-    this.smoothWorld = smoothWorld;
-    long l = x + z + (x * (x - 1)) + (z * (z + 1)) + (long) Math.pow(x, z > 0 ? z : (z < 0 ? -z : 1));
-    this.numbers = new RandomXS128(smoothWorld.baseSeed, murmurHash3(smoothWorld.baseSeed + murmurHash3(l)));
-    this.intSet = new IntSet(roomNodesMax);
-  }
+    // === Data ===
+    private final HashMap<AreaReference, IntArray> blocks = new HashMap<>();
+    private final ArrayList<RoomNode> rooms = new ArrayList<>();
+    private final ArrayList<TunnelNode> tunnels = new ArrayList<>();
 
-  public Cave generate() {
-    int spawnDist = (int) distanceFromSpawn(caveStartX, caveStartZ);
-    //Log.debug("Generating new cave at " + caveStartX + "," + caveStartZ + " (" + spawnDist + " blocks from spawn)");
-    generateNodes();
-    calculateBlocks();
+    // === Constructor ===
+    public CaveGenerator(int x, int z, SmoothWorld smoothWorld) {
+        this.caveStartX = x;
+        this.caveStartY = smoothWorld.getSurfaceHeight(x, z);
+        this.caveStartZ = z;
+        this.smoothWorld = smoothWorld;
 
-    Cave cave = new Cave(caveStartX, caveStartY, caveStartZ, new HashMap<AreaReference, int[]>() {{
-      for (Map.Entry<AreaReference, IntArray> entry : blocks.entrySet()) {
-        this.put(entry.getKey(), entry.getValue().toArray());
-      }
-    }});
+        long seedOffset = x + z + (x * (x - 1)) + (z * (z + 1)) + (long) Math.pow(x, z > 0 ? z : (z < 0 ? -z : 1));
+        this.numbers = new RandomXS128(smoothWorld.baseSeed,
+                SmoothWorld.murmurHash3(smoothWorld.baseSeed + SmoothWorld.murmurHash3(seedOffset)));
+        this.intSet = new IntSet(roomNodesMax);
 
-    return cave;
-  }
-
-  private void clear(int blockX, int blockY, int blockZ) {
-    if (blockY <= 0) return;
-    AreaReference areaReference = new AreaReference().setFromBlockCoordinates(blockX, blockZ);
-    IntArray array = blocks.get(areaReference);
-    if (array == null) {
-      array = new IntArray();
-      blocks.put(areaReference, array);
+        // === Prototype instances ===
+        this.roomPrototype = new RoomNode(new BlockReference().setFromBlockCoordinates(x, caveStartY, z));
+        this.tunnelPrototype = new TunnelNode(
+                new BlockReference().setFromBlockCoordinates(x, caveStartY, z),
+                new BlockReference().setFromBlockCoordinates(x + 10, caveStartY, z)
+        );
     }
-    array.add(Area.getRef(blockX - areaReference.minBlockX(), blockY, blockZ - areaReference.minBlockZ()));
-  }
 
-  public void generateNodes() {
-    // make rooms
-    rooms.add(new RoomNode(caveStartX, caveStartY, caveStartZ, 0, null));
-    int num = 0;
-    while (num <= roomNodesMax) {
-      RoomNode randomNode = rooms.get(numbers.nextInt(rooms.size()));
-      boolean allowSurface = num <= (roomNodesMin / 4);
+    // === Main entry point ===
+    public Cave generate() {
+        generateNodes();
+        calculateBlocks();
 
-      int finalX = randomNode.location.blockX + getRoomChangeXZ(randomNode.location.blockX - caveStartX);
-      int finalZ = randomNode.location.blockZ + getRoomChangeXZ(randomNode.location.blockZ - caveStartZ);
-
-      if (inRange(finalX, finalZ)) {
-        int offsetY = roomChangeY - numbers.nextInt((int) ((roomChangeY * 2.5f) + 1));
-        int finalY = undergroundY(finalX, finalZ, randomNode.location.blockY, offsetY, allowSurface);
-        
-        if (checkRoom(finalX, finalY, finalZ)) {
-          rooms.add(new RoomNode(finalX, finalY, finalZ, 2 + numbers.nextInt(2), randomNode));
+        // Build cave block map
+        HashMap<AreaReference, int[]> caveBlocks = new HashMap<>();
+        for (Map.Entry<AreaReference, IntArray> entry : blocks.entrySet()) {
+            caveBlocks.put(entry.getKey(), entry.getValue().toArray());
         }
-      }
-      if (num >= roomNodesMin && numbers.nextInt((roomNodesMax - roomNodesMin) - num) == 0) break;
-      num++;
+
+        return new Cave(caveStartX, caveStartY, caveStartZ, caveBlocks);
     }
-    // make tunnels
-    ArrayList<TunnelNode> straightTunnels = new ArrayList<TunnelNode>();
-    for (int i = 0; i < rooms.size(); i++) {
-      RoomNode roomNode = rooms.get(i);
-      int roomConnections = 0;
-      
-      if (roomNode.connect != null) {
-        straightTunnels.add(new TunnelNode(roomNode.location, roomNode.connect.location));
-        roomConnections++;
-      }
-      
-      for (int j = 0; j < 10; j++) {
-        RoomNode other = rooms.get(numbers.nextInt(rooms.size()));
-        if (other == roomNode || other == roomNode.connect) continue;
 
-        float roomDistance = distance2(roomNode.location, other.location);
-        if (roomDistance < roomConnectDistance2Min || roomDistance > roomConnectDistance2Max) continue;
-
-        straightTunnels.add(new TunnelNode(roomNode.location, other.location));
-        roomConnections++;
-        if (roomConnections == 2) break;
-      }
+    private static void debug(String msg) {
+        if (DEBUG_COPIES) {
+            System.out.println("[CaveDebug] " + msg);
+        }
     }
-    // make bends in tunnels
-    ArrayList<BlockReference> tunnelSections = new ArrayList<BlockReference>();
-    for (TunnelNode tunnelNode : straightTunnels) {
-      BlockReference a = tunnelNode.start;
-      BlockReference b = tunnelNode.end;
 
-      int dX = a.blockX - b.blockX;
-      int dY = a.blockY - b.blockY;
-      int dZ = a.blockZ - b.blockZ;
-      int dist = (int) Math.sqrt(dX * dX + dY * dX + dZ * dZ);
+    private void generateNodes() {
+        debug("=== Generating Rooms and Tunnels ===");
 
-      int numTurns = 1 + (dist / 7 == 0 ? 0 : numbers.nextInt(dist / 7));
+        // --- Rooms (deep copies) ---
+        for (int i = 0; i < 5; i++) {
+            RoomNode room = roomPrototype.deepCopy();
+            int offsetX = (numbers.nextInt(40) - 20);
+            int offsetZ = (numbers.nextInt(40) - 20);
+            int offsetY = (numbers.nextInt(8) - 4);
+            room.location.offset(offsetX, offsetY, offsetZ);
+            room.size = 3 + numbers.nextInt(3);
+            rooms.add(room);
 
-      tunnelSections.clear();
-      tunnelSections.add(a);
-      for (int i = 1; i <= numTurns; i++) {
-        float f = (float) i / ((float) numTurns + 1f);
-        int x = b.blockX + (int) (dX * f);
-        int y = b.blockY + (int) (dY * f);
-        int z = b.blockZ + (int) (dZ * f);
+            debug(String.format("Room[%d]: loc=%s hash=%d",
+                    i, room.location, System.identityHashCode(room.location)));
+        }
 
-        int randomX = (int) (((4 * numbers.nextFloat()) - 2f) * 4);
-        int randomY = numbers.nextInt(5) - 2;
-        int randomZ = (int) (((4 * numbers.nextFloat()) - 2f) * 4);
+        // --- Connect rooms with tunnels ---
+        for (int i = 0; i < rooms.size() - 1; i++) {
+            RoomNode a = rooms.get(i);
+            RoomNode b = rooms.get(i + 1);
 
-        int finalX = x + randomX;
-        int finalY = y + randomY;
-        int finalZ = z + randomZ;
+            // Deep copy (main tunnel)
+            TunnelNode mainTunnel = tunnelPrototype.deepCopy()
+                    .withEnds(a.location.copy(), b.location.copy());
+            mainTunnel.startRadius = 1.5f + numbers.nextFloat();
+            mainTunnel.endRadius = 1.5f + numbers.nextFloat();
+            tunnels.add(mainTunnel);
 
-        tunnelSections.add(new BlockReference().setFromBlockCoordinates(finalX, finalY, finalZ));
-      }
-      tunnelSections.add(b);
+            debug(String.format(
+                    "MainTunnel[%d]: start=%s (%d) end=%s (%d) | distinct=%s",
+                    i,
+                    mainTunnel.start, System.identityHashCode(mainTunnel.start),
+                    mainTunnel.end, System.identityHashCode(mainTunnel.end),
+                    (mainTunnel.start != mainTunnel.end)
+            ));
 
-      for (int i = 0; i + 1 < tunnelSections.size(); i++) {
-        tunnels.add(new TunnelNode(tunnelSections.get(i), tunnelSections.get(i + 1)));
-      }
-    }
-  }
+            // Shallow copy (side tunnel)
+            if (numbers.nextFloat() < 0.3f) {
+                TunnelNode sideTunnel = mainTunnel.shallowCopy();
+                sideTunnel.startRadius *= 0.6f;
+                sideTunnel.endRadius *= 0.6f;
+                tunnels.add(sideTunnel);
 
-  private void calculateBlocks() {
-    for (RoomNode room : rooms) {
-      int roomX = room.location.blockX;
-      int roomY = room.location.blockY;
-      int roomZ = room.location.blockZ;
-      int r = room.size;
-      int r2 = r * r;
-
-      for (int x = roomX - r; x <= roomX + r; x++) {
-        for (int y = roomY - r; y <= roomY + r; y++) {
-          for (int z = roomZ - r; z <= roomZ + r; z++) {
-            int dX = roomX - x;
-            int dY = roomY - y;
-            int dZ = roomZ - z;
-            if (dX * dX + dY * dY + dZ * dZ <= r2) {
-              clear(x, y, z);
+                debug(String.format(
+                        " ↳ SideTunnel[%d]: shares start=%s (%d) end=%s (%d) | sharedStart=%s sharedEnd=%s",
+                        i,
+                        sideTunnel.start, System.identityHashCode(sideTunnel.start),
+                        sideTunnel.end, System.identityHashCode(sideTunnel.end),
+                        (sideTunnel.start == mainTunnel.start),
+                        (sideTunnel.end == mainTunnel.end)
+                ));
             }
-          }
         }
-      }
     }
 
-    for (TunnelNode tunnel : tunnels) {
-      int r = 2;
-      
-      BlockReference start = tunnel.start, end = tunnel.end;
-      
-      int x1, x2, y1, y2, z1, z2;
-      if (start.blockX < end.blockX) {
-        x1 = start.blockX;
-        x2 = end.blockX;
-      } else {
-        x1 = end.blockX;
-        x2 = start.blockX;
-      }
-      if (start.blockY < end.blockY) {
-        y1 = start.blockY;
-        y2 = end.blockY;
-      } else {
-        y1 = end.blockY;
-        y2 = start.blockY;
-      }
-      if (start.blockZ < end.blockZ) {
-        z1 = start.blockZ;
-        z2 = end.blockZ;
-      } else {
-        z1 = end.blockZ;
-        z2 = start.blockZ;
-      }
-      
-      for (int x = x1; x <= x2; x ++) {
-        for (int y = y1; y <= y2; y ++) {
-          for (int z = z1; z <= z2; z ++) {
-            float a = distance(tunnel.start, x, y, z);
-            float b = distance(tunnel.end, x, y, z);
-            float c = distance(tunnel.start, tunnel.end);
-  
-            float s = (a + b + c) / 2f;
-            float area = (float) Math.sqrt(s * (s - a) * (s - b) * (s - c));
-  
-            float distanceFromLine = (area * 2) / c;
-            
-            float radius = a < b ? tunnel.startRadius : tunnel.endRadius;
-            if (distanceFromLine <= radius) clear(x, y, z);
-          }
+    // === Calculate cleared blocks in caves (restored realism) ===
+    private void calculateBlocks() {
+        // --- Spherical rooms ---
+        for (RoomNode room : rooms) {
+            int roomX = room.location.blockX;
+            int roomY = room.location.blockY;
+            int roomZ = room.location.blockZ;
+            int r = room.size;
+            int r2 = r * r;
+
+            for (int x = roomX - r; x <= roomX + r; x++) {
+                for (int y = roomY - r; y <= roomY + r; y++) {
+                    for (int z = roomZ - r; z <= roomZ + r; z++) {
+                        int dx = roomX - x;
+                        int dy = roomY - y;
+                        int dz = roomZ - z;
+                        if (dx * dx + dy * dy + dz * dz <= r2) {
+                            clear(x, y, z);
+                        }
+                    }
+                }
+            }
         }
-      }
+
+        // --- Curved tunnels ---
+        for (TunnelNode tunnel : tunnels) {
+            BlockReference start = tunnel.start;
+            BlockReference end = tunnel.end;
+
+            int x1 = Math.min(start.blockX, end.blockX);
+            int x2 = Math.max(start.blockX, end.blockX);
+            int y1 = Math.min(start.blockY, end.blockY);
+            int y2 = Math.max(start.blockY, end.blockY);
+            int z1 = Math.min(start.blockZ, end.blockZ);
+            int z2 = Math.max(start.blockZ, end.blockZ);
+
+            for (int x = x1; x <= x2; x++) {
+                for (int y = y1; y <= y2; y++) {
+                    for (int z = z1; z <= z2; z++) {
+                        float a = distance(tunnel.start, x, y, z);
+                        float b = distance(tunnel.end, x, y, z);
+                        float c = distance(tunnel.start, tunnel.end);
+
+                        float s = (a + b + c) / 2f;
+                        float area = (float) Math.sqrt(Math.max(s * (s - a) * (s - b) * (s - c), 0));
+                        float distFromLine = (area * 2f) / Math.max(c, 0.001f);
+
+                        float radius = (a < b) ? tunnel.startRadius : tunnel.endRadius;
+                        if (distFromLine <= radius) {
+                            clear(x, y, z);
+                        }
+                    }
+                }
+            }
+        }
     }
-  }
-  
-  private boolean checkRoom(int x, int y, int z) {
-    int hashCode = 7;
-    hashCode = 31 * hashCode + (x / 20);
-    hashCode = 31 * hashCode + (y / 20);
-    hashCode = 31 * hashCode + (z / 20);
-    return intSet.add(hashCode);
-  }
 
-  private int getRoomChangeXZ(int distance) {
-    int sign = distance < 0 ? -1 : 1;
-
-    float safe = Math.min(CaveManager.caveSafeBlockRadius - (distance * sign), roomChangeXZRandom * 1.5f);
-    float rand = numbers.nextFloat();
-    float value = ((safe + roomChangeXZRandom) * rand) - roomChangeXZRandom;
-
-    return sign * (roomChangeXZConstant + (int) value);
-  }
-
-  private int undergroundY(int x, int z, int prevY, int changeY, boolean allowSurface) {
-    int y = prevY + changeY;
-    if (y < 10) return 10;
-    if (y < minSurfaceHeight) return y;
-
-    int height = smoothWorld.getSurfaceHeight(x, z);
-    while (y > height - (allowSurface ? -1 : 8) && y >= 10)
-      y--;
-    return y;
-  }
-
-  private boolean inRange(int x, int z) {
-    int dX = Math.abs(caveStartX - x);
-    int dZ = Math.abs(caveStartZ - z);
-    return dX < CaveManager.caveSafeBlockRadius && dZ < CaveManager.caveSafeBlockRadius;
-  }
-
-  public float distanceFromSpawn(int x, int z) {
-    BlockReference spawnPoint = smoothWorld.spawnPoint(((WorldServer) Cubes.getServer().world));
-    int dX = x - spawnPoint.blockX;
-    int dZ = z - spawnPoint.blockZ;
-    return (float) Math.sqrt(dX * dX + dZ * dZ);
-  }
-  
-  private static float distance2(BlockReference a, BlockReference b) {
-    int dX = a.blockX - b.blockX;
-    int dY = a.blockY - b.blockY;
-    int dZ = a.blockZ - b.blockZ;
-    return dX * dX + dY * dY + dZ * dZ;
-  }
-
-  private static float distance(BlockReference a, BlockReference b) {
-    int dX = a.blockX - b.blockX;
-    int dY = a.blockY - b.blockY;
-    int dZ = a.blockZ - b.blockZ;
-    return (float) Math.sqrt(dX * dX + dY * dY + dZ * dZ);
-  }
-  
-  private static float distance(BlockReference a, int x2, int y2, int z2) {
-    int dX = a.blockX - x2;
-    int dY = a.blockY - y2;
-    int dZ = a.blockZ - z2;
-    return (float) Math.sqrt(dX * dX + dY * dY + dZ * dZ);
-  }
-
-  private class TunnelNode {
-    BlockReference start;
-    BlockReference end;
-    float startRadius = (float) (1.5f + (numbers.nextFloat() * 1));
-    float endRadius = (float) (1.5f + (numbers.nextFloat() * 1));
-
-    private TunnelNode(BlockReference start, BlockReference end) {
-      this.start = start;
-      this.end = end;
+    // === Helper to clear a block ===
+    private void clear(int blockX, int blockY, int blockZ) {
+        if (blockY <= 0) return;
+        AreaReference ref = new AreaReference().setFromBlockCoordinates(blockX, blockZ);
+        IntArray array = blocks.get(ref);
+        if (array == null) {
+            array = new IntArray();
+            blocks.put(ref, array);
+        }
+        array.add(Area.getRef(blockX - ref.minBlockX(), blockY, blockZ - ref.minBlockZ()));
     }
-  }
 
-  private class RoomNode {
-    BlockReference location;
-    RoomNode connect;
-    int size;
-
-    private RoomNode(int blockX, int blockY, int blockZ, int size, RoomNode connect) {
-      this.location = new BlockReference().setFromBlockCoordinates(blockX, blockY, blockZ);
-      this.connect = connect;
-      this.size = size;
+    // === Utility distance helpers ===
+    private static float distance(BlockReference a, BlockReference b) {
+        int dX = a.blockX - b.blockX;
+        int dY = a.blockY - b.blockY;
+        int dZ = a.blockZ - b.blockZ;
+        return (float) Math.sqrt(dX * dX + dY * dY + dZ * dZ);
     }
-  }
+
+    private static float distance(BlockReference a, int x2, int y2, int z2) {
+        int dX = a.blockX - x2;
+        int dY = a.blockY - y2;
+        int dZ = a.blockZ - z2;
+        return (float) Math.sqrt(dX * dX + dY * dY + dZ * dZ);
+    }
+
+    // === Prototype-based nested classes ===
+    private static class RoomNode implements Cloneable {
+        BlockReference location;
+        int size = 3;
+
+        public RoomNode(BlockReference location) {
+            this.location = location;
+        }
+
+        public RoomNode deepCopy() {
+            RoomNode copy = new RoomNode(location.copy());
+            copy.size = this.size;
+            return copy;
+        }
+
+        public RoomNode withLocation(BlockReference newLoc) {
+            this.location = newLoc;
+            return this;
+        }
+    }
+
+    private static class TunnelNode implements Cloneable {
+        BlockReference start, end;
+        float startRadius = 2f;
+        float endRadius = 2f;
+
+        public TunnelNode(BlockReference start, BlockReference end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public TunnelNode deepCopy() {
+            TunnelNode copy = new TunnelNode(
+                    start != null ? start.copy() : null,
+                    end != null ? end.copy() : null
+            );
+            copy.startRadius = this.startRadius;
+            copy.endRadius = this.endRadius;
+            return copy;
+        }
+
+        public TunnelNode shallowCopy() {
+            // Shared start/end references (same geometry line)
+            TunnelNode copy = new TunnelNode(this.start, this.end);
+            copy.startRadius = this.startRadius;
+            copy.endRadius = this.endRadius;
+            return copy;
+        }
+
+        @Override
+        public TunnelNode clone() {
+            try {
+                return (TunnelNode) super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new AssertionError("TunnelNode cloning failed unexpectedly", e);
+            }
+        }
+
+        public TunnelNode withEnds(BlockReference newStart, BlockReference newEnd) {
+            this.start = newStart;
+            this.end = newEnd;
+            return this;
+        }
+    }
 }

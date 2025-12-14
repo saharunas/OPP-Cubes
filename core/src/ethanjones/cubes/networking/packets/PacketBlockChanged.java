@@ -1,5 +1,8 @@
 package ethanjones.cubes.networking.packets;
 
+import ethanjones.cubes.core.GameContext;
+import ethanjones.cubes.core.command.CommandManager;
+import ethanjones.cubes.core.command.PlaceBlockCommand;
 import ethanjones.cubes.core.id.IDManager;
 import ethanjones.cubes.networking.packet.Packet;
 import ethanjones.cubes.networking.packet.PacketDirection;
@@ -39,7 +42,9 @@ public class PacketBlockChanged extends Packet {
 
   @Override
   public void handlePacket() {
-    Cubes.getClient().world.setBlock(IDManager.toBlock(block), x, y, z);
+      GameContext.commandManager.executeCommand(
+              new PlaceBlockCommand(Cubes.getClient().world, IDManager.toBlock(block), x, y, z, meta)
+      );
   }
 
   @Override

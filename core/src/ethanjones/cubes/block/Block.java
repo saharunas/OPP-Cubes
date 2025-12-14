@@ -26,22 +26,30 @@ public class Block {
 
   private static final int[] ONE_ZERO = new int[] { 0 };
 
-  public String id;
-  public int intID;
-  protected ItemBlock itemBlock;
-  protected BlockTextureHandler[] textureHandlers;
-  // block mining
-  protected float miningTime = 0.5f;
-  protected ItemTool.ToolType miningTool = ItemTool.ToolType.pickaxe;
-  protected int miningToolLevel = 1;
-  protected boolean miningOther = true;
+    public String id;
+    public int intID;
 
-  public Block(String id) {
-    if (!id.contains(":"))
-      throw new IllegalArgumentException(id + " is not in the correct format");
-    this.id = id.toLowerCase();
-    this.itemBlock = new ItemBlock(this);
-  }
+    // the Item form of this block
+    protected ItemBlock itemBlock;
+
+    protected BlockTextureHandler[] textureHandlers;
+
+    // mining characteristics (configurable via builder)
+    public float miningTime = 0.5f;
+    public ItemTool.ToolType miningTool = ItemTool.ToolType.pickaxe;
+    public int miningToolLevel = 1;
+    public boolean miningOther = true;
+
+    /**
+     * Protected so only subclasses/builders can call it.
+     */
+    protected Block(String id) {
+        if (id == null || !id.contains(":"))
+            throw new IllegalArgumentException(id + " is not in the correct format");
+        this.id = id.toLowerCase();
+
+        this.itemBlock = new ItemBlock(this);
+    }
 
   public void loadGraphics() {
     textureHandlers = new BlockTextureHandler[] { BlockTextureHandlers.uniform(id) };
@@ -53,39 +61,39 @@ public class Block {
     return textureHandlers[meta];
   }
 
-  public ItemBlock getItemBlock() {
-    return itemBlock;
-  }
+    public ItemBlock getItemBlock() {
+        return itemBlock;
+    }
 
-  public String getName(int meta) {
-    String s = "block." + id.replaceFirst(":", ".");
-    return Localization.getFirstAvailable(s + "." + meta, s);
-  }
+    public String getName(int meta) {
+        String s = "block." + id.replaceFirst(":", ".");
+        return Localization.getFirstAvailable(s + "." + meta, s);
+    }
 
-  public int getLightLevel(int meta) {
-    return 0;
-  }
+    public int getLightLevel(int meta) {
+        return 0;
+    }
 
-  public boolean alwaysTransparent() {
-    return false; // should be true if isTransparent always return true
-  }
+    public boolean alwaysTransparent() {
+        return false;
+    }
 
-  public boolean canBeTransparent() {
-    return alwaysTransparent(); // should be true if it is possible for isTransparent to return true
-  }
+    public boolean canBeTransparent() {
+        return alwaysTransparent();
+    }
 
-  public boolean isTransparent(int meta) {
-    return alwaysTransparent();
-  }
+    public boolean isTransparent(int meta) {
+        return alwaysTransparent();
+    }
 
-  public int[] displayMetaValues() {
-    return ONE_ZERO;
-  }
+    public int[] displayMetaValues() {
+        return ONE_ZERO;
+    }
 
-  @Override
-  public String toString() {
-    return id;
-  }
+    @Override
+    public String toString() {
+        return id;
+    }
 
   // block mining
   public boolean canMine(ItemStack itemStack) {
@@ -97,9 +105,9 @@ public class Block {
     return miningOther || miningToolLevel >= itemTool.getToolLevel();
   }
 
-  public float getMiningTime() {
-    return miningTime;
-  }
+    public float getMiningTime() {
+        return miningTime;
+    }
 
   public float getMiningSpeed(ItemStack itemStack) {
     if (itemStack == null || !(itemStack.item instanceof ItemTool))
@@ -110,18 +118,18 @@ public class Block {
     return itemTool.getToolLevel() * 2;
   }
 
-  public boolean onButtonPress(ClickType type, Player player, int blockX, int blockY, int blockZ) {
-    return false;
-  }
+    // ===== Interaction / world behavior =====
+    public boolean onButtonPress(ClickType type, Player player, int blockX, int blockY, int blockZ) {
+        return false;
+    }
 
-  // coordinates inside area
-  public BlockData createBlockData(Area area, int x, int y, int z, int meta, DataGroup dataGroup) {
-    return null;
-  }
+    public BlockData createBlockData(Area area, int x, int y, int z, int meta, DataGroup dataGroup) {
+        return null;
+    }
 
-  public boolean blockData() {
-    return false; // true if in any state the block has blockdata
-  }
+    public boolean blockData() {
+        return false;
+    }
 
   // coordinates inside area
   public void randomTick(World world, Area area, int x, int y, int z, int meta) {
@@ -139,17 +147,17 @@ public class Block {
     }
   }
 
-  public Integer place(World world, int x, int y, int z, int meta, Player player, BlockIntersection intersection) {
-    return meta;
-  }
+    public Integer place(World world, int x, int y, int z, int meta, Player player, BlockIntersection intersection) {
+        return meta;
+    }
 
   public ItemStack[] drops(World world, int x, int y, int z, int meta) {
     return new ItemStack[] { new ItemStack(getItemBlock(), 1, meta) };
   }
 
-  public BlockRenderType renderType(int meta) {
-    return BlockRenderType.DEFAULT;
-  }
+    public BlockRenderType renderType(int meta) {
+        return BlockRenderType.DEFAULT;
+    }
 
   public boolean renderFace(BlockFace blockFace, int neighbourIDAndMeta) {
     return TransparencyManager.isTransparent(neighbourIDAndMeta);

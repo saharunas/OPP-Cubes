@@ -1,6 +1,10 @@
 package ethanjones.cubes.core.lua;
 
 import ethanjones.cubes.block.Block;
+import ethanjones.cubes.core.GameContext;
+import ethanjones.cubes.core.command.CommandManager;
+import ethanjones.cubes.core.command.CompositeCommand;
+import ethanjones.cubes.core.command.PlaceBlockCommand;
 import ethanjones.cubes.world.World;
 
 import org.luaj.vm2.LuaUserdata;
@@ -67,7 +71,9 @@ public final class LuaMappingWorld {
       int z = args.checkint(3);
       Block block = (Block) args.checkuserdata(4, Block.class);
       int meta = args.optint(5, 0);
-      world.setBlock(block, x, y, z, meta);
+        GameContext.commandManager.executeCommand(
+                new PlaceBlockCommand(world, block, x, y, z, meta)
+        );
       return NIL;
     }
   };
@@ -83,7 +89,17 @@ public final class LuaMappingWorld {
       int z2 = args.checkint(6);
       Block block = (Block) args.checkuserdata(7, Block.class);
       int meta = args.optint(8, 0);
-      world.setBlocks(block, x1, y1, z1, x2, y2, z2, meta);
+        CompositeCommand composite = new CompositeCommand();
+
+        for (int x = x1; x <= x2; x++) {
+            for (int y = y1; y <= y2; y++) {
+                for (int z = z1; z <= z2; z++) {
+                    composite.add(new PlaceBlockCommand(world, block, x, y, z, meta));
+                }
+            }
+        }
+
+        GameContext.commandManager.executeCommand(composite);
       return NIL;
     }
   };

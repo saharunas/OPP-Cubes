@@ -15,15 +15,14 @@ import ethanjones.cubes.graphics.world.block.BlockTextureHandlers;
 
 public class BlockGrass extends Block {
 
-  public static final int MIN_LIGHT = 10;
+    public static final int MIN_LIGHT = 10;
 
-  public BlockGrass() {
-    super("core:grass");
-
-    miningTime = 0.6f;
-    miningTool = ToolType.shovel;
-    miningOther = true;
-  }
+    public BlockGrass(String id) {
+        super(id);
+        miningTime = 0.6f;
+        miningTool = ToolType.shovel;
+        miningOther = true;
+    }
 
   @Override
   public void loadGraphics() {
