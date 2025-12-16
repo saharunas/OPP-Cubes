@@ -29,4 +29,7 @@ public class PacketQueue {
     }
   }
 
+  public Iterable<Packet> iterableView() {
+    return queue;
+  }
 }

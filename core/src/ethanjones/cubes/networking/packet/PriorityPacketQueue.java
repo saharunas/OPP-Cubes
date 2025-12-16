@@ -3,6 +3,7 @@ package ethanjones.cubes.networking.packet;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.Iterator;
 
 public class PriorityPacketQueue extends PacketQueue {
   private PriorityBlockingQueue<FIFOEntry> queue = new PriorityBlockingQueue<FIFOEntry>();
@@ -49,5 +50,31 @@ public class PriorityPacketQueue extends PacketQueue {
         priority = (num < other.num ? -1 : 1);
       return priority;
     }
+  }
+
+  @Override
+  public Iterable<Packet> iterableView() {
+    return new Iterable<Packet>() {
+      @Override
+      public Iterator<Packet> iterator() {
+        final Iterator<FIFOEntry> it = queue.iterator();
+        return new Iterator<Packet>() {
+          @Override
+          public boolean hasNext() {
+            return it.hasNext();
+          }
+
+          @Override
+          public Packet next() {
+            return it.next().packet;
+          }
+
+          @Override
+          public void remove() {
+            it.remove();
+          }
+        };
+      }
+    };
   }
 }

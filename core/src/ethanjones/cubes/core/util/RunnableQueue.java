@@ -1,5 +1,8 @@
 package ethanjones.cubes.core.util;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,5 +26,19 @@ public class RunnableQueue {
     while ((runnable = q.poll()) != null) {
       runnable.run();
     }
+  }
+
+  public Iterable<Runnable> iterableView() {
+    // snapshot to avoid concurrent modification issues and to avoid changing queue behaviour
+    final List<Runnable> snapshot = new ArrayList<Runnable>();
+    snapshot.addAll(queueA);
+    snapshot.addAll(queueB);
+
+    return new Iterable<Runnable>() {
+      @Override
+      public Iterator<Runnable> iterator() {
+        return snapshot.iterator();
+      }
+    };
   }
 }

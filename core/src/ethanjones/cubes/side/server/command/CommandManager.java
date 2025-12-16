@@ -122,5 +122,9 @@ public class CommandManager {
 
     StopCommand.init();
     ThreadDumpCommand.init();
+
+    IteratorDemoCommand.init();
+
+    IteratorDemoCommand.autoRun();
   }
 }
